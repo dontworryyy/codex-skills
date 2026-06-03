@@ -1,0 +1,59 @@
+[
+  {
+    "name": "agent-role-orchestrator",
+    "path": "skills/agent-role-orchestrator",
+    "status": "active",
+    "source": "local",
+    "summary": "架构先行的多窗口角色编排、继承、交接提示词"
+  },
+  {
+    "name": "authorized-blackbox-web-security",
+    "path": "skills/authorized-blackbox-web-security",
+    "status": "active",
+    "source": "local",
+    "summary": "授权黑盒 Web 安全测试和报告"
+  },
+  {
+    "name": "design-taste-frontend",
+    "path": "skills/design-taste-frontend",
+    "status": "active",
+    "source": "local",
+    "summary": "Landing/作品集/重设计的前端审美防模板化规则"
+  },
+  {
+    "name": "guizang-ppt-skill",
+    "path": "skills/guizang-ppt-skill",
+    "status": "active",
+    "source": "upstream-adapted",
+    "summary": "横向翻页网页 PPT，杂志风和瑞士风模板"
+  },
+  {
+    "name": "hatch-pet",
+    "path": "skills/hatch-pet",
+    "status": "active",
+    "source": "local",
+    "summary": "Codex pet 精灵图生成、修复、校验和打包"
+  },
+  {
+    "name": "pdf",
+    "path": "skills/pdf",
+    "status": "active",
+    "source": "local",
+    "summary": "PDF 读取、生成、渲染校验工作流"
+  },
+  {
+    "name": "playwright",
+    "path": "skills/playwright",
+    "status": "active",
+    "source": "local",
+    "summary": "终端 Playwright CLI 浏览器自动化"
+  },
+  {
+    "name": "startup-pressure-test",
+    "path": "skills/startup-pressure-test",
+    "status": "active",
+    "source": "local",
+    "summary": "创业想法压力测试、MVP 和首批客户计划"
+  }
+]
+

@@ -1,0 +1,15 @@
+.DS_Store
+*.log
+tmp/
+dist/
+node_modules/
+.venv/
+__pycache__/
+.pytest_cache/
+.backup-*/
+generated_images/
+screen_recording/
+*.capture
+*.capture.json
+*.ocr.jsonl
+
