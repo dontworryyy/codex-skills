@@ -6,6 +6,34 @@
 
 推荐先阅读 [角色分工与推荐使用方式](docs/role-usage.md)：本地 Codex 主要承接架构、开发、UI/PPT、视频、安全、测试和 QA；服务器侧 Hermes agent 优先承接运维只读诊断、部署检查和发布验证。
 
+## 快速使用
+
+推荐把这个仓库当成“角色 + skill 工具箱”使用：
+
+| 场景 | 推荐入口 | 运行环境 |
+| --- | --- | --- |
+| 新需求、需求拆分、多窗口协作 | `$agent-role-orchestrator`，先走 `架构` | Codex 本地窗口 |
+| 代码实现、文档修改、测试执行 | `开发` 角色提示词 | Codex 本地窗口 |
+| UI、网页 PPT、社交卡、公众号封面 | `UI/PPT`，按任务路由到 `design-taste-frontend` / `guizang-ppt-skill` / `guizang-social-card-skill` | Codex 本地窗口 |
+| 部署检查、发布验证、日志/cron/服务诊断 | Hermes-owned 运维 skills | 服务器侧 Hermes agent 优先 |
+| 测试用例、测试报告、证据包 | `$test-case-report-builder`，由 `测试` 角色承接 | Codex 本地窗口 |
+| Review readiness、验收缺口、阻塞风险 | `QA` 角色 | Codex 本地窗口 |
+| 授权安全审计 | `authorized-blackbox-web-security` 或 Codex Security 系列 | Codex 本地窗口，必要时低影响远端验证 |
+
+常用调用示例：
+
+```text
+使用 $agent-role-orchestrator，先按架构角色梳理这个需求，并判断是否需要开发/UI/测试/运维窗口。
+```
+
+```text
+使用 $guizang-social-card-skill，把这篇文章做成一套小红书 3:4 图文。
+```
+
+```text
+给 Hermes 运维 agent 一个部署后只读验证提示词，使用 post-deployment-readonly-verification 的边界。
+```
+
 ## Skills
 
 | Skill | 用途 | 来源 | 主要角色 |
@@ -50,6 +78,19 @@
 ├── scripts/
 │   └── validate_public_skills.py
 └── README.md
+```
+
+`skills/` 保持扁平结构：`skills/<skill-name>/SKILL.md`。如果某个 skill 自带 `references/`、`assets/`、`scripts/`、模板或校验脚本，整目录一起复制；不要只复制 `SKILL.md`。
+
+单个 skill 的推荐结构：
+
+```text
+skills/<skill-name>/
+├── SKILL.md               # 必需，frontmatter 至少包含 name 和 description
+├── references/            # 可选，长说明和细分规则
+├── assets/                # 可选，模板、图片、静态资源
+├── scripts/               # 可选，辅助脚本
+└── README.md              # 可选，上游或本仓库说明
 ```
 
 ## 安装
