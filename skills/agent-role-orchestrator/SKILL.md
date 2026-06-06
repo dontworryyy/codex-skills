@@ -93,6 +93,7 @@ For role tools sourced from external GitHub skills or Hermes-owned operational s
 - `架构` engineering plan review / lock-in before downstream windows: `$gstack`;
 - `UI/PPT` landing/redesign/frontend taste work: `$design-taste-frontend`;
 - `UI/PPT` web PPT / Swiss deck / magazine deck work: `$guizang-ppt-skill`;
+- `UI/PPT` Xiaohongshu/Rednote carousel images, social cards, or WeChat cover pairs: `$guizang-social-card-skill`;
 - browser UI verification, rendered frontend checks, and E2E-like flows: `$playwright`;
 - `测试` test cases, Excel workbook, Word/DOCX test report, or formal testing artifact package: `$test-case-report-builder`.
 - `运维` application incident diagnosis: `$application-problem-diagnosis-workflow`;

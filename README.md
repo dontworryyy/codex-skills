@@ -15,6 +15,7 @@
 | `authorized-blackbox-web-security` | 授权黑盒 Web 安全测试和报告 | local | 安全 |
 | `design-taste-frontend` | Landing/作品集/重设计的前端审美防模板化规则 | external-github | UI/PPT |
 | `guizang-ppt-skill` | 横向翻页网页 PPT，杂志风和瑞士风模板 | external-github | UI/PPT |
+| `guizang-social-card-skill` | 小红书/Rednote 图文组图、社交卡和公众号封面对生成 | external-github | UI/PPT |
 | `gstack` | 架构角色使用的 gstack 工程计划审查适配入口 | external-github | 架构 |
 | `gstack-plan-eng-review` | gstack engineering-manager plan review workflow | external-github | 架构 |
 | `hatch-pet` | Codex pet 精灵图生成、修复、校验和打包 | local | UI/PPT / 视频 |

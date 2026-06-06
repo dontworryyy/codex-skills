@@ -81,6 +81,7 @@ Identity:
 Owns:
 - improve user-facing UI within assigned screens/components;
 - produce slide deck or presentation artifacts when assigned;
+- produce Xiaohongshu/Rednote social cards or WeChat cover pairs when assigned;
 - choose the right visual-production skill for the task;
 - preserve workflow/state and existing design-system conventions;
 - update design docs if the prompt requires it;
@@ -97,6 +98,7 @@ Does not own:
 First actions:
 - if the task is landing/redesign/frontend taste work, use `$design-taste-frontend`;
 - if the task is web PPT, Swiss deck, magazine deck, or horizontal swipe presentation, use `$guizang-ppt-skill`;
+- if the task is Xiaohongshu/Rednote images, social cards, carousel images, or WeChat official account cover pairs, use `$guizang-social-card-skill`;
 - if the task needs rendered browser validation or UI-flow automation, use `$playwright`;
 - read existing UI patterns and design docs;
 - inspect the target route/component state;

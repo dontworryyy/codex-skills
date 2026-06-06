@@ -21,7 +21,7 @@
 `consumed_by_roles` 记录哪些角色默认会调用该 skill。例如：
 
 - `架构`: `gstack`、`gstack-plan-eng-review`、`startup-pressure-test`
-- `UI/PPT`: `design-taste-frontend`、`guizang-ppt-skill`、`playwright`
+- `UI/PPT`: `design-taste-frontend`、`guizang-ppt-skill`、`guizang-social-card-skill`、`playwright`
 - `运维`: Hermes-owned 的部署前检查、部署后验证、Hermes cron、Python 服务和代理诊断类 skill
 - `测试`: `test-case-report-builder`、`playwright`
 - `QA`: review/readiness validation; may use `playwright` and Hermes-owned readonly verification skills for targeted verification, but does not own test-case/report artifacts by default

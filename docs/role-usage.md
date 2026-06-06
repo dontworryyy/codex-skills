@@ -41,7 +41,7 @@
 | --- | --- | --- | --- |
 | `架构` | Codex 本地窗口 | 需求澄清、架构判断、拆分角色、维护角色台账 | `agent-role-orchestrator`, `gstack`, `gstack-plan-eng-review`, `startup-pressure-test` |
 | `开发` | Codex 本地窗口 | 按架构提示词实现代码、测试、提交 | 由项目技术栈决定，可辅助用 `playwright`, `pdf` |
-| `UI/PPT` | Codex 本地窗口 | UI 体验、视觉改造、网页 PPT、演示材料 | `design-taste-frontend`, `guizang-ppt-skill`, `playwright` |
+| `UI/PPT` | Codex 本地窗口 | UI 体验、视觉改造、网页 PPT、社交卡、公众号封面、演示材料 | `design-taste-frontend`, `guizang-ppt-skill`, `guizang-social-card-skill`, `playwright` |
 | `视频` | Codex 本地窗口 | 宣传视频脚本、分镜、素材和渲染计划 | `hatch-pet` 或视频插件/工具链 |
 | `运维` | 服务器侧 Hermes agent 优先 | 部署检查、发布验证、日志/cron/服务诊断 | Hermes-owned 运维 skills |
 | `安全` | Codex 本地窗口，必要时低影响远端验证 | 授权安全审计、仓库/PR 安全扫描、黑盒报告 | `authorized-blackbox-web-security` 和 Codex Security 系列 |
@@ -63,7 +63,7 @@
 推荐用 Codex 本地窗口承接：
 
 - 架构拆分后的代码实现。
-- 前端/UI/PPT/视频产物。
+- 前端/UI/PPT/社交卡/视频产物。
 - 仓库测试、QA、Review 准备。
 - 安全代码审计和低影响黑盒报告。
 

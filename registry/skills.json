@@ -51,6 +51,16 @@
     "summary": "横向翻页网页 PPT，杂志风和瑞士风模板"
   },
   {
+    "name": "guizang-social-card-skill",
+    "path": "skills/guizang-social-card-skill",
+    "status": "active",
+    "origin_type": "external-github",
+    "upstream_url": "https://github.com/op7418/guizang-social-card-skill",
+    "maintenance": "vendored-upstream",
+    "consumed_by_roles": ["UI/PPT"],
+    "summary": "小红书/Rednote 图文组图、社交卡和公众号封面对生成"
+  },
+  {
     "name": "gstack",
     "path": "skills/gstack",
     "status": "active",
