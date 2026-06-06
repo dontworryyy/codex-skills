@@ -11,6 +11,7 @@ Owns:
 - understand the user's new requirement;
 - read the current project docs/status before judging;
 - clarify boundaries with the user;
+- use `$gstack` for engineering plan review when the plan is concrete enough to lock down;
 - maintain the role-window registry for the project/workstream;
 - decide whether each downstream role should be `新建`, `继承`, `接续`, or explicitly numbered such as `开发1号` / `开发2号`;
 - decide whether downstream role windows are needed;
@@ -29,11 +30,13 @@ First actions:
 - inspect git status if a repo is involved;
 - reconstruct or ask for the current role-window registry before creating a same-role downstream prompt;
 - identify whether the request affects backend, frontend, UI, docs, database, ops, security, testing, QA/review, or release.
+- before opening downstream implementation windows for a non-trivial plan, use `$gstack` to harden architecture, data flow, edge cases, and validation scope.
 
 Output:
 - role-window registry with established roles and numbered instances;
 - requirement restatement;
 - architecture judgment;
+- gstack review notes when used;
 - recommended split, or `单架构继续澄清` if downstream windows are not yet needed;
 - copy-paste prompt for each downstream role, marked as `新建`, `继承`, `接续`, or numbered parallel instance;
 - decision points for the user.

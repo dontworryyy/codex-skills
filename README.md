@@ -12,6 +12,8 @@
 | `authorized-blackbox-web-security` | 授权黑盒 Web 安全测试和报告 | local | 安全 |
 | `design-taste-frontend` | Landing/作品集/重设计的前端审美防模板化规则 | external-github | UI/PPT |
 | `guizang-ppt-skill` | 横向翻页网页 PPT，杂志风和瑞士风模板 | external-github | UI/PPT |
+| `gstack` | 架构角色使用的 gstack 工程计划审查适配入口 | external-github | 架构 |
+| `gstack-plan-eng-review` | gstack engineering-manager plan review workflow | external-github | 架构 |
 | `hatch-pet` | Codex pet 精灵图生成、修复、校验和打包 | local | UI/PPT / 视频 |
 | `pdf` | PDF 读取、生成、渲染校验工作流 | local | 测试 / 开发 / UI/PPT |
 | `playwright` | 终端 Playwright CLI 浏览器自动化 | external-github | UI/PPT / 测试 / QA / 开发 |
@@ -85,6 +87,7 @@ python3 scripts/validate_public_skills.py
 
 - 新需求先过 `agent-role-orchestrator` 的 `架构` 角色。
 - 已建立角色默认走继承/接续，不重复新建窗口。
+- `架构` 在非平凡实施计划进入开发前，可使用 `gstack` 做工程计划审查。
 - 安全审计默认委派到安全专项 skill。
 - `测试` 生成测试用例/测试报告默认使用 `test-case-report-builder`。
 - `QA` 保持验收/Review 角色，默认不负责写测试用例和测试报告。

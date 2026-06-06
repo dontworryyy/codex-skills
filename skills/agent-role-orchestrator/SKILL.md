@@ -90,6 +90,7 @@ For `安全`, always include the relevant downstream security skill in the gener
 - fix a validated or plausible security finding: `$codex-security:fix-finding`.
 
 For role tools sourced from external GitHub skills, name them as dependencies instead of treating them as local role logic:
+- `架构` engineering plan review / lock-in before downstream windows: `$gstack`;
 - `UI/PPT` landing/redesign/frontend taste work: `$design-taste-frontend`;
 - `UI/PPT` web PPT / Swiss deck / magazine deck work: `$guizang-ppt-skill`;
 - browser UI verification, rendered frontend checks, and E2E-like flows: `$playwright`;
@@ -278,12 +279,14 @@ Before finalizing, check:
 - `安全` prompts explicitly invoke the appropriate security skill instead of duplicating that workflow.
 - `测试` prompts for test cases or test reports explicitly invoke `$test-case-report-builder`.
 - `QA` prompts stay focused on review readiness, acceptance risk, and blocker verification; they do not own test-case/report authoring by default.
+- `架构` prompts use `$gstack` when a concrete implementation plan needs engineering-manager review before opening downstream windows.
 - role prompts distinguish external GitHub skills from local-owned skills when that affects maintenance or self-editing.
 
 ## Common Defaults
 
 Use these defaults unless the user says otherwise:
 - `架构` clarifies requirements, maintains the role-window registry, and decides whether downstream windows are needed; it does not code or commit.
+- `架构` uses `$gstack` for engineering plan review when the plan is concrete enough to harden.
 - `开发` implements within a narrow file scope, runs tests, and commits when asked or when workspace instructions require it.
 - `UI/PPT` and `视频` produce visible artifacts and perform visual verification.
 - `测试` uses `$test-case-report-builder` for test case and test report artifacts.

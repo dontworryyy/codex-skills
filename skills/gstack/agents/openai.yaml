@@ -1,0 +1,4 @@
+interface:
+  display_name: "GStack Architecture"
+  short_description: "Use gstack review patterns from the architecture role"
+  default_prompt: "Use $gstack to review this architecture plan before opening development windows."

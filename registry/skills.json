@@ -41,6 +41,26 @@
     "summary": "横向翻页网页 PPT，杂志风和瑞士风模板"
   },
   {
+    "name": "gstack",
+    "path": "skills/gstack",
+    "status": "active",
+    "origin_type": "external-github",
+    "upstream_url": "https://github.com/garrytan/gstack",
+    "maintenance": "vendored-adapted",
+    "consumed_by_roles": ["架构"],
+    "summary": "Codex 架构角色使用的 gstack 工程计划审查适配入口"
+  },
+  {
+    "name": "gstack-plan-eng-review",
+    "path": "skills/gstack-plan-eng-review",
+    "status": "active",
+    "origin_type": "external-github",
+    "upstream_url": "https://github.com/garrytan/gstack/tree/main/plan-eng-review",
+    "maintenance": "vendored-adapted",
+    "consumed_by_roles": ["架构"],
+    "summary": "Vendored gstack engineering-manager plan review workflow"
+  },
+  {
     "name": "hatch-pet",
     "path": "skills/hatch-pet",
     "status": "active",

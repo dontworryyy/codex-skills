@@ -20,6 +20,7 @@
 
 `consumed_by_roles` 记录哪些角色默认会调用该 skill。例如：
 
+- `架构`: `gstack`、`gstack-plan-eng-review`、`startup-pressure-test`
 - `UI/PPT`: `design-taste-frontend`、`guizang-ppt-skill`、`playwright`
 - `测试`: `test-case-report-builder`、`playwright`
 - `QA`: review/readiness validation; may use `playwright` for targeted verification, but does not own test-case/report artifacts by default

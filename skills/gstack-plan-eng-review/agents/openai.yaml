@@ -1,0 +1,4 @@
+interface:
+  display_name: "GStack Plan Review"
+  short_description: "Vendored gstack engineering plan review"
+  default_prompt: "Use $gstack-plan-eng-review to harden this implementation plan."
