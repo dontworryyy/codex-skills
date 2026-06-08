@@ -35,6 +35,114 @@
 给 Hermes 运维 agent 一个部署后只读验证提示词，使用 post-deployment-readonly-verification 的边界。
 ```
 
+## 角色关系
+
+一条新需求默认先进入 `架构`，由 `架构` 判断是否需要启用其他角色。已经建立过的角色默认走 `继承` / `接续`，不要重复新建；只有用户或 `架构` 明确要求并行时才开 `开发1号`、`开发2号` 这类编号窗口。
+
+```mermaid
+flowchart TD
+  U["用户新需求"] --> A["架构"]
+  A -->|"实现代码/文档"| D["开发"]
+  A -->|"UI/网页 PPT/社交卡"| UI["UI/PPT"]
+  A -->|"宣传视频/动效素材"| V["视频"]
+  A -->|"远程生产/部署/日志"| O["运维（Hermes 优先）"]
+  A -->|"授权审计/安全风险"| S["安全"]
+  A -->|"测试用例/测试报告"| T["测试"]
+  A -->|"验收/Review readiness"| Q["QA"]
+  D --> Q
+  UI --> Q
+  S --> D
+  O --> Q
+  T --> Q
+  Q --> A
+```
+
+角色之间的基本关系：
+
+- `架构` 是入口和分流者，负责需求澄清、边界判断、角色台账、文件范围、验收标准和下游提示词。
+- `开发`、`UI/PPT`、`视频` 是产物角色，只在 `架构` 给出的范围内执行。
+- `运维` 优先交给服务器侧 Hermes agent；本地 Codex 主要负责编写 Hermes 提示词、判断回传证据和组织验收口径。
+- `安全` 先走授权和范围确认，再调用安全专项 skill 或 Codex Security 插件。
+- `测试` 负责正式测试资产，例如 Excel 测试用例、Word/DOCX 测试报告和测试证据包。
+- `QA` 负责验收、Review readiness、阻塞风险和缺口确认，不默认写测试用例或测试报告。
+
+## 角色下的 Skills
+
+| 角色 | 默认入口 | 常用 skills | 备注 |
+| --- | --- | --- | --- |
+| `架构` | `$agent-role-orchestrator` | `$gstack`, `$gstack-office-hours`, `$gstack-spec`, `$gstack-autoplan`, `$gstack-plan-*`, `$startup-pressure-test` | 新需求先过架构；架构决定是否启用其他角色 |
+| `开发` | 架构给出的开发提示词 | `$gstack-investigate`, `$gstack-review`, `$gstack-ship`, `$gstack-health`, `$gstack-careful`, `$gstack-guard`, `$playwright`, `$pdf` | 默认包含文件白名单、禁止范围、验证命令、提交要求 |
+| `UI/PPT` | 架构给出的 UI/PPT 提示词 | `$gstack-design-*`, `$design-taste-frontend`, `$guizang-ppt-skill`, `$guizang-social-card-skill`, `$playwright` | UI、网页 PPT、社交卡、公众号封面和视觉验证 |
+| `视频` | 架构给出的视频提示词 | `$hatch-pet`，以及可用的视频/HyperFrames 插件 | 宣传视频脚本、分镜、素材和渲染计划 |
+| `运维` | Hermes handoff 提示词 | `$application-problem-diagnosis-workflow`, `$package-update-check-and-plan`, `$pre-deployment-readonly-checklist`, `$post-deployment-readonly-verification`, `$hermes-*`, `$proxy-dependent-python-service-diagnosis`, `$python-project-deployment-troubleshooting` | 远程生产事实由 Hermes 只读查；写操作必须授权 |
+| `安全` | 安全审计提示词 | `$gstack-cso`, `$authorized-blackbox-web-security`, Codex Security 插件 skills | 黑盒、公网、仓库、PR、深度扫描要分开 |
+| `测试` | 测试提示词 | `$test-case-report-builder`, `$playwright`, `$pdf` | 正式测试用例、测试报告和证据包归测试 |
+| `QA` | QA/验收提示词 | `$gstack-qa-only`, `$gstack-qa`, `$gstack-canary`, `$gstack-review`, `$playwright`, Hermes 只读验证 skills | Review readiness、验收缺口、阻塞风险，不默认写测试报告 |
+
+## 跨电脑继承
+
+另一台电脑可以通过这个 Git 仓库完整继承“公开 skills + 角色分工 + registry + 使用文档”。继承范围包括 `skills/` 下的 50 个 active skills、`registry/skills.json`、角色关系和安装说明。
+
+首次安装：
+
+```bash
+git clone git@github.com:Dirtytrii/codex-skills.git
+cd codex-skills
+python3 scripts/validate_public_skills.py
+mkdir -p "${CODEX_HOME:-$HOME/.codex}/skills"
+for d in skills/*; do
+  [ -d "$d" ] || continue
+  rsync -a --delete "$d/" "${CODEX_HOME:-$HOME/.codex}/skills/$(basename "$d")/"
+done
+```
+
+更新已有机器：
+
+```bash
+cd codex-skills
+git pull --ff-only
+python3 scripts/validate_public_skills.py
+for d in skills/*; do
+  [ -d "$d" ] || continue
+  rsync -a --delete "$d/" "${CODEX_HOME:-$HOME/.codex}/skills/$(basename "$d")/"
+done
+```
+
+`--delete` 会让目标机器上的同名 skill 与仓库版本保持一致；如果目标机器上对同名 skill 做过私有改动，先备份或去掉 `--delete`。
+
+安装后验证 active skills 是否都已继承：
+
+```bash
+python3 - <<'PY'
+import json, os
+from pathlib import Path
+
+repo = Path.cwd()
+home = Path(os.environ.get("CODEX_HOME", Path.home() / ".codex"))
+registry = json.loads((repo / "registry/skills.json").read_text(encoding="utf-8"))
+active = [item["name"] for item in registry if item.get("status") == "active"]
+missing = [name for name in active if not (home / "skills" / name / "SKILL.md").is_file()]
+print(f"active skills: {len(active)}")
+print(f"installed active skills: {len(active) - len(missing)}")
+if missing:
+    print("missing:")
+    for name in missing:
+        print(f"- {name}")
+    raise SystemExit(1)
+print("OK: all active skills installed")
+PY
+```
+
+这个仓库不能继承的内容：
+
+- Codex 插件本身，例如 Browser、Build Web Apps、Canva、Codex Security、GitHub、HyperFrames、Documents、Spreadsheets 等，需要在目标机器单独启用。
+- 本机私有 memory、Chronicle 屏幕历史、登录态、GitHub SSH key、API token、浏览器 cookie、`.codex/config`、自动化任务。
+- 未纳入公开仓库的本机私有/实验 skill。当前本机额外存在 `chronicle` 和 `humanizer-zh`，不会随本仓库安装到其他电脑。
+- 上游 `gstack` 的大体积浏览器/设计二进制运行时；本仓库沉淀的是适配后的方法论和角色入口。
+- Hermes 服务器上的生产环境、服务状态、日志、密钥和运行时配置；这里只同步脱敏后的可公开运维 skill。
+
+结论：只要目标机器已经有 Codex，并且需要的插件/凭据另行配置，通过本仓库可以完整继承当前这套公开 role skills。若目标机器只安装本仓库，不额外启用插件，那么插件型能力会在角色提示词里被提及，但不会自动变成可调用工具。
+
 ## Skills
 
 完整机器可读清单在 [registry/skills.json](registry/skills.json)。当前 active skills 共 50 个，按使用方式分组如下：
