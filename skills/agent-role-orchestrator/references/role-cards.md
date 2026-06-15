@@ -113,6 +113,7 @@ First actions:
 - if the task is web PPT, Swiss deck, magazine deck, or horizontal swipe presentation, use `$guizang-ppt-skill`;
 - if the task is Xiaohongshu/Rednote images, social cards, carousel images, or WeChat official account cover pairs, use `$guizang-social-card-skill`;
 - if the task needs rendered browser validation or UI-flow automation, use `$playwright`;
+- before final export or handoff of public-facing Chinese cover/card/landing copy, load and run `$humanizer-zh` without changing facts, claims, dates, prices, or attribution;
 - read existing UI patterns and design docs;
 - inspect the target route/component state;
 - identify user workflow, empty/loading/error states, and responsive constraints.
@@ -120,6 +121,7 @@ First actions:
 Output:
 - role tool skill used, especially any external GitHub skill;
 - UI changes with screenshots or browser verification notes;
+- public-copy polish status when public copy was part of the artifact;
 - deck file/path or slide outline when PPT work is assigned;
 - files changed;
 - verification commands;
@@ -144,10 +146,12 @@ Does not own:
 First actions:
 - identify target audience, platform, duration, aspect ratio, and language;
 - collect real screenshots/assets or mark missing assets;
-- define scenes, voiceover/captions, and call to action.
+- define scenes, voiceover/captions, and call to action;
+- before final public script, voiceover, or caption output, load and run `$humanizer-zh`; use `$story-deslop` only for narrative/story/dialogue passages.
 
 Output:
 - storyboard/script;
+- public-copy polish status when scripts, voiceover, or captions were finalized;
 - produced video artifact if requested;
 - render/preview validation;
 - asset/source list.
@@ -175,12 +179,14 @@ First actions:
 - use `$wechat-ai-app-ops` first when the task is about AI application WeChat articles, weekly AI app digests, draft-box updates, or the accounts/content operations repository;
 - confirm target account, source article, title, author/source line, cover assets, media library needs, and desired publish mode;
 - inspect provided article/assets and mark missing materials as `待确认`;
-- use `$humanizer-zh` when approved article copy sounds AI-generated or needs a final human voice pass before preview/draft handoff; keep facts, dates, claims, and attribution unchanged;
+- before formal article output, local preview, or draft-box handoff, load and run `$humanizer-zh` on approved public copy; keep facts, dates, claims, links, and attribution unchanged;
+- use `$story-deslop` only when the article contains narrative prose, story fragments, or dialogue that should keep a natural storytelling voice; do not turn normal analysis or marketing copy into fiction style;
 - default to draft/preview creation, not final publishing;
 - if cover images or social-card assets are missing, route that asset work to `UI/PPT` or use `$guizang-social-card-skill` only for cover image pairs.
 
 Output:
 - draft/preview status and link or screenshot when available;
+- public-copy polish status: `$humanizer-zh` used, `$story-deslop` used for narrative passages, or skipped because no formal public copy was output;
 - article title, summary, cover asset paths, media IDs if available, and publish checklist;
 - exact automation steps run and any manual actions left;
 - explicit approval checkpoint before final publish.
@@ -193,9 +199,12 @@ Identity:
 Owns:
 - package Xiaohongshu/Rednote notes from approved copy, carousel images, screenshots, tags, topics, and publishing metadata;
 - prepare captions, title variants, tag/topic sets, image order, and draft/preview posting automation steps;
+- keep account identity explicit in local records: every note package, prediction, publish record, comment analysis, and retro should include the target account/handle; when unknown, write `account: 待确认` instead of assuming the current account;
 - use `$cheat-on-content` when the work is about content experiments: benchmark import, topic scoring, blind pre-publish prediction, post-publish retro, rubric evolution, candidate pool, or status;
 - use `$humanizer-zh` for title, caption, and body-copy humanization after source facts are approved and before the final note package;
 - use `$guizang-social-card-skill` for Xiaohongshu/Rednote carousel images or social cards when visual assets are needed;
+- use `$xhs-publish-assistant` when the user asks for `输出发布格式`, `小红书发布格式`, `准备发布`, or `二次编辑发布格式`; it should output copy-ready title, body, tags, the `output\` image directory, and publish checks without browser automation;
+- split note packaging responsibilities clearly: the title should cover audience, scenario, and platform-recognizable keywords; the cover should carry emotional conflict and a reason to click; the first three carousel cards should lower comprehension cost, with page 1 as the click hook and pages 2-3 carrying one clear emotion, contradiction, or promise per card; push dense facts, lists, source details, and multi-block explanations to page 4 or later;
 - preserve platform fit, readability on mobile, claim discipline, blind-prediction integrity, and evidence for any generated assets or performance claims.
 
 Does not own:
@@ -207,14 +216,22 @@ Does not own:
 
 First actions:
 - confirm target account, note objective, audience, source materials, image count/aspect ratio, title direction, tags, and whether final posting is authorized;
+- if the user may operate multiple Xiaohongshu accounts, read the project account registry first and keep data separated by account;
 - inspect provided assets and identify gaps before creating or automating anything;
 - if the user asks for scoring, prediction, benchmark learning, topic selection, retro, or growth review, use `$cheat-on-content`; initialize it first when the current content project has no `.cheat-state.json`;
-- run `$humanizer-zh` on generated or formulaic note copy before final packaging, without inventing claims, dates, prices, testimonials, or platform performance;
+- before formal note output, final packaging, or publish-format bundle, load and run `$humanizer-zh` on title/body/caption copy without inventing claims, dates, prices, testimonials, or platform performance;
+- use `$story-deslop` only when the note itself contains narrative prose, story fragments, or dialogue; ordinary Xiaohongshu analysis, recommendation, and marketing copy still defaults to `$humanizer-zh`;
+- if the user asks for final publish copy/paste material, use `$xhs-publish-assistant` and do not open or operate Xiaohongshu unless separately authorized;
 - default to draft/package preparation, not final posting;
 - if assets are missing, use `$guizang-social-card-skill` for carousel/social-card production or request the missing source material.
 
 Output:
 - note package with title, caption, tag/topic list, image order, and asset paths;
+- account/handle used for the package and where it was recorded locally;
+- public-copy polish status: `$humanizer-zh` used, `$story-deslop` used for narrative passages, or skipped because no formal public copy was output;
+- title/cover/card responsibility check: title has audience + scenario + searchable/recognizable keywords; cover has emotional conflict + click reason; pages 1-3 are low-comprehension-cost; facts/lists/sources start on page 4 or later;
+- front-three card check: whether pages 1-3 are simple enough for feed click-through and where detailed information starts;
+- publish-format bundle when requested: copy-ready title, body, tags, image output directory, image-order note, tag count, dimension check, and re-edit phase note when applicable;
 - content-experiment status, score/prediction/retro links, or rubric notes when `$cheat-on-content` was used;
 - draft/preview status and screenshot/link when available;
 - exact automation steps run and manual actions left;
