@@ -92,6 +92,8 @@
     "upstream_url": "https://github.com/op7418/Humanizer-zh",
     "maintenance": "vendored-upstream",
     "consumed_by_roles": [
+      "UI/PPT",
+      "视频",
       "公众号发布",
       "小红书"
     ],
@@ -106,7 +108,10 @@
     "source_note": "Extracted from upstream HEAD ef8ae1e30fb01aee7ea3bc451d9e3e92a9287b9b; only the story-deslop skill, its references, and punctuation script are included. Story setup, scan, analyze, write, cover, agents, hooks, and browser skills are intentionally excluded.",
     "maintenance": "vendored-adapted",
     "consumed_by_roles": [
-      "架构"
+      "架构",
+      "公众号发布",
+      "小红书",
+      "视频"
     ],
     "summary": "中文网文和叙事正文去 AI 味、句式去套路、对话口语化和剧情功能保护"
   },
@@ -123,6 +128,18 @@
       "架构"
     ],
     "summary": "社交内容选题打分、盲预测、发布复盘、rubric 迭代和内容实验工作流"
+  },
+  {
+    "name": "xhs-publish-assistant",
+    "path": "skills/xhs-publish-assistant",
+    "status": "active",
+    "origin_type": "local",
+    "upstream_url": null,
+    "maintenance": "local-owned",
+    "consumed_by_roles": [
+      "小红书"
+    ],
+    "summary": "小红书发布前复制包整理、标签数量检查、配图目录和图片尺寸检查"
   },
   {
     "name": "wechat-ai-app-ops",

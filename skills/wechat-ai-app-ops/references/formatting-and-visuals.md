@@ -66,6 +66,8 @@ Recommended rhythm:
 
 Generate a local preview HTML and inspect it before API updates.
 
+Before preview generation, run a `humanizer-zh` pass over the public article body and section labels. Remove fake reader emotions such as "别急着兴奋" unless the article has actually built that emotion, reduce repetitive "不是...而是..." contrast scaffolding, and replace template labels with content-specific short headings.
+
 ## Lightweight Frontmatter Layout Controls
 
 When the draft script supports article-specific frontmatter controls, prefer small explicit fields instead of hard-coding one house style for every article:
@@ -79,15 +81,19 @@ wechat_layout: short_response
 
 Use these fields to let each article define its own column strip, opening punch line, summary label, and layout family. This is especially useful for flexible short articles that should not look like weekly digests.
 
-For `wechat_layout: short_response`:
+For `wechat_layout: short_response`, treat it as a flexible layout family, not a fixed template:
 
 - keep the top structure lighter and more conversational than weekly articles
-- use section-specific tags such as `回个响 / 01`, `落地了 / 02`, `先别急 / 03`, `我的判断 / 04`, `谁要关注 / 05`
+- choose fresh short section labels for each article; do not reuse the same labels such as `短回应`, `先别急`, `我的判断`, or `谁要关注` by default
+- prefer short titles with bite: 2-6 Chinese characters where possible, or one compact spoken phrase
 - avoid repeating the same lead-in sentence for every section
-- vary accent colors or visual rhythm by section while keeping typography disciplined
+- vary visual rhythm by article: image-led cards, side-by-side comparisons, ledger/checklist blocks, quote punches, timeline strips, or mini diagrams
+- vary accent colors or section shapes by article while keeping typography disciplined
 - use "上篇文章" in public copy; keep "周观察" and week-tracking language as internal metadata only
+- make short articles more image-rich than weekly digests when the topic benefits from visual explanation
+- keep short-article prose flexible for now; do not lock a rigid house style until there are more successful samples
 
-If a short article preview still reads like a weekly issue, adjust the layout branch or frontmatter before touching the WeChat API.
+If two consecutive short articles look structurally similar, redesign the next one before touching the WeChat API. If a short article preview still reads like a weekly issue, adjust the layout branch or frontmatter first.
 
 ## Chinese Encoding On Windows
 
@@ -103,14 +109,17 @@ For automated preview checks that match Chinese phrases, prefer a small `.js` fi
 
 ## Inline Illustrations
 
-When the article feels dry, add 1-2 inner illustrations only where they clarify the argument:
+When the article feels dry, add inner illustrations where they clarify the argument:
 
 - after the opening or section 01: a workflow/relationship diagram
 - after the governance/security sections: a risk chain or permissions map
+- for short articles: a higher image ratio is acceptable; use content-driven cards, diagrams, or visual metaphors instead of forcing the weekly article rhythm
 
-Use `$guizang-social-card-skill` for the visual language, but do not update that skill unless explicitly asked. Prefer Swiss-style information graphics for AI/tooling articles. Keep text short, avoid decorative filler, and export local PNG assets before uploading or embedding them in WeChat content.
+Use `$guizang-social-card-skill` when its visual language fits, but do not force it for every short article and do not update that skill unless explicitly asked. Prefer content-first images that explain the article's specific argument. Keep text short, avoid decorative filler, and export local PNG assets before uploading or embedding them in WeChat content.
 
 Images should be explanatory anchors, not generic AI art.
+
+If generated images contain Chinese text, Chinese readability is a hard requirement: inspect the rendered PNG at normal mobile-reading size, regenerate or simplify the design if characters are distorted, crowded, or too small.
 
 Recommended illustration spec:
 

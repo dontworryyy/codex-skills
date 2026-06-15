@@ -23,8 +23,8 @@
 - `架构`: `gstack`、`gstack-office-hours`、`gstack-spec`、`gstack-autoplan`、`gstack-plan-*`、`startup-pressure-test`
 - `开发`: `gstack-investigate`、`gstack-review`、`gstack-ship`、`gstack-health`、`gstack-devex-review`、`gstack-careful`、`gstack-guard`
 - `UI/PPT`: `design-taste-frontend`、`guizang-ppt-skill`、`guizang-social-card-skill`、`playwright`
-- `公众号发布`: `wechat-ai-app-ops` 承接公众号 AI 应用文章、周刊连续性、草稿箱 API 和本地交接；文案人味化可复用 `humanizer-zh`，视觉资产可复用 `guizang-social-card-skill`
-- `小红书`: 预留的小红书/Rednote 笔记和授权发布角色；内容实验和增长判断可复用 `cheat-on-content`，标题、正文和 caption 人味化可复用 `humanizer-zh`，图文资产可复用 `guizang-social-card-skill`
+- `公众号发布`: `wechat-ai-app-ops` 承接公众号 AI 应用文章、周刊连续性、草稿箱 API 和本地交接；正式对外文案输出前必须复用 `humanizer-zh`，视觉资产可复用 `guizang-social-card-skill`
+- `小红书`: 预留的小红书/Rednote 笔记和授权发布角色；内容实验和增长判断可复用 `cheat-on-content`，标题、正文和 caption 在正式输出前必须复用 `humanizer-zh`，图文资产可复用 `guizang-social-card-skill`，发布前复制包可复用 `xhs-publish-assistant`
 - `story-deslop`: 从 `worldwonderer/oh-story-claudecode` 只抽取 `skills/story-deslop` 子 skill；仅保留去 AI 味规则、references 和标点脚本，不引入 story setup、扫榜、拆文、写作、封面、agents、hooks 或浏览器能力
 - `运维`: Hermes-owned 的部署前检查、部署后验证、Hermes cron、Python 服务和代理诊断类 skill
 - `测试`: `test-case-report-builder`、`playwright`
