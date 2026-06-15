@@ -98,7 +98,7 @@ flowchart TD
 
 ## 跨电脑继承
 
-另一台电脑可以通过这个 Git 仓库完整继承“公开 skills + 角色分工 + registry + 使用文档”。继承范围包括 `skills/` 下的 53 个 active skills、`registry/skills.json`、角色关系和安装说明。
+另一台电脑可以通过这个 Git 仓库完整继承“公开 skills + 角色分工 + registry + 使用文档”。继承范围包括 `skills/` 下的 54 个 active skills、`registry/skills.json`、角色关系和安装说明。
 
 首次安装：
 
@@ -162,7 +162,7 @@ PY
 
 ## Skills
 
-完整机器可读清单在 [registry/skills.json](registry/skills.json)。当前 active skills 共 53 个，按使用方式分组如下：
+完整机器可读清单在 [registry/skills.json](registry/skills.json)。当前 active skills 共 54 个，按使用方式分组如下：
 
 | 分组 | 代表 skills | 来源 | 主要角色 |
 | --- | --- | --- | --- |
@@ -174,6 +174,7 @@ PY
 | UI/PPT 生产 | `design-taste-frontend`、`guizang-ppt-skill`、`guizang-social-card-skill`、`playwright` | external-github | UI/PPT / 小红书 / 公众号发布 |
 | 公众号发布运营 | `wechat-ai-app-ops` | local | 公众号发布 / 架构 / UI/PPT |
 | 中文文案人味化 | `humanizer-zh` | external-github | 小红书 / 公众号发布 |
+| 中文叙事去 AI 味 | `story-deslop` | external-github / adapted | 架构 / 按需直接唤起 |
 | 社媒内容实验 | `cheat-on-content` | external-github / adapted | 小红书 / 架构 |
 | 视频/视觉资产 | `hatch-pet` | local | UI/PPT / 视频 |
 | 安全审计 | `authorized-blackbox-web-security`，以及 Codex Security 插件 skills | local / plugin | 安全 |
