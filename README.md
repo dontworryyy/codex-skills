@@ -1,6 +1,6 @@
 # Codex Skills
 
-个人沉淀的 Codex skill 体系。它不是普通 prompt collection，而是一套可跨机器继承的 **role-based agent workflow**：用 `agent-role-orchestrator` 先做架构分流，再让开发、UI、内容发布、运维、DBA、安全、测试、QA、文档/交付、知识库等角色按边界工作。
+个人沉淀的 Codex skill 体系。它不是普通 prompt collection，而是一套可跨机器继承的 **role-based agent workflow**：用 `agent-role-orchestrator` 先做架构分流，再让开发、UI、内容发布、运维、DBA、安全、测试、QA、文档/交付、知识库、技能维护等角色按边界工作。
 
 这个仓库适合两类人或 agent：
 
@@ -36,6 +36,7 @@ Windows 没有 `rsync` 时，可以按目录复制 `skills/<skill-name>/` 到 `%
 使用 $agent-role-orchestrator，给我公众号发布窗口。
 使用 $agent-role-orchestrator，给我小红书窗口。
 使用 $agent-role-orchestrator，给我 DBA 窗口。
+使用 $agent-role-orchestrator，给我技能维护窗口。
 ```
 
 ## 这套体系解决什么
@@ -53,15 +54,16 @@ Windows 没有 `rsync` 时，可以按目录复制 `skills/<skill-name>/` 到 `%
 - 新需求先过 `架构`，复杂需求先给多方案技术选型。
 - 新本地代码项目默认检查或初始化 CodeGraph。
 - 需求确认后，`架构` 先做有边界的开源/可借鉴方案扫描。
+- `架构` 维护轻量技能路由台账，记录候选、必选、实际命中和有效命中。
 - 已建立角色默认继承/接续，不重复开新窗口。
-- 下游完成、阻塞或需要决策时，回调任务发起窗口，不默认都回架构。
+- 下游完成、阻塞或需要决策时，用压缩回调通知任务发起窗口，不默认都回架构。
 - 闭环结束要写 `可复用优化沉淀：无 / 建议 / 已沉淀`。
 
 ## 技术亮点
 
 ### 1. Architecture-first Gateway
 
-`agent-role-orchestrator` 是入口控制器。它先澄清需求、判断风险、拆角色、给文件范围和验收标准，再决定是否派给开发、UI、内容发布、运维、DBA、安全、测试、QA 或文档角色。
+`agent-role-orchestrator` 是入口控制器。它先澄清需求、判断风险、拆角色、给文件范围和验收标准，再决定是否派给开发、UI、内容发布、运维、DBA、安全、测试、QA、文档或技能维护角色。
 
 ### 2. Multi-Window / Role-Based Loop Engineering
 
@@ -84,7 +86,7 @@ Windows 没有 `rsync` 时，可以按目录复制 `skills/<skill-name>/` 到 `%
 - `开发`、`UI`、`内容发布`、`DBA`、`运维`、`测试`、`QA` 分离职责。
 - `QA` 是 evaluator，不默认写测试报告，也不替开发修问题。
 - 回调按任务来源流动：A 派 B，B 完成后回 A；如果 B 再派 C，C 回 B。
-- 反馈必须包含问题、证据、影响等级、回流对象、决策需求和下一闭环状态。
+- 反馈默认只传状态增量、证据句柄、决策需求、下一回流对象和可复用优化，不搬运完整上下文。
 
 ### 3. Skill as Capability Routing
 
@@ -102,8 +104,21 @@ Windows 没有 `rsync` 时，可以按目录复制 `skills/<skill-name>/` 到 `%
 | 数据库实例风险 | DBA 角色卡，危险动作二次授权 |
 | 测试资产和压测验证 | `test-case-report-builder`、`playwright` |
 | 安全审计 | `authorized-blackbox-web-security` 或 Codex Security 系列 |
+| 技能命中复盘、registry/README/docs 调优 | `技能维护` 角色 + `agent-role-orchestrator` |
 
-### 4. Source and Safety Governance
+### 4. Measured Skill Routing and Token-Aware Loops
+
+skill 变多以后，`架构` 不只派角色，也负责建立轻量路由台账：哪些 skill 是候选、哪些必选、哪些实际加载、哪些最终有效。下游角色在回调里用 `技能命中回传` 报告实际使用、误召、漏召和产出影响。
+
+这让体系可以量化：
+
+- `技能路由命中率 = 实际命中的必选 skill 数 / 架构标记的必选 skill 数`
+- `误召率 = 加载但最终无效的 skill 数 / 总加载 skill 数`
+- `漏召数 = 任务结束后发现本该使用但没有使用的 skill 数`
+
+长期的漏召、误召、触发描述过期、registry 漂移和 README 说明混乱，不交给 `架构` 长期背锅，而是路由给 `技能维护 / Skill Curator` 专门收敛。
+
+### 5. Source and Safety Governance
 
 仓库区分三种来源：
 
@@ -127,6 +142,7 @@ Windows 没有 `rsync` 时，可以按目录复制 `skills/<skill-name>/` 到 `%
 | `小红书` | 小红书笔记、图文、标题标签、发布复制包 | 默认发布包，最终发布需授权 |
 | `文档/交付` | 交付清单、验收表、演示脚本、交接文档 | 不替代 QA、开发事实或法律/税务意见 |
 | `知识库` | Obsidian/个人笔记整理 | 不删除、不公开、不改写成专业建议 |
+| `技能维护` | skill 命中率、触发规则、registry/README/docs 维护 | 不替代产品实现，不同步项目私有状态 |
 | `运维` | 部署检查、日志、cron、服务诊断 | Hermes 优先，只读优先，写操作授权 |
 | `DBA` | 容量、锁、binlog/WAL、长事务、备份恢复 | 只读诊断优先，危险动作二次授权 |
 | `安全` | 授权安全审计、仓库/PR 扫描、黑盒报告 | 低影响验证，委派安全专项 skill |
@@ -154,7 +170,7 @@ Windows 没有 `rsync` 时，可以按目录复制 `skills/<skill-name>/` 到 `%
 常规维护流程：
 
 1. 本机使用中发现可复用改进。
-2. 优先沉淀到对应 skill；角色编排类改进通常在 `agent-role-orchestrator`。
+2. 优先沉淀到对应 skill；跨角色命中率、触发规则、registry/README/docs 改进交给 `技能维护`，角色编排类规则落在 `agent-role-orchestrator`。
 3. 可公开复用的部分同步到本仓库，项目私有状态不进仓库。
 4. 更新 `registry/skills.json` 和必要 docs。
 5. 运行 `python3 scripts/validate_public_skills.py`。
