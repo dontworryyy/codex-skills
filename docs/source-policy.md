@@ -33,11 +33,13 @@
 - `安全`: `gstack-cso`、`authorized-blackbox-web-security`
 - `文档/交付`: `delivery-document-package`，可按需配合 `gstack-document-*`
 - `知识库`: 由 `agent-role-orchestrator` 的角色卡定义；当前没有独立 skill 目录
-- `技能维护`: 由 `agent-role-orchestrator` 的角色卡定义；用于 skill 命中复盘、触发描述调优、registry/README/docs/source-policy 维护和角色卡拆合建议，不接收项目私有状态
+- `技能维护`: 由 `agent-role-orchestrator` 的角色卡定义；用于 skill 命中复盘、触发描述调优、registry/README/docs/source-policy 维护、AGENTS/台账入口规则模板和角色卡拆合建议，不接收项目私有状态
 
 角色提示词维护时，若使用中发现可复用优化，回调里必须用 `可复用优化沉淀：无 / 建议 / 已沉淀` 显式说明；若涉及 skill 命中率、误召/漏召、触发描述过期、registry 漂移或 README/docs/source-policy 混乱，优先交给 `技能维护` 角色收敛。只有用户授权或任务明确要求维护 workflow 时，才直接改对应 skill、README、清单或项目文档。
 
 角色消费不代表原创归属。外部 skill 可以作为角色默认工具，但仍必须保持外部来源标记。
+
+`.codex/role-windows.md` 是目标项目的 source of truth，不进入共享 skill 包；共享仓库只维护可复用的入口规则、字段模板和路由约束。
 
 ## 外部 GitHub Skill 修改规则
 

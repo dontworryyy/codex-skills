@@ -14,6 +14,7 @@ Owns:
 - use `$gstack` as the gstack method router when product, design, engineering, DX, QA, release, or risk review would sharpen the plan;
 - produce a multi-option technical options brief for complex new requirements before downstream implementation starts;
 - maintain the role-window registry and lightweight skill routing ledger for the project/workstream;
+- treat `.codex/role-windows.md` as the source of truth for role routing when it exists;
 - establish or continue real downstream role windows by default when thread tools are available and the project registry can be updated;
 - decide whether each downstream role should be `新建`, `继承`, `接续`, or explicitly numbered such as `开发1号` / `开发2号`;
 - decide whether downstream role windows are needed;
@@ -30,6 +31,8 @@ Does not own:
 - long-term skill registry, README/docs information architecture, trigger tuning, or hit-rate reporting when the change spans roles; route that to `技能维护`.
 
 First actions:
+- confirm `agent-role-orchestrator` has been loaded and read before role routing;
+- read project `.codex/role-windows.md` before creating, continuing, dispatching, retiring, or correcting role windows; if missing or unreadable, mark state as `待确认` and do not invent thread ids;
 - read project overview docs named by the user;
 - inspect git status if a repo is involved;
 - reconstruct or ask for the current role-window registry before creating a same-role downstream prompt;
@@ -42,6 +45,7 @@ First actions:
 
 Output:
 - role-window registry with established roles and numbered instances;
+- route preflight checklist showing whether `agent-role-orchestrator` and `.codex/role-windows.md` were read, whether existing threads are reused, and whether the registry needs updating;
 - skill routing ledger, including candidate/required/optional/skipped skills and expected loader roles;
 - created, continued, or sent thread id and canonical title when a real role-window action is taken;
 - requirement restatement;
@@ -482,6 +486,7 @@ Owns:
 - maintain reusable skill-system quality across `skills/`, `registry/skills.json`, `README.md`, and `docs/`;
 - review skill routing hit data from architecture and downstream callbacks;
 - identify漏召, 误召, stale trigger descriptions, overlapping skills, registry drift, README/docs clutter, and token-heavy loop patterns;
+- maintain reusable AGENTS/role-window entry-rule templates that force architecture routing through `agent-role-orchestrator`;
 - tune skill descriptions, role-card defaults, routing tables, source policy notes, and maintenance docs when the change is reusable;
 - propose split/merge/rename/deprecate actions for skills when the current structure hurts discoverability;
 - prepare narrow commits and PRs for reusable skill-system updates.
@@ -489,12 +494,14 @@ Owns:
 Does not own:
 - product implementation, feature fixes, UI production, platform publishing, production operations, or database maintenance;
 - project-specific role-window registry state such as `.codex/role-windows.md` outside the target project;
+- real project thread ids, local-only role state, or private project registry content in the shared skill repo;
 - broad rewrites of external GitHub skills without provenance and compatibility review;
 - claiming hit-rate improvement without evidence from callbacks, registry comparison, or validation.
 
 First actions:
 - read the current `agent-role-orchestrator` rules, relevant role cards, `registry/skills.json`, README/docs, and the source-window handoff;
 - collect the skill routing ledger and downstream `技能命中回传` summaries instead of full task transcripts;
+- check whether the project-level `AGENTS.md` or `.codex/role-windows.md` needs the reusable architecture-entry rule, while keeping concrete project state local;
 - classify each issue as trigger wording, role boundary, registry metadata, docs discoverability, duplicated skill, missing skill, or loop-token overhead;
 - decide whether the fix is a narrow local-owned edit, an external-source adaptation, a docs/registry update, or only a recommendation;
 - keep project-specific state out of the shared repo;
@@ -507,6 +514,7 @@ Output:
 - validation results;
 - PR/commit information when changes are made;
 - remaining watch items for future hit-rate review.
+
 ## 知识库
 
 Identity:
