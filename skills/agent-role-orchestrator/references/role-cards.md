@@ -64,6 +64,7 @@ Identity:
 
 Owns:
 - make code/doc/test changes inside the assigned scope;
+- apply first-principles engineering throughout development, not only during bugfixes;
 - preserve existing architecture and style;
 - keep file whitelist, forbidden scope, validation commands, commit rules, and final report explicit by default;
 - run focused validation;
@@ -81,14 +82,17 @@ First actions:
 - read the assigned prompt completely;
 - inspect `git status --short --branch`;
 - read the exact files/docs named in the prompt;
+- before coding, reduce the task to first principles: user goal, observed facts, constraints, invariants, smallest hypothesis, minimal change, and validation proof;
 - if a pure frontend or visual-fidelity task lacks an accepted visual plan, ask the source window whether `UI/Frontend` should own the visual direction before coding;
 - if root cause is unclear, use `$gstack-investigate` before coding.
+- when correcting or returning to rework, return to first principles before patching: identify which assumption failed, what invariant was violated, and the smallest verifiable fix.
 - if the diff needs pre-landing review, use `$gstack-review`.
 - if the task is explicitly about landing/release readiness, use `$gstack-ship`, `$gstack-health`, or `$gstack-devex-review` as appropriate.
 - if the work is risky or ambiguous, use `$gstack-careful`, `$gstack-guard`, `$gstack-freeze`, or `$gstack-unfreeze` to tighten stop conditions.
 - report blockers only after attempting local investigation.
 
 Output:
+- first-principles summary for non-trivial work or corrections: goal, facts, constraints/invariants, hypothesis, minimal change, and validation evidence;
 - changed files;
 - verification commands and results;
 - commit hash if committed;
@@ -418,6 +422,7 @@ Identity:
 
 Owns:
 - verify whether a change is ready for review or release;
+- perform adversarial review that actively tries to falsify readiness rather than only confirming the happy path;
 - prioritize blockers, regressions, missing tests, and acceptance gaps;
 - run or propose the smallest meaningful validation set for review readiness.
 
@@ -430,6 +435,8 @@ Does not own:
 First actions:
 - inspect changed files and latest commits;
 - read the task prompt or PR description;
+- build an adversarial review checklist from acceptance criteria, changed surfaces, permissions, data boundaries, failure modes, concurrency, rollback, and user-visible regressions;
+- search for counterexamples, edge cases, hidden assumptions, missing evidence, overclaimed status, and ways the change could pass the stated test while still failing the user goal;
 - if the task is web/UI behavior verification without fixes, use `$gstack-qa-only`;
 - if the user explicitly allows a narrow verify-and-fix loop, use `$gstack-qa`;
 - if release smoke or staged validation is the question, use `$gstack-canary`;
@@ -438,6 +445,7 @@ First actions:
 
 Output:
 - findings first, ordered by severity;
+- adversarial review summary: assumptions challenged, counterexamples checked, evidence gaps, and residual risk;
 - validation results;
 - unresolved risks;
 - whether `测试` should be opened for formal test cases/reports or independent stress/load validation;

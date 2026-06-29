@@ -18,6 +18,8 @@ Use this skill to:
 - route `安全` work to the right existing security skill by default.
 - route `测试` test-case/report work to the test artifact skill by default.
 - route independent stress, load, performance, and concurrency validation to the `测试` role by default.
+- require `开发` windows to use first-principles engineering during implementation, investigation, and corrections.
+- require `QA` windows to use adversarial review to falsify readiness, not only confirm happy paths.
 - require role windows to actively report terminal task state back to the task's source window.
 - measure skill routing with a lightweight candidate/required/actual/effective hit ledger.
 - keep loop callbacks token-efficient by passing deltas, evidence links, and decisions instead of full transcripts.
@@ -79,6 +81,31 @@ Do not use `开发` as a catch-all just because the workspace contains code. Rou
 When a request is a pure frontend project, UI-heavy page, visual-fidelity pass, interaction/motion design, design-system decision, generated-asset composition, 2D/2.5D/3D scene layout, or "make it match the preview" task, prefer `UI/PPT` as the primary downstream role. In these cases `UI/PPT` may be addressed as `UI/Frontend`.
 
 Use `开发` for implementation plumbing, data models, build/test scripts, asset gates, browser-state bugs, and code execution under an accepted visual/technical spec. When both visual direction and code are needed, split them: `UI/Frontend` owns the visual route, target composition, screenshot acceptance, and responsive behavior; `开发` implements the scoped code changes from that spec; `QA` or `架构` verifies.
+
+## Development First-Principles Rule
+
+`开发` must use first-principles engineering throughout development, not only when correcting defects. Before implementing, investigating, correcting, or returning to rework, reduce the task to:
+- user goal and acceptance signal;
+- observed facts from files, tests, logs, UI, or docs;
+- constraints, invariants, ownership boundaries, and forbidden scope;
+- smallest falsifiable hypothesis for the change;
+- minimal change that should satisfy the hypothesis;
+- validation evidence that can disprove or confirm the result.
+
+When a correction is requested, do not stack patches on top of a failed assumption. Name the failed assumption or violated invariant first, then make the smallest verifiable fix.
+
+## QA Adversarial Review Rule
+
+`QA` must use adversarial review by default. Its job is to try to falsify readiness, not merely confirm that the happy path works.
+
+Adversarial review should challenge:
+- hidden assumptions and overclaimed status;
+- counterexamples, edge cases, and regression surfaces;
+- permission, data-boundary, concurrency, rollback, and failure-mode risks;
+- missing tests, weak evidence, and checks that could pass while the user goal still fails;
+- mismatch between acceptance criteria, implementation behavior, and user-visible outcome.
+
+QA findings should still be evidence-based and ordered by severity. If no blocker is found, QA should say what it tried to falsify and what residual risk remains.
 
 ## Open-Source Reference Scan Rule
 
@@ -688,7 +715,9 @@ Before finalizing, check:
 - `安全` prompts explicitly invoke the appropriate security skill instead of duplicating that workflow.
 - `测试` prompts for test cases or test reports explicitly invoke `$test-case-report-builder`.
 - `测试` prompts for stress/load/performance/concurrency validation specify environment, data isolation, traffic limits, stop conditions, metrics, and evidence capture.
+- `开发` prompts require first-principles engineering for implementation, investigation, and correction: goal, facts, constraints/invariants, hypothesis, minimal change, and validation proof.
 - `QA` prompts stay focused on review readiness, acceptance risk, and blocker verification; they do not own test-case/report authoring by default.
+- `QA` prompts require adversarial review: counterexamples, hidden assumptions, edge cases, regression surfaces, evidence gaps, and residual risks.
 - `文档/交付` prompts stay focused on requirements, quotes, contracts, acceptance records, handoff docs, change logs, and operator-facing documentation; they do not own code, QA signoff, legal advice, or tax advice.
 - `架构` prompts use `$gstack` as a method router and choose `$gstack-office-hours`, `$gstack-spec`, `$gstack-autoplan`, or focused `$gstack-plan-*` reviews when useful.
 - role prompts distinguish external GitHub skills from local-owned skills when that affects maintenance or self-editing.
@@ -699,12 +728,12 @@ Before finalizing, check:
 Use these defaults unless the user says otherwise:
 - `架构` clarifies requirements, writes a multi-option technical options brief for complex new requirements, bootstraps CodeGraph for new local code projects when available, performs a bounded open-source/reference scan when relevant and allowed, maintains the role-window registry and skill routing ledger, and decides whether downstream windows are needed; it does not code, commit, or own long-term skill curation.
 - `架构` uses `$gstack` for method routing: early ideas go to `$gstack-office-hours` or `$gstack-spec`; concrete plans go to `$gstack-autoplan` or focused `$gstack-plan-*` reviews.
-- `开发` implements within a narrow file scope, runs tests, and commits when asked or when workspace instructions require it; it should not own UI/visual direction when the dominant risk is visual fidelity.
+- `开发` implements within a narrow file scope, uses first-principles engineering before and during coding, runs tests, and commits when asked or when workspace instructions require it; it should not own UI/visual direction when the dominant risk is visual fidelity.
 - `UI/PPT` (also `UI/Frontend` for frontend visual work) and `视频` produce visible artifacts and perform visual verification; when their output includes final public-facing Chinese copy, they run `$humanizer-zh` before export or handoff.
 - `公众号发布` uses `$wechat-ai-app-ops`, runs `$humanizer-zh` before final preview/draft handoff, prepares and automates WeChat Official Account article drafts/previews by default, and requires explicit approval before final publish.
 - `小红书` may use `$cheat-on-content` for social-content scoring, blind prediction, benchmark learning, and retro loops; it uses `$humanizer-zh` before final note/publish copy, uses `$xhs-publish-assistant` for copy-ready publish bundles, and requires explicit approval before final posting.
 - `测试` uses `$test-case-report-builder` for test case and test report artifacts, and owns independent stress/load/performance/concurrency validation when assigned.
-- `QA` checks review/release readiness, blockers, and acceptance risk.
+- `QA` checks review/release readiness, blockers, and acceptance risk through adversarial review that tries to falsify readiness with counterexamples, edge cases, regression surfaces, and evidence gaps.
 - `文档/交付` maintains the project documentation package across phases: requirements, quotes, contracts/service agreements, acceptance sheets, delivery checklists, operation guides, change confirmations, and handoff notes; it does not write code or replace legal/tax review.
 - `知识库` organizes an Obsidian-style personal notes vault: inventories note clusters, proposes taxonomy and link maps, maintains WikiLinks/MOC/index notes and shareable Markdown when assigned, and preserves the user's personal voice and high-stakes boundaries; it does not delete, publish, edit `.obsidian` config, or convert personal notes into medical/financial/legal advice without explicit approval.
 - `技能维护` owns skill-hit retrospectives, trigger tuning, registry/README/docs/source-policy updates, role-card split/merge/rename suggestions, and reusable skill PRs; it does not implement product work or absorb project-specific role-window state.
