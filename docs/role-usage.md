@@ -15,6 +15,9 @@
 │   └── source-policy.md
 ├── scripts/
 │   └── validate_public_skills.py
+├── skills/agent-role-orchestrator/scripts/
+│   ├── render_role_prompt.py
+│   └── validate_role_loop.py
 └── README.md
 ```
 
@@ -94,7 +97,7 @@
 5. 新本地代码项目由 `架构 / CTO` 默认先检查或初始化 CodeGraph；未安装时提示安装，或在环境允许且安装方式明确时做用户级静默安装。
 6. 技术需求确认到足以描述问题后，`架构 / CTO` 先做有边界的开源/可借鉴方案扫描；若网络不可用、用户禁用或上下文敏感，要写明跳过原因。
 7. 内容任务由 `内容主编` 判断是否拆给 `公众号发布`、`小红书`、`视频` 或 `UI/PPT` 视觉资产协作。
-8. `总控`、`架构`、`内容主编` 只在必要时输出下游提示词，并写清模型建议、文件范围、禁止范围、验证和回调。
+8. `总控`、`架构`、`内容主编` 只在必要时输出下游提示词，并写清模型建议、文件范围、禁止范围、验证和回调；脚本可用时优先用 `render_role_prompt.py` 生成骨架。
 9. 已建立过的角色默认走 `继承` / `接续`，不要重复新建窗口；`.codex/role-windows.md` 中已有线程 ID 时必须复用。
 10. 下游角色完成、阻塞或需要发起方决策时，用 `压缩回调` 默认回调任务发起窗口；不无条件回报给 `总控` 或 `架构`。
 11. 每次派发、回调、阻塞、完成、误开或纠偏后，更新 `.codex/role-windows.md` 的最新结果、下一步和循环状态。
@@ -113,6 +116,33 @@
 - 是否写清验证与提交要求？
 - 是否包含技能路由台账？
 - 是否需要更新 `.codex/role-windows.md`？
+
+### Fail-Closed 工具层
+
+`agent-role-orchestrator` 的规则分两层：Markdown 负责原则和角色边界；脚本负责台账、模板、字段、枚举、统计和校验。
+
+生成角色提示词：
+
+```bash
+python skills/agent-role-orchestrator/scripts/render_role_prompt.py \
+  --role 开发 \
+  --objective "实现订单列表筛选修复" \
+  --source-role 架构 \
+  --source-thread thread-123 \
+  --required-skill gstack-investigate \
+  --validation "npm test"
+```
+
+校验台账、提示词或回调：
+
+```bash
+python skills/agent-role-orchestrator/scripts/validate_role_loop.py \
+  --project /path/to/project \
+  --prompt /path/to/prompt.md \
+  --callback /path/to/callback.md
+```
+
+校验失败时不要派发、继续或关闭 loop；先补齐缺失字段，或把不确定状态明确写成 `待确认` 并说明原因。
 
 ### 技能命中和 Token 压缩
 

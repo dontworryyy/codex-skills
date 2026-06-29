@@ -27,8 +27,38 @@ Use this skill to:
 - keep loop callbacks token-efficient by passing deltas, evidence links, and decisions instead of full transcripts.
 - require CEO, architecture, multi-role, dispatch, callback, and registry work to read this skill plus the project role-window ledger before creating or continuing role windows.
 - apply model/thinking routing defaults when creating or continuing role windows.
+- use the fail-closed tool layer for mechanical fields, prompt templates, ledger checks, callback checks, and skill-hit metrics when scripts are available.
 - route cross-role skill curation, registry updates, README/docs structure, and hit-rate retrospectives to `技能维护` by default.
 - bootstrap CodeGraph for new local code projects when available.
+
+## Fail-Closed Tool Layer Rule
+
+Markdown owns principles, role boundaries, and judgment. Scripts own mechanical fields, enums, templates, ledgers, callback completeness, and metrics.
+
+When this skill's `scripts/` directory is available:
+- use `scripts/render_role_prompt.py` to generate non-trivial role prompts instead of hand-typing required sections from memory;
+- use `scripts/validate_role_loop.py` before dispatching or accepting non-trivial prompts, callbacks, or `.codex/role-windows.md` updates;
+- if validation fails, do not create/continue/dispatch/close the role loop until the missing field is fixed or explicitly marked `待确认` with a reason;
+- do not let the script decide the architecture/content/business judgment. Fill the judgment fields after the script creates the structure.
+
+Useful commands:
+
+```bash
+python skills/agent-role-orchestrator/scripts/render_role_prompt.py \
+  --role 开发 \
+  --objective "实现订单列表筛选修复" \
+  --source-role 架构 \
+  --source-thread thread-123 \
+  --required-skill gstack-investigate \
+  --validation "npm test"
+```
+
+```bash
+python skills/agent-role-orchestrator/scripts/validate_role_loop.py \
+  --project /path/to/project \
+  --prompt /path/to/prompt.md \
+  --callback /path/to/callback.md
+```
 
 ## CEO-First Role Hierarchy Rule
 
@@ -541,6 +571,8 @@ These boundary items are defaults. Do not make the user spell out "文件白名�
 ### 5. Output A Forwardable Prompt
 
 Default to Chinese when the user writes in Chinese. Make the prompt directly copyable.
+
+Prefer generating the skeleton with `scripts/render_role_prompt.py` when available, then fill project-specific judgment fields. Before using the prompt for a non-trivial role dispatch, run `scripts/validate_role_loop.py --prompt <file>` or manually check the same required markers when no file exists.
 
 Use this structure:
 
