@@ -31,7 +31,7 @@ role still owns the boundary:
 | `gstack-plan-devex-review` | developer setup, commands, docs, or feedback loop may be fragile | DX friction list, setup/test/documentation improvements |
 | `gstack-plan-tune` | the agent keeps asking too much or too little for this user/workstream | question policy, autonomy level, stop conditions |
 
-Architecture should use `gstack-office-hours` before plan reviews when the requirement is still exploratory. Use `gstack-spec` when the user has intent but no execution-ready shape. Use `gstack-autoplan` when a non-trivial plan crosses product, UI, engineering, and developer-experience boundaries.
+`总控` should use `gstack-office-hours` or `gstack-plan-ceo-review` when the requirement is still exploratory, strategically unclear, or budget-sensitive. `架构` should use `gstack-spec` when the user has intent but no execution-ready technical shape, and `gstack-autoplan` when a non-trivial technical plan crosses product, UI, engineering, and developer-experience boundaries.
 
 ## Engineering Execution Methods
 

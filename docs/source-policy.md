@@ -20,9 +20,11 @@
 
 `consumed_by_roles` 记录哪些角色默认会调用该 skill。例如：
 
-- `架构`: `gstack`、`gstack-office-hours`、`gstack-spec`、`gstack-autoplan`、`gstack-plan-*`、`startup-pressure-test`
+- `总控`: `agent-role-orchestrator`、`gstack-office-hours`、`gstack-plan-ceo-review`、`startup-pressure-test`
+- `架构`: `gstack`、`gstack-spec`、`gstack-autoplan`、`gstack-plan-*`
 - `开发`: `gstack-investigate`、`gstack-review`、`gstack-ship`、`gstack-health`、`gstack-devex-review`、`gstack-careful`、`gstack-guard`
 - `UI/PPT`: `design-taste-frontend`、`guizang-ppt-skill`、`guizang-social-card-skill`、`photo-to-cute-3d-toy`、`playwright`
+- `内容主编`: 管理公众号发布、小红书、视频和 UI/PPT 视觉资产协作；负责内容 skill 路由、正式对外文案 gate、账号边界和发布授权边界
 - `公众号发布`: `wechat-ai-app-ops` 承接公众号 AI 应用文章、周刊连续性、草稿箱 API 和本地交接；技术选题初稿可用 `wechat-tech-writer`，HTML 排版可用 `wechat-article-formatter`；正式对外文案输出前必须复用 `humanizer-zh`，视觉资产可复用 `guizang-social-card-skill`
 - `小红书`: 预留的小红书/Rednote 笔记和授权发布角色；内容实验和增长判断可复用 `cheat-on-content`，评论研究可复用 `xhs-comment-research`，标题、正文和 caption 在正式输出前必须复用 `humanizer-zh`，图文资产可复用 `guizang-social-card-skill`，发布前复制包可复用 `xhs-publish-assistant`
 - `story-deslop`: 从 `worldwonderer/oh-story-claudecode` 只抽取 `skills/story-deslop` 子 skill；仅保留去 AI 味规则、references 和标点脚本，不引入 story setup、扫榜、拆文、写作、封面、agents、hooks 或浏览器能力
