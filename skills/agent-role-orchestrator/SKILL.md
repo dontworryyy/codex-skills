@@ -36,12 +36,18 @@ Use this skill to:
 Markdown owns principles, role boundaries, and judgment. Scripts own mechanical fields, enums, templates, ledgers, callback completeness, and metrics.
 
 When this skill's `scripts/` directory is available:
+- use `scripts/ensure_project_role_files.py --project <path>` to inspect whether `AGENTS.md` and `.codex/role-windows.md` need bootstrapping; add `--write` only when project file writes are allowed;
 - use `scripts/render_role_prompt.py` to generate non-trivial role prompts instead of hand-typing required sections from memory;
 - use `scripts/validate_role_loop.py` before dispatching or accepting non-trivial prompts, callbacks, or `.codex/role-windows.md` updates;
 - if validation fails, do not create/continue/dispatch/close the role loop until the missing field is fixed or explicitly marked `待确认` with a reason;
 - do not let the script decide the architecture/content/business judgment. Fill the judgment fields after the script creates the structure.
 
 Useful commands:
+
+```bash
+python skills/agent-role-orchestrator/scripts/ensure_project_role_files.py \
+  --project /path/to/project
+```
 
 ```bash
 python skills/agent-role-orchestrator/scripts/render_role_prompt.py \
@@ -103,6 +109,8 @@ Required preflight:
 - read the project `.codex/role-windows.md` when a project path is known and the file exists;
 - if `.codex/role-windows.md` does not exist, say it is absent and either create it when project writes are allowed or keep an inline `待确认` registry;
 - if the project ledger cannot be read, do not create, continue, or dispatch role windows until the missing state is confirmed or marked as `待确认` with a clear reason.
+
+When project file writes are allowed, prefer `scripts/ensure_project_role_files.py --project <path> --write` to create or refresh the managed `AGENTS.md` entry-rule block and initial `.codex/role-windows.md` table. Without `--write`, the script is dry-run only.
 
 When maintaining a project-level `AGENTS.md` or `.codex/role-windows.md`, add this reusable entry rule near the top unless the project explicitly forbids it:
 

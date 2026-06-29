@@ -11,8 +11,9 @@
 - [ ] 第三方来源保留 LICENSE、README 或 provenance。
 - [ ] 外部 GitHub 来源已在 `registry/skills.json` 标注 `origin_type=external-github`。
 - [ ] 已记录 `consumed_by_roles`，说明哪些角色会默认调用该 skill。
+- [ ] `python3 scripts/validate_role_system.py` 通过。
 - [ ] `python3 scripts/validate_public_skills.py` 通过。
-- [ ] 若修改 `agent-role-orchestrator`，已运行 `render_role_prompt.py` 正例和 `validate_role_loop.py` 正/负例。
+- [ ] 若修改 `agent-role-orchestrator`，已运行 `ensure_project_role_files.py` dry-run/write 正例、`render_role_prompt.py` 正例和 `validate_role_loop.py` 正/负例。
 - [ ] README 或 `registry/skills.json` 已更新。
 
 安全类 skill 额外确认：

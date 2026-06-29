@@ -14,8 +14,11 @@
 │   ├── role-usage.md
 │   └── source-policy.md
 ├── scripts/
-│   └── validate_public_skills.py
+│   ├── validate_public_skills.py
+│   ├── validate_role_system.py
+│   └── test_role_system_tools.py
 ├── skills/agent-role-orchestrator/scripts/
+│   ├── ensure_project_role_files.py
 │   ├── render_role_prompt.py
 │   └── validate_role_loop.py
 └── README.md
@@ -92,7 +95,7 @@
 
 1. 先开或继承 `总控` 窗口，除非用户明确要求直接进入某个专业角色。
 2. `总控` 读取项目上下文，判断需求类型、风险、模型预算、是否需要多角色，以及是否进入 `架构`、`内容主编`、`知识库` 或 `技能维护`。
-3. 总控/架构/多角色/派发/回调/台账类任务必须先读取已安装的 `agent-role-orchestrator/SKILL.md` 和项目 `.codex/role-windows.md`；若台账缺失或不可读，状态写 `待确认`，不要编造线程 ID。
+3. 总控/架构/多角色/派发/回调/台账类任务必须先读取已安装的 `agent-role-orchestrator/SKILL.md` 和项目 `.codex/role-windows.md`；若台账缺失或不可读，状态写 `待确认`，不要编造线程 ID。项目允许写入时，优先用 `ensure_project_role_files.py --write` 创建或刷新 `AGENTS.md` 托管规则块和初始台账模板。
 4. 技术复杂需求交给 `架构 / CTO` 输出 3-5 个可行技术路线的选型简报，再进入下游实施。
 5. 新本地代码项目由 `架构 / CTO` 默认先检查或初始化 CodeGraph；未安装时提示安装，或在环境允许且安装方式明确时做用户级静默安装。
 6. 技术需求确认到足以描述问题后，`架构 / CTO` 先做有边界的开源/可借鉴方案扫描；若网络不可用、用户禁用或上下文敏感，要写明跳过原因。
@@ -122,6 +125,12 @@
 `agent-role-orchestrator` 的规则分两层：Markdown 负责原则和角色边界；脚本负责台账、模板、字段、枚举、统计和校验。
 
 生成角色提示词：
+
+```bash
+python skills/agent-role-orchestrator/scripts/ensure_project_role_files.py \
+  --project /path/to/project \
+  --write
+```
 
 ```bash
 python skills/agent-role-orchestrator/scripts/render_role_prompt.py \
@@ -295,7 +304,7 @@ done
 3. 对 Hermes 内容先脱敏，移除真实路径、IP、域名、账号、日志原文、密钥和项目专属信息。
 4. 放入 `skills/<skill-name>/`。
 5. 更新 `registry/skills.json`、`README.md` 和必要 docs。
-6. 运行 `python3 scripts/validate_public_skills.py`。
+6. 运行 `python3 scripts/validate_role_system.py`；`python3 scripts/validate_public_skills.py` 也会自动包含该校验。
 7. 做敏感信息扫描。
 8. 中文提交并推送。
 

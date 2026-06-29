@@ -586,6 +586,7 @@ First actions:
 - read the current `agent-role-orchestrator` rules, relevant role cards, `registry/skills.json`, README/docs, and the source-window handoff;
 - collect the skill routing ledger and downstream `技能命中回传` summaries instead of full task transcripts;
 - check whether the project-level `AGENTS.md` or `.codex/role-windows.md` needs the reusable `总控` / `架构` entry rule, while keeping concrete project state local;
+- use `scripts/ensure_project_role_files.py` to dry-run or, when project writes are allowed, create/refresh the managed `AGENTS.md` block and `.codex/role-windows.md` template;
 - when role-loop mechanics are being changed, run `scripts/render_role_prompt.py` and `scripts/validate_role_loop.py` examples instead of relying on Markdown review alone;
 - classify each issue as trigger wording, role boundary, registry metadata, docs discoverability, duplicated skill, missing skill, or loop-token overhead;
 - decide whether the fix is a narrow local-owned edit, an external-source adaptation, a docs/registry update, or only a recommendation;
