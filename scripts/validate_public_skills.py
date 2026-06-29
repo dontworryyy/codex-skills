@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import json
 import re
+import subprocess
 import sys
 from pathlib import Path
 
@@ -12,6 +13,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 SKILLS = ROOT / "skills"
 REGISTRY = ROOT / "registry" / "skills.json"
+ROLE_SYSTEM_VALIDATOR = ROOT / "scripts" / "validate_role_system.py"
 
 NAME_RE = re.compile(r"^[a-z0-9-]+$")
 ORIGIN_TYPES = {"local", "external-github", "hermes", "upstream-adapted"}
@@ -97,6 +99,25 @@ def is_allowed_example(line: str) -> bool:
     return any(example in line for example in ALLOWED_SENSITIVE_EXAMPLES)
 
 
+def validate_role_system(errors: list[str]) -> None:
+    if not ROLE_SYSTEM_VALIDATOR.is_file():
+        errors.append("missing scripts/validate_role_system.py")
+        return
+    result = subprocess.run(
+        [sys.executable, str(ROLE_SYSTEM_VALIDATOR)],
+        cwd=str(ROOT),
+        text=True,
+        capture_output=True,
+        check=False,
+    )
+    if result.returncode != 0:
+        errors.append(
+            "role-system validation failed:\n"
+            f"stdout:\n{result.stdout}\n"
+            f"stderr:\n{result.stderr}"
+        )
+
+
 def main() -> int:
     errors: list[str] = []
 
@@ -156,6 +177,8 @@ def main() -> int:
     for name in registry_names:
         if name and name not in skill_names:
             errors.append(f"registry references missing skill: {name}")
+
+    validate_role_system(errors)
 
     for path in iter_text_files():
         try:
