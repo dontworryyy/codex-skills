@@ -161,10 +161,13 @@ When thread tools are available, `总控` and `架构` should set model and thin
 Default model routes:
 - `总控` / `CEO`: `gpt-5.5` + `xhigh`.
 - `架构` / `CTO`: `gpt-5.5` + `xhigh`.
-- `开发`: `gpt-5.3-codex-spark` + `xhigh`.
-- `QA`: ordinary acceptance checks use `gpt-5.3-codex-spark` + `high`; critical PR, adversarial review, release gate, or final risk review uses `gpt-5.5` + `xhigh`.
+- `开发负责人` / `Dev Lead` (`开发` window): `gpt-5.5` + `xhigh`; it owns task breakdown, integration, correction, and final commit.
+- `开发执行 subagent`: `gpt-5.3-codex-spark` + `xhigh`; it only executes a single, short, small, verifiable coding task from a written task card.
+- `QA`: ordinary acceptance checks use `gpt-5.5` + `medium`; critical PR, adversarial review, release gate, or final risk review uses `gpt-5.5` + `xhigh`.
 - `技能维护` and `文档/交付`: `gpt-5.3-codex-spark` + `high`, or `gpt-5.4-mini` for small docs/registry edits.
 - `内容主编`, `公众号发布`, `小红书`, and `视频`: default to `gpt-5.3-codex-spark` + `high`; escalate to `gpt-5.5` + `xhigh` only for high-risk positioning, public claims, compliance, or cross-platform strategy.
+
+For long or compact-prone development tasks, do not make `gpt-5.3-codex-spark` the long-running owner. Keep ownership in the `开发负责人` / `Dev Lead` window and delegate only bounded execution slices to Spark subagents. The Dev Lead must write the task card first: goal, allowed files, forbidden scope, validation command, expected output, and callback target. Spark subagents must not own architecture decisions, cross-file integration, correction strategy, final verification, or commits unless the Dev Lead explicitly narrows that responsibility.
 
 If thread tools are unavailable or the output is copy-paste only, include this block in the prompt:
 
@@ -200,13 +203,15 @@ Use `开发` for implementation plumbing, data models, build/test scripts, asset
 
 ## Development First-Principles Rule
 
-`开发` must use first-principles engineering throughout development, not only when correcting defects. Before implementing, investigating, correcting, or returning to rework, reduce the task to:
+`开发` usually acts as `开发负责人` / `Dev Lead`, not merely a long-running Spark executor. It must use first-principles engineering throughout development, not only when correcting defects. Before implementing, investigating, correcting, or returning to rework, reduce the task to:
 - user goal and acceptance signal;
 - observed facts from files, tests, logs, UI, or docs;
 - constraints, invariants, ownership boundaries, and forbidden scope;
 - smallest falsifiable hypothesis for the change;
 - minimal change that should satisfy the hypothesis;
 - validation evidence that can disprove or confirm the result.
+
+When subagents are available and the work is long, compact-prone, or parallelizable, the Dev Lead should split execution into narrow task cards and send only those cards to `开发执行 subagent` workers. Each subagent task must be single-purpose, short, small, and verifiable, with disjoint write scope when multiple subagents run in parallel. The Dev Lead remains responsible for reviewing diffs, integrating results, rerunning final validation, correcting failed assumptions, committing, and reporting back to `架构` / `CTO`.
 
 When a correction is requested, do not stack patches on top of a failed assumption. Name the failed assumption or violated invariant first, then make the smallest verifiable fix.
 
@@ -936,7 +941,7 @@ Use these defaults unless the user says otherwise:
 - `总控` is the default first window. It clarifies goal, success signal, priority, loop depth, role route, source-window callback, model/thinking plan, token budget, top-level registry, and final acceptance; it talks to owner-layer roles by default and does not code, write test/acceptance scripts, draft content, operate production, directly supervise execution roles, or own long-term skill curation.
 - `架构` / `CTO` owns technical delivery under `总控` or an explicit user/source-window assignment: technical options, CodeGraph bootstrap, bounded open-source/reference scan, technical role split, and the `开发` / `UI/PPT` / `测试` / `QA` / `安全` / `DBA` / `运维` loop.
 - `架构` uses `$gstack` for technical method routing: specs go to `$gstack-spec`; concrete plans go to `$gstack-autoplan` or focused `$gstack-plan-*` reviews.
-- `开发` implements within a narrow file scope, uses first-principles engineering before and during coding, runs tests, and commits when asked or when workspace instructions require it; it should not own UI/visual direction when the dominant risk is visual fidelity.
+- `开发` is the `开发负责人` / `Dev Lead` by default: it breaks down coding work, may delegate single, short, small, verifiable coding slices to `gpt-5.3-codex-spark` + `xhigh` subagents, integrates results, runs final tests, and commits when asked or when workspace instructions require it; it should not own UI/visual direction when the dominant risk is visual fidelity.
 - `UI/PPT` (also `UI/Frontend` for frontend visual work) and `视频` produce visible artifacts and perform visual verification; when their output includes final public-facing Chinese copy, they run `$humanizer-zh` before export or handoff.
 - `内容主编` owns content-domain routing under `总控`: `公众号发布`, `小红书`, `视频`, and `UI/PPT` visual-asset collaboration; it enforces fact discipline, account boundaries, public-writing gates, and explicit publish approvals.
 - `公众号发布` uses `$wechat-ai-app-ops`, runs `$humanizer-zh` before final preview/draft handoff, prepares and automates WeChat Official Account article drafts/previews by default, and requires explicit approval before final publish.

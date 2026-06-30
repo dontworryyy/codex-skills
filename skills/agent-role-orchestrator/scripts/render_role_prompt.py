@@ -82,11 +82,11 @@ def model_route(role: str, risk: str) -> ModelRoute:
     if role in {"总控", "架构"}:
         return ModelRoute("gpt-5.5", "xhigh", "降级仅限低风险摘要或已确认的机械同步。")
     if role == "开发":
-        return ModelRoute("gpt-5.3-codex-spark", "xhigh", "复杂架构决策或跨系统高风险变更回流架构/总控。")
+        return ModelRoute("gpt-5.5", "xhigh", "开发执行 subagent 默认使用 gpt-5.3-codex-spark + xhigh；复杂架构决策或跨系统高风险变更回流架构/总控。")
     if role == "QA":
         if risk == "critical":
-            return ModelRoute("gpt-5.5", "xhigh", "普通验收可降级到 gpt-5.3-codex-spark + high。")
-        return ModelRoute("gpt-5.3-codex-spark", "high", "关键 PR、对抗式审查、发布门禁升级到 gpt-5.5 + xhigh。")
+            return ModelRoute("gpt-5.5", "xhigh", "普通验收可降级到 gpt-5.5 + medium。")
+        return ModelRoute("gpt-5.5", "medium", "关键 PR、对抗式审查、发布门禁升级到 gpt-5.5 + xhigh。")
     if role in {"技能维护", "文档/交付", "知识库"}:
         return ModelRoute("gpt-5.3-codex-spark", "high", "小型文档/registry 机械编辑可降级到 gpt-5.4-mini。")
     if role in CONTENT_ROLES:
@@ -145,6 +145,17 @@ def loop_depth_explanation(depth: str, override_reason: str | None) -> str:
 """
 
 
+def role_execution_guidance(role: str) -> str:
+    if role != "开发":
+        return ""
+    return """开发负责人 / Dev Lead 执行规则：
+- 本窗口默认是开发负责人 / Dev Lead，使用 gpt-5.5 + xhigh，负责拆解、集成、纠偏、最终提交。
+- 需要并行或长任务时，先拆成任务卡，再把单一、短、小、可验证的代码任务交给开发执行 subagent。
+- 开发执行 subagent 默认模型：gpt-5.3-codex-spark + xhigh；只执行单一、短、小、可验证的代码任务。
+- subagent 必须带文件白名单、禁止范围、验收命令和退出条件；不要让 subagent 承担架构判断、跨文件整合或最终提交。
+"""
+
+
 def build_prompt(args: argparse.Namespace) -> str:
     role = canonical_role(args.role)
     validate_source_route(role, args)
@@ -181,6 +192,7 @@ def build_prompt(args: argparse.Namespace) -> str:
 - thinking：{route.thinking}
 - 升级/降级条件：{route.escalation}
 
+{role_execution_guidance(role)}
 角色树位置（总控/架构/内容主编/执行角色）：
 {ROLE_TREE_POSITION[role]}
 

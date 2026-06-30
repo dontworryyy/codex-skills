@@ -49,7 +49,7 @@
 | --- | --- | --- | --- |
 | `总控` / `CEO` | Codex 本地窗口 | 默认入口、目标澄清、优先级、模型预算、角色路由、顶层台账、最终验收 | `agent-role-orchestrator`, `gstack-office-hours`, `gstack-plan-ceo-review`, `startup-pressure-test` |
 | `架构` / `CTO` | Codex 本地窗口 | 技术方案、多方案技术选型、新项目 CodeGraph 启动、开源/可借鉴方案扫描、管理开发/UI/测试/QA/安全/DBA/运维闭环 | `agent-role-orchestrator`, `gstack`, `gstack-spec`, `gstack-autoplan`, `gstack-plan-*` |
-| `开发` | Codex 本地窗口 | 按第一性原理拆解后实现代码、测试、提交 | 由项目技术栈决定，可辅助用 `gstack-investigate`, `gstack-review`, `gstack-ship`, `gstack-health`, `gstack-careful`, `gstack-guard`, `playwright`, `pdf` |
+| `开发负责人 / Dev Lead` | Codex 本地窗口 | 按第一性原理拆解任务、管理开发执行 subagent、整合代码、测试、提交 | 由项目技术栈决定，可辅助用 `gstack-investigate`, `gstack-review`, `gstack-ship`, `gstack-health`, `gstack-careful`, `gstack-guard`, `playwright`, `pdf` |
 | `UI/PPT` / `UI/Frontend` | Codex 本地窗口 | UI 体验、视觉改造、前端视觉保真、网页 PPT、社交卡、公众号封面、演示材料、照片到玩具资产规划 | `gstack-design-*`, `design-taste-frontend`, `guizang-ppt-skill`, `guizang-social-card-skill`, `photo-to-cute-3d-toy`, `playwright` |
 | `视频` | Codex 本地窗口 | 宣传视频脚本、分镜、素材和渲染计划 | `hatch-pet` 或视频插件/工具链 |
 | `内容主编` | Codex 本地窗口 | 内容域上层协调，管理公众号发布、小红书、视频和 UI/PPT 视觉资产协作 | `agent-role-orchestrator`, `humanizer-zh`, `story-deslop`, 内容平台相关 skills |
@@ -214,8 +214,9 @@ python skills/agent-role-orchestrator/scripts/aggregate_skill_hits.py \
 | --- | --- |
 | `总控 / CEO` | `gpt-5.5` + `xhigh` |
 | `架构 / CTO` | `gpt-5.5` + `xhigh` |
-| `开发` | `gpt-5.3-codex-spark` + `xhigh` |
-| `QA` 普通验收 | `gpt-5.3-codex-spark` + `high` |
+| `开发负责人 / Dev Lead` | `gpt-5.5` + `xhigh` |
+| `开发执行 subagent` | `gpt-5.3-codex-spark` + `xhigh`，只执行单一、短、小、可验证的代码任务 |
+| `QA` 普通验收 | `gpt-5.5` + `medium` |
 | `QA` 关键 PR / 对抗式审查 / 发布门禁 | `gpt-5.5` + `xhigh` |
 | `技能维护` / `文档/交付` | `gpt-5.3-codex-spark` + `high`，小文档可用 `gpt-5.4-mini` |
 | `内容主编` / 内容执行角色 | 默认 `gpt-5.3-codex-spark` + `high`，高风险定位或公开声明升 `gpt-5.5` + `xhigh` |
@@ -225,7 +226,10 @@ python skills/agent-role-orchestrator/scripts/aggregate_skill_hits.py \
 推荐用 Codex 本地窗口承接：
 
 - `架构 / CTO` 拆分后的代码实现。
+- `开发` 默认是 `开发负责人 / Dev Lead`：用 `gpt-5.5` + `xhigh` 拆解任务、整合结果、纠偏、最终验证和提交。
+- `开发执行 subagent` 默认用 `gpt-5.3-codex-spark` + `xhigh`，只执行单一、短、小、可验证的代码任务；不要让 Spark subagent 独立承担长任务负责人、架构判断、跨文件整合、最终提交或完整上下文恢复。
 - 开发全过程默认遵循第一性原理：先还原目标、事实、约束/不变量、最小可证伪假设、最小改动和验证证据，再动手实现。
+- 长任务或容易 compact 的任务先由 Dev Lead 写任务卡，包含目标、文件白名单、禁止范围、验证命令、预期输出和回调对象，再派发给开发执行 subagent。
 - 前端/UI/PPT/社交卡/视频产物；纯前端或视觉保真任务默认先由 `UI/PPT` / `UI/Frontend` 定视觉路线，再让 `开发` 按范围实现。
 - 公众号文章和小红书笔记的草稿、预览、发布包和明确授权后的发布自动化。
 - 交付文档包和个人知识库整理。

@@ -75,6 +75,9 @@ def validate_docs(errors: list[str]) -> None:
             "上下文预算",
             "Loop 深度",
             "总控只直接对接负责人层",
+            "开发负责人 / Dev Lead",
+            "开发执行 subagent",
+            "gpt-5.5` + `medium",
         ],
         errors,
     )
@@ -93,6 +96,9 @@ def validate_docs(errors: list[str]) -> None:
             "压缩交接卡",
             "Loop 深度",
             "总控只直接对接负责人层",
+            "开发负责人 / Dev Lead",
+            "开发执行 subagent",
+            "gpt-5.5` + `medium",
         ],
         errors,
     )
@@ -117,6 +123,9 @@ def validate_orchestrator(errors: list[str]) -> None:
             "上下文预算",
             "Loop Depth And Owner-Layer Routing Rule",
             "负责人交互边界",
+            "开发负责人",
+            "开发执行 subagent",
+            "gpt-5.5` + `medium",
         ],
         errors,
     )

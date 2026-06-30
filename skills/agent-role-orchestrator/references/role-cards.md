@@ -108,10 +108,14 @@ Output:
 ## 开发
 
 Identity:
-- Act as `开发`.
+- Act as `开发负责人` / `Dev Lead` when the task is non-trivial, long-running, compact-prone, or may need subagents.
+- Act as a direct `开发` executor only for a narrow, low-risk task explicitly assigned by the source window.
 
 Owns:
 - make code/doc/test changes inside the assigned scope;
+- decompose long or parallelizable work into written task cards before execution;
+- delegate only single, short, small, verifiable coding tasks to `开发执行 subagent` workers when subagents are available;
+- integrate subagent results, review diffs, resolve conflicts, rerun final validation, correct failed assumptions, and own the final commit;
 - apply first-principles engineering throughout development, not only during bugfixes;
 - preserve existing architecture and style;
 - keep file whitelist, forbidden scope, validation commands, commit rules, and final report explicit by default;
@@ -125,12 +129,14 @@ Does not own:
 - production operations;
 - owning UI/visual direction when the dominant risk is visual fidelity and no accepted `UI/Frontend` plan exists;
 - modifying package/dependency files unless explicitly allowed.
+- handing long-running ownership, architecture judgment, cross-file integration, correction strategy, final verification, or final commit to a Spark subagent by default.
 
 First actions:
 - read the assigned prompt completely;
 - inspect `git status --short --branch`;
 - read the exact files/docs named in the prompt;
 - before coding, reduce the task to first principles: user goal, observed facts, constraints, invariants, smallest hypothesis, minimal change, and validation proof;
+- for long or compact-prone tasks, create one or more subagent task cards with objective, allowed files, forbidden files, validation, expected output, and callback target before spawning execution workers;
 - if a pure frontend or visual-fidelity task lacks an accepted visual plan, ask the source window whether `UI/Frontend` should own the visual direction before coding;
 - if root cause is unclear, use `$gstack-investigate` before coding.
 - when correcting or returning to rework, return to first principles before patching: identify which assumption failed, what invariant was violated, and the smallest verifiable fix.
@@ -141,6 +147,7 @@ First actions:
 
 Output:
 - first-principles summary for non-trivial work or corrections: goal, facts, constraints/invariants, hypothesis, minimal change, and validation evidence;
+- subagent task cards and results when used, including model route `gpt-5.3-codex-spark` + `xhigh` and each worker's changed files;
 - changed files;
 - verification commands and results;
 - commit hash if committed;

@@ -234,6 +234,61 @@ def test_render_prompt_allows_ceo_to_owner_layer_and_explicit_override() -> None
     assert "用户明确要求绕过架构" in override.stdout
 
 
+def test_render_prompt_routes_development_lead_and_subagents() -> None:
+    dev = run(
+        [
+            PYTHON,
+            str(RENDER_PROMPT),
+            "--role",
+            "开发",
+            "--objective",
+            "实现一组长任务拆分",
+            "--source-role",
+            "架构",
+        ]
+    )
+    assert "model：gpt-5.5" in dev.stdout
+    assert "thinking：xhigh" in dev.stdout
+    assert "开发负责人 / Dev Lead" in dev.stdout
+    assert "开发执行 subagent" in dev.stdout
+    assert "gpt-5.3-codex-spark" in dev.stdout
+    assert "只执行单一、短、小、可验证的代码任务" in dev.stdout
+
+
+def test_render_prompt_routes_qa_default_and_critical_models() -> None:
+    ordinary = run(
+        [
+            PYTHON,
+            str(RENDER_PROMPT),
+            "--role",
+            "QA",
+            "--objective",
+            "普通验收",
+            "--source-role",
+            "架构",
+        ]
+    )
+    assert "model：gpt-5.5" in ordinary.stdout
+    assert "thinking：medium" in ordinary.stdout
+
+    critical = run(
+        [
+            PYTHON,
+            str(RENDER_PROMPT),
+            "--role",
+            "QA",
+            "--objective",
+            "关键 PR 对抗式审查",
+            "--source-role",
+            "架构",
+            "--risk",
+            "critical",
+        ]
+    )
+    assert "model：gpt-5.5" in critical.stdout
+    assert "thinking：xhigh" in critical.stdout
+
+
 def test_role_system_validator() -> None:
     result = run([PYTHON, str(VALIDATE_ROLE_SYSTEM)])
     assert "Role system validation passed" in result.stdout
@@ -249,6 +304,8 @@ def main() -> int:
         test_render_prompt_rejects_ceo_direct_technical_execution,
         test_render_prompt_rejects_ceo_direct_content_execution,
         test_render_prompt_allows_ceo_to_owner_layer_and_explicit_override,
+        test_render_prompt_routes_development_lead_and_subagents,
+        test_render_prompt_routes_qa_default_and_critical_models,
         test_role_system_validator,
     ]
     for test in tests:

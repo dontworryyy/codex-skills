@@ -24,7 +24,7 @@
       "知识库",
       "技能维护"
     ],
-    "summary": "总控/CEO 先行的多窗口角色编排，含可折叠 L0-L3 loop 深度、CEO 负责人层交互、CTO 技术闭环、内容主编分流、模型路由默认值、fail-closed 提示词/台账/回调校验脚本、AGENTS.md/role-windows bootstrap、CodeGraph 状态检查、开源参考扫描、多方案选型、项目台账入口守卫、开发第一性原理、QA 对抗式审查、源窗口回调、技能命中聚合治理、Token 压缩交接卡、技能维护角色和可复用优化沉淀提示词"
+    "summary": "总控/CEO 先行的多窗口角色编排，含可折叠 L0-L3 loop 深度、CEO 负责人层交互、CTO 技术闭环、开发负责人/Dev Lead 与 Spark 开发执行 subagent 分层、QA gpt-5.5 模型路由、内容主编分流、模型路由默认值、fail-closed 提示词/台账/回调校验脚本、AGENTS.md/role-windows bootstrap、CodeGraph 状态检查、开源参考扫描、多方案选型、项目台账入口守卫、开发第一性原理、QA 对抗式审查、源窗口回调、技能命中聚合治理、Token 压缩交接卡、技能维护角色和可复用优化沉淀提示词"
   },
   {
     "name": "delivery-document-package",
