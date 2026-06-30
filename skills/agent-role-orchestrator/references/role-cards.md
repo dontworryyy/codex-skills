@@ -190,6 +190,7 @@ First actions:
 - if the task is Xiaohongshu/Rednote images, social cards, carousel images, or WeChat official account cover pairs, use `$guizang-social-card-skill`;
 - if the task starts from photo references and needs a cute 3D toy concept, toy prompt pack, or GLB production route, use `$photo-to-cute-3d-toy`;
 - if the task needs rendered browser validation or UI-flow automation, use `$playwright`;
+- when the visual artifact contains formal public Chinese copy, apply the `反老登味 / 反 AI 味内容闸门`: avoid 说教、爹味、上位者口吻、模板化、空泛排比、万能套话, while preserving facts and claims;
 - before final export or handoff of public-facing Chinese cover/card/landing copy, load and run `$humanizer-zh` without changing facts, claims, dates, prices, or attribution;
 - read existing UI patterns and design docs;
 - inspect the target route/component state;
@@ -198,7 +199,7 @@ First actions:
 Output:
 - role tool skill used, especially any external GitHub skill;
 - UI changes with screenshots or browser verification notes;
-- public-copy polish status when public copy was part of the artifact;
+- public-copy tone/polish status when public copy was part of the artifact;
 - visual acceptance baseline, including screenshots/crops and known residual gaps when frontend visual fidelity is the goal;
 - deck file/path or slide outline when PPT work is assigned;
 - files changed;
@@ -228,11 +229,12 @@ First actions:
 - if assigned X MCP research, keep it read-only and translate cross-platform X signals into platform-appropriate video hooks instead of copying wording or claims;
 - collect real screenshots/assets or mark missing assets;
 - define scenes, voiceover/captions, and call to action;
+- before final public script, voiceover, or captions, apply the `反老登味 / 反 AI 味内容闸门`: avoid 说教、爹味、上位者口吻、模板化、空泛排比、万能套话, while preserving facts, dates, claims, sources, and authorization boundaries;
 - before final public script, voiceover, or caption output, load and run `$humanizer-zh`; use `$story-deslop` only for narrative/story/dialogue passages.
 
 Output:
 - storyboard/script;
-- public-copy polish status when scripts, voiceover, or captions were finalized;
+- public-copy tone/polish status when scripts, voiceover, or captions were finalized;
 - produced video artifact if requested;
 - render/preview validation;
 - asset/source list.
@@ -247,6 +249,7 @@ Owns:
 - clarify audience, platform, account identity, content goal, publishing mode, compliance constraints, and asset needs before assigning content execution;
 - decide which content skills are required, including `$wechat-ai-app-ops`, `$wechat-tech-writer`, `$wechat-article-formatter`, `$cheat-on-content`, `$xhs-comment-research`, `$xhs-publish-assistant`, `$humanizer-zh`, `$story-deslop`, and `$guizang-social-card-skill`;
 - use X MCP as an optional read-only research source for viral-content research, topic pools, benchmark accounts, trend/news scanning, and public discussion timelines when the user has authorized X access;
+- own the `反老登味 / 反 AI 味内容闸门` for public copy: avoid 说教、爹味、上位者口吻、油腻成功学、年龄/资历压人、替读者下判断, plus 模板化、空泛排比、万能套话、机械转折、过度总结、没有个人判断;
 - keep outward-facing facts, dates, claims, links, attribution, prices, and account boundaries stable across content roles;
 - enforce explicit approval gates before final publish, mass send, deletion, account setting changes, credential changes, comment automation, or engagement manipulation;
 - coordinate `UI/PPT` only for content visuals such as WeChat covers, Xiaohongshu carousels, social cards, thumbnails, and presentation-like assets.
@@ -263,6 +266,7 @@ First actions:
 - read account/content project registries when assigned and keep account-specific records separated;
 - when using X MCP, keep it read-only by default, cite https://docs.x.com/tools/mcp as the setup reference, and never write OAuth credentials or account tokens into the repo;
 - decide whether the work should go to `公众号发布`, `小红书`, `视频`, `UI/PPT`, or several of them in sequence;
+- define the platform voice and tone no-go list before formal outward copy, especially what counts as 老登味 or AI 味 for this task;
 - require `$humanizer-zh` before formal public Chinese copy leaves the content domain, unless the output is only a rough internal outline;
 - route narrative prose, story fragments, or dialogue to `$story-deslop` only when the content itself is narrative;
 - record missing assets, missing approvals, and manual platform actions as `待确认` instead of assuming them.
@@ -273,7 +277,7 @@ Output:
 - required/optional content skills and skipped-skill rationale;
 - platform/account boundary and final-publish authorization status;
 - prompts for `公众号发布`, `小红书`, `视频`, or `UI/PPT` visual assets;
-- public-copy polish gate status;
+- public-copy tone gate and polish gate status;
 - manual approval checkpoints and residual content risks.
 
 ## 公众号发布
@@ -304,6 +308,7 @@ First actions:
 - use `$wechat-article-formatter` when the assigned work is Markdown-to-WeChat HTML formatting, template selection, or final layout polish;
 - confirm target account, source article, title, author/source line, cover assets, media library needs, and desired publish mode;
 - inspect provided article/assets and mark missing materials as `待确认`;
+- before formal article output, local preview, or draft-box handoff, apply the `反老登味 / 反 AI 味内容闸门`: remove 说教、爹味、上位者口吻、油腻成功学、模板化、空泛排比、万能套话, without changing facts, data, dates, prices, sources, or authorization boundaries;
 - before formal article output, local preview, or draft-box handoff, load and run `$humanizer-zh` on approved public copy; keep facts, dates, claims, links, and attribution unchanged;
 - use `$story-deslop` only when the article contains narrative prose, story fragments, or dialogue that should keep a natural storytelling voice; do not turn normal analysis or marketing copy into fiction style;
 - default to draft/preview creation, not final publishing;
@@ -311,7 +316,7 @@ First actions:
 
 Output:
 - draft/preview status and link or screenshot when available;
-- public-copy polish status: `$humanizer-zh` used, `$story-deslop` used for narrative passages, or skipped because no formal public copy was output;
+- public-copy tone/polish status: `反老登味 / 反 AI 味内容闸门` passed, `$humanizer-zh` used, `$story-deslop` used for narrative passages, or skipped because no formal public copy was output;
 - article title, summary, cover asset paths, media IDs if available, and publish checklist;
 - exact automation steps run and any manual actions left;
 - explicit approval checkpoint before final publish.
@@ -348,6 +353,7 @@ First actions:
 - if the user asks for scoring, prediction, benchmark learning, topic selection, retro, or growth review, use `$cheat-on-content`; initialize it first when the current content project has no `.cheat-state.json`;
 - if assigned X MCP research, treat X data as a cross-platform signal only; convert it through `$cheat-on-content`, `$xhs-comment-research`, and platform-local judgment before final Xiaohongshu packaging;
 - if the user asks to crawl, summarize, classify, or use Xiaohongshu comments for content planning or reply strategy, use `$xhs-comment-research` and keep browser-session data boundaries explicit;
+- before formal note output, final packaging, or publish-format bundle, apply the `反老登味 / 反 AI 味内容闸门`: remove 说教、爹味、上位者口吻、油腻成功学、模板化、空泛排比、万能套话, while keeping platform voice natural and not inventing claims;
 - before formal note output, final packaging, or publish-format bundle, load and run `$humanizer-zh` on title/body/caption copy without inventing claims, dates, prices, testimonials, or platform performance;
 - use `$story-deslop` only when the note itself contains narrative prose, story fragments, or dialogue; ordinary Xiaohongshu analysis, recommendation, and marketing copy still defaults to `$humanizer-zh`;
 - if the user asks for final publish copy/paste material, use `$xhs-publish-assistant` and do not open or operate Xiaohongshu unless separately authorized;
@@ -357,7 +363,7 @@ First actions:
 Output:
 - note package with title, caption, tag/topic list, image order, and asset paths;
 - account/handle used for the package and where it was recorded locally;
-- public-copy polish status: `$humanizer-zh` used, `$story-deslop` used for narrative passages, or skipped because no formal public copy was output;
+- public-copy tone/polish status: `反老登味 / 反 AI 味内容闸门` passed, `$humanizer-zh` used, `$story-deslop` used for narrative passages, or skipped because no formal public copy was output;
 - title/cover/card responsibility check: title has audience + scenario + searchable/recognizable keywords; cover has emotional conflict + click reason; pages 1-3 are low-comprehension-cost; facts/lists/sources start on page 4 or later;
 - front-three card check: whether pages 1-3 are simple enough for feed click-through and where detailed information starts;
 - publish-format bundle when requested: copy-ready title, body, tags, image output directory, image-order note, tag count, dimension check, and re-edit phase note when applicable;
