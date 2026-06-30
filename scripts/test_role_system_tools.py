@@ -13,6 +13,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 PYTHON = sys.executable
 ENSURE = ROOT / "skills" / "agent-role-orchestrator" / "scripts" / "ensure_project_role_files.py"
+RENDER_PROMPT = ROOT / "skills" / "agent-role-orchestrator" / "scripts" / "render_role_prompt.py"
 VALIDATE_LOOP = ROOT / "skills" / "agent-role-orchestrator" / "scripts" / "validate_role_loop.py"
 CHECK_CODEGRAPH = ROOT / "skills" / "agent-role-orchestrator" / "scripts" / "check_codegraph.py"
 AGGREGATE_SKILL_HITS = ROOT / "skills" / "agent-role-orchestrator" / "scripts" / "aggregate_skill_hits.py"
@@ -160,6 +161,79 @@ def test_aggregate_skill_hits_quantifies_required_actual_and_misfires() -> None:
         assert payload["hit_rate"] == 0.5
 
 
+def test_render_prompt_rejects_ceo_direct_technical_execution() -> None:
+    result = run(
+        [
+            PYTHON,
+            str(RENDER_PROMPT),
+            "--role",
+            "开发",
+            "--objective",
+            "编写验收脚本",
+            "--source-role",
+            "总控",
+        ],
+        check=False,
+    )
+    assert result.returncode != 0
+    assert "总控不能直接派发技术执行角色" in result.stderr
+
+
+def test_render_prompt_rejects_ceo_direct_content_execution() -> None:
+    result = run(
+        [
+            PYTHON,
+            str(RENDER_PROMPT),
+            "--role",
+            "小红书",
+            "--objective",
+            "准备发布包",
+            "--source-role",
+            "总控",
+        ],
+        check=False,
+    )
+    assert result.returncode != 0
+    assert "总控不能直接派发内容执行角色" in result.stderr
+
+
+def test_render_prompt_allows_ceo_to_owner_layer_and_explicit_override() -> None:
+    owner = run(
+        [
+            PYTHON,
+            str(RENDER_PROMPT),
+            "--role",
+            "架构",
+            "--objective",
+            "拆解验收脚本需求",
+            "--source-role",
+            "总控",
+            "--loop-depth",
+            "L1",
+        ]
+    )
+    assert "Loop 深度（可折叠路由）：" in owner.stdout
+    assert "本次深度：L1" in owner.stdout
+    assert "总控 / CEO 只直接对接负责人层" in owner.stdout
+
+    override = run(
+        [
+            PYTHON,
+            str(RENDER_PROMPT),
+            "--role",
+            "开发",
+            "--objective",
+            "用户明确要求直接生成开发窗口",
+            "--source-role",
+            "总控",
+            "--allow-ceo-direct-dispatch",
+            "--override-reason",
+            "用户明确要求绕过架构",
+        ]
+    )
+    assert "用户明确要求绕过架构" in override.stdout
+
+
 def test_role_system_validator() -> None:
     result = run([PYTHON, str(VALIDATE_ROLE_SYSTEM)])
     assert "Role system validation passed" in result.stdout
@@ -172,6 +246,9 @@ def main() -> int:
         test_role_ledger_rejects_duplicate_threads_and_bad_status,
         test_check_codegraph_reports_state_without_guessing,
         test_aggregate_skill_hits_quantifies_required_actual_and_misfires,
+        test_render_prompt_rejects_ceo_direct_technical_execution,
+        test_render_prompt_rejects_ceo_direct_content_execution,
+        test_render_prompt_allows_ceo_to_owner_layer_and_explicit_override,
         test_role_system_validator,
     ]
     for test in tests:

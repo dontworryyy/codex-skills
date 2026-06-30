@@ -73,6 +73,8 @@ def validate_docs(errors: list[str]) -> None:
             "check_codegraph.py",
             "aggregate_skill_hits.py",
             "上下文预算",
+            "Loop 深度",
+            "总控只直接对接负责人层",
         ],
         errors,
     )
@@ -89,6 +91,8 @@ def validate_docs(errors: list[str]) -> None:
             "check_codegraph.py",
             "aggregate_skill_hits.py",
             "压缩交接卡",
+            "Loop 深度",
+            "总控只直接对接负责人层",
         ],
         errors,
     )
@@ -111,6 +115,8 @@ def validate_orchestrator(errors: list[str]) -> None:
             "模型建议：",
             "技能命中回传：",
             "上下文预算",
+            "Loop Depth And Owner-Layer Routing Rule",
+            "负责人交互边界",
         ],
         errors,
     )
