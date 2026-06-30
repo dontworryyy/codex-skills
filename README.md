@@ -55,6 +55,8 @@ Windows 没有 `rsync` 时，可以按目录复制 `skills/<skill-name>/` 到 `%
 核心默认行为：
 
 - 新需求默认先过 `总控 / CEO`，由总控判断是否进入 `架构 / CTO`、`内容主编`、`知识库`、`技能维护` 或专业角色。
+- 角色树是可折叠组织结构，不是每次强制最长链路；总控先选择 `L0`/`L1`/`L2`/`L3` loop 深度。
+- 进入总控管理流后，总控只直接对接负责人层：`架构 / CTO`、`内容主编`、`知识库`、`技能维护` 和必要时 `文档/交付`。
 - `架构 / CTO` 管技术交付闭环：开发、UI/Frontend、测试、QA、安全、DBA、运维。
 - `内容主编` 管内容闭环：公众号发布、小红书、视频和 UI/PPT 视觉资产协作。
 - 新本地代码项目默认检查或初始化 CodeGraph。
@@ -62,7 +64,7 @@ Windows 没有 `rsync` 时，可以按目录复制 `skills/<skill-name>/` 到 `%
 - 总控/架构/多角色/派发/回调/台账类任务必须先读取 `agent-role-orchestrator` 和项目 `.codex/role-windows.md`。
 - `总控` 维护全局技能路由和模型预算台账，`架构` 维护技术子树台账，`内容主编` 维护内容子树台账。
 - 机械字段、提示词模板、CodeGraph 状态、台账状态、回调完整性和技能命中统计优先交给 `agent-role-orchestrator/scripts/` 做 fail-closed 校验。
-- `开发` 默认按第一性原理开发：目标、事实、约束/不变量、最小假设、最小改动、验证证据。
+- `开发` 默认是 `开发负责人 / Dev Lead`：用 `gpt-5.5` + `xhigh` 拆解、集成、纠偏和最终提交；`gpt-5.3-codex-spark` + `xhigh` 只作为短小可验证的开发执行 subagent。
 - `QA` 默认做对抗式审查：主动找反例、边界、回归面、证据缺口和过度声明。
 - 新建或接续角色窗口时默认写清 model/thinking 路由。
 - 已建立角色默认继承/接续，不重复开新窗口。
@@ -99,6 +101,17 @@ Windows 没有 `rsync` 时，可以按目录复制 `skills/<skill-name>/` 到 `%
 ```
 
 `总控` 类似 CEO，管入口、优先级、角色路由、模型预算和最终验收。`架构` 类似 CTO，管技术方案和开发/UI/测试/QA/安全/DBA/运维闭环。`内容主编` 管公众号、小红书、视频和视觉资产协作。
+
+Loop 深度按任务折叠：
+
+| 深度 | 链路 | 适用 |
+| --- | --- | --- |
+| `L0` | 用户 -> 执行角色 | 用户明确指定角色、低风险小任务 |
+| `L1` | 总控 -> 负责人层 | 需要目标、风险、路线判断，但暂不需要多角色执行 |
+| `L2` | 总控 -> 负责人 -> 执行角色 -> 负责人 -> 总控 | 普通复杂技术或内容任务 |
+| `L3` | L2 + 测试/QA/安全/DBA/运维等独立门禁 | 关键 PR、发布、生产、账号、安全、数据库、公开声明风险 |
+
+总控不直接追开发细节，不写代码、测试脚本、验收脚本或自动化验证脚本；这些产物交给 `开发` 或 `测试`，由 `架构` / `QA` 复核证据。
 
 ### 3. Multi-Window / Role-Based Loop Engineering
 
@@ -191,13 +204,16 @@ python skills/agent-role-orchestrator/scripts/aggregate_skill_hits.py \
 | --- | --- |
 | `总控 / CEO` | `gpt-5.5` + `xhigh` |
 | `架构 / CTO` | `gpt-5.5` + `xhigh` |
-| `开发` | `gpt-5.3-codex-spark` + `xhigh` |
-| `QA` 普通验收 | `gpt-5.3-codex-spark` + `high` |
+| `开发负责人 / Dev Lead` | `gpt-5.5` + `xhigh` |
+| `开发执行 subagent` | `gpt-5.3-codex-spark` + `xhigh`，窗口内一次性 worker，只执行单一、短、小、可验证的代码任务 |
+| `QA` 普通验收 | `gpt-5.5` + `medium` |
 | `QA` 关键 PR / 对抗式审查 / 发布门禁 | `gpt-5.5` + `xhigh` |
 | `技能维护` / `文档/交付` | `gpt-5.3-codex-spark` + `high`，小文档可用 `gpt-5.4-mini` |
 | `内容主编` / 内容执行角色 | 默认 `gpt-5.3-codex-spark` + `high`，高风险定位或公开声明升 `gpt-5.5` + `xhigh` |
 
 新建窗口时由 `总控` 或 `架构` 显式指定 model/thinking；已开窗口优先复用，并可在后续消息里覆盖 model/thinking，覆盖只影响之后的回复。
+
+长任务不要让 Spark 独立扛完整上下文。`开发负责人 / Dev Lead` 先写任务卡，明确目标、文件白名单、禁止范围、验证命令、期望输出和回调对象，再把短小执行片段派给 `开发执行 subagent`。这里的 subagent 是当前窗口内的一次性 worker：任务结束后关闭，不写入 `.codex/role-windows.md`，不作为角色窗口复用。最终 review、整合、纠偏、验证和提交仍由 Dev Lead 负责。
 
 ### 7. Measured Skill Routing and Token-Aware Loops
 

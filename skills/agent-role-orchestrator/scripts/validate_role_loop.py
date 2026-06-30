@@ -36,6 +36,8 @@ PLACEHOLDERS = {"", "TODO", "TBD", "<待填写>", "<todo>", "null", "None"}
 PROMPT_REQUIRED_MARKERS = [
     "模型建议：",
     "角色树位置",
+    "Loop 深度（可折叠路由）：",
+    "负责人交互边界：",
     "目标：",
     "请先阅读/检查：",
     "允许修改：",

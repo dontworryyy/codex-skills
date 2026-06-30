@@ -49,7 +49,7 @@
 | --- | --- | --- | --- |
 | `总控` / `CEO` | Codex 本地窗口 | 默认入口、目标澄清、优先级、模型预算、角色路由、顶层台账、最终验收 | `agent-role-orchestrator`, `gstack-office-hours`, `gstack-plan-ceo-review`, `startup-pressure-test` |
 | `架构` / `CTO` | Codex 本地窗口 | 技术方案、多方案技术选型、新项目 CodeGraph 启动、开源/可借鉴方案扫描、管理开发/UI/测试/QA/安全/DBA/运维闭环 | `agent-role-orchestrator`, `gstack`, `gstack-spec`, `gstack-autoplan`, `gstack-plan-*` |
-| `开发` | Codex 本地窗口 | 按第一性原理拆解后实现代码、测试、提交 | 由项目技术栈决定，可辅助用 `gstack-investigate`, `gstack-review`, `gstack-ship`, `gstack-health`, `gstack-careful`, `gstack-guard`, `playwright`, `pdf` |
+| `开发负责人 / Dev Lead` | Codex 本地窗口 | 按第一性原理拆解任务、管理开发执行 subagent、整合代码、测试、提交 | 由项目技术栈决定，可辅助用 `gstack-investigate`, `gstack-review`, `gstack-ship`, `gstack-health`, `gstack-careful`, `gstack-guard`, `playwright`, `pdf` |
 | `UI/PPT` / `UI/Frontend` | Codex 本地窗口 | UI 体验、视觉改造、前端视觉保真、网页 PPT、社交卡、公众号封面、演示材料、照片到玩具资产规划 | `gstack-design-*`, `design-taste-frontend`, `guizang-ppt-skill`, `guizang-social-card-skill`, `photo-to-cute-3d-toy`, `playwright` |
 | `视频` | Codex 本地窗口 | 宣传视频脚本、分镜、素材和渲染计划 | `hatch-pet` 或视频插件/工具链 |
 | `内容主编` | Codex 本地窗口 | 内容域上层协调，管理公众号发布、小红书、视频和 UI/PPT 视觉资产协作 | `agent-role-orchestrator`, `humanizer-zh`, `story-deslop`, 内容平台相关 skills |
@@ -96,17 +96,29 @@
 ### 新需求
 
 1. 先开或继承 `总控` 窗口，除非用户明确要求直接进入某个专业角色。
-2. `总控` 读取项目上下文，判断需求类型、风险、模型预算、是否需要多角色，以及是否进入 `架构`、`内容主编`、`知识库` 或 `技能维护`。
-3. 总控/架构/多角色/派发/回调/台账类任务必须先读取已安装的 `agent-role-orchestrator/SKILL.md` 和项目 `.codex/role-windows.md`；若台账缺失或不可读，状态写 `待确认`，不要编造线程 ID。项目允许写入时，优先用 `ensure_project_role_files.py --write` 创建或刷新 `AGENTS.md` 托管规则块和初始台账模板。
-4. 技术复杂需求交给 `架构 / CTO` 输出 3-5 个可行技术路线的选型简报，再进入下游实施。
-5. 新本地代码项目由 `架构 / CTO` 默认先用 `check_codegraph.py --project <path>` 检查 CodeGraph；未初始化时在允许写入的前提下初始化并重查，未安装时提示安装，或在环境允许且安装方式明确时做用户级静默安装。
-6. 技术需求确认到足以描述问题后，`架构 / CTO` 先做有边界的开源/可借鉴方案扫描；若网络不可用、用户禁用或上下文敏感，要写明跳过原因。
-7. 内容任务由 `内容主编` 判断是否拆给 `公众号发布`、`小红书`、`视频` 或 `UI/PPT` 视觉资产协作。
-8. `总控`、`架构`、`内容主编` 只在必要时输出下游提示词，并写清模型建议、文件范围、禁止范围、验证和回调；脚本可用时优先用 `render_role_prompt.py` 生成骨架。
-9. 已建立过的角色默认走 `继承` / `接续`，不要重复新建窗口；`.codex/role-windows.md` 中已有线程 ID 时必须复用。
-10. 下游角色完成、阻塞或需要发起方决策时，用 `压缩回调` 默认回调任务发起窗口；不无条件回报给 `总控` 或 `架构`。
-11. 每次派发、回调、阻塞、完成、误开或纠偏后，更新 `.codex/role-windows.md` 的最新结果、下一步和循环状态。
-12. 只有明确需要并行时才开 `开发1号`、`开发2号` 这类编号角色。
+2. `总控` 读取项目上下文，判断需求类型、风险、模型预算、是否需要多角色，并先选择 loop 深度：`L0` 直接执行、`L1` 负责人层、`L2` 标准负责人-执行闭环、`L3` 高风险门禁闭环。
+3. 一旦进入总控管理流，原则是总控只直接对接负责人层：`架构 / CTO`、`内容主编`、`知识库`、`技能维护`，必要时 `文档/交付`；不直接指挥开发、测试、QA、DBA、运维、公众号、小红书或视频。
+4. 总控/架构/多角色/派发/回调/台账类任务必须先读取已安装的 `agent-role-orchestrator/SKILL.md` 和项目 `.codex/role-windows.md`；若台账缺失或不可读，状态写 `待确认`，不要编造线程 ID。项目允许写入时，优先用 `ensure_project_role_files.py --write` 创建或刷新 `AGENTS.md` 托管规则块和初始台账模板。
+5. 技术复杂需求交给 `架构 / CTO` 输出 3-5 个可行技术路线的选型简报，再进入下游实施。
+6. 新本地代码项目由 `架构 / CTO` 默认先用 `check_codegraph.py --project <path>` 检查 CodeGraph；未初始化时在允许写入的前提下初始化并重查，未安装时提示安装，或在环境允许且安装方式明确时做用户级静默安装。
+7. 技术需求确认到足以描述问题后，`架构 / CTO` 先做有边界的开源/可借鉴方案扫描；若网络不可用、用户禁用或上下文敏感，要写明跳过原因。
+8. 内容任务由 `内容主编` 判断是否拆给 `公众号发布`、`小红书`、`视频` 或 `UI/PPT` 视觉资产协作。
+9. `总控`、`架构`、`内容主编` 只在必要时输出下游提示词，并写清模型建议、文件范围、禁止范围、验证和回调；脚本可用时优先用 `render_role_prompt.py` 生成骨架。
+10. 已建立过的角色默认走 `继承` / `接续`，不要重复新建窗口；`.codex/role-windows.md` 中已有线程 ID 时必须复用。
+11. 下游角色完成、阻塞或需要发起方决策时，用 `压缩回调` 默认回调任务发起窗口；不无条件回报给 `总控` 或 `架构`。
+12. 每次派发、回调、阻塞、完成、误开或纠偏后，更新 `.codex/role-windows.md` 的最新结果、下一步和循环状态。
+13. 只有明确需要并行时才开 `开发1号`、`开发2号` 这类编号角色。
+
+Loop 深度：
+
+| 深度 | 链路 | 适用 |
+| --- | --- | --- |
+| `L0` | 用户 -> 执行角色 | 用户明确指定角色、低风险小任务 |
+| `L1` | 总控 -> 负责人层 | 需要目标、路线、风险判断，但暂不需要多角色执行 |
+| `L2` | 总控 -> 负责人 -> 执行角色 -> 负责人 -> 总控 | 普通复杂任务 |
+| `L3` | L2 + 独立门禁 | 关键 PR、发布、生产、账号、安全、DBA、公开声明等高风险任务 |
+
+总控不写代码、测试脚本、验收脚本或自动化验证脚本；这类产物交给 `开发` 或 `测试`，由 `架构` / `QA` 复核证据。
 
 ### 路由前检查
 
@@ -115,6 +127,8 @@
 - 是否读取 agent-role-orchestrator？
 - 是否读取 `.codex/role-windows.md`？
 - 是否复用已有角色线程？
+- 是否选择最小可行 loop 深度？
+- 总控是否只对接负责人层？
 - 是否写清模型建议/覆盖？
 - 是否写清 source-window callback？
 - 是否写清允许/禁止范围？
@@ -200,8 +214,9 @@ python skills/agent-role-orchestrator/scripts/aggregate_skill_hits.py \
 | --- | --- |
 | `总控 / CEO` | `gpt-5.5` + `xhigh` |
 | `架构 / CTO` | `gpt-5.5` + `xhigh` |
-| `开发` | `gpt-5.3-codex-spark` + `xhigh` |
-| `QA` 普通验收 | `gpt-5.3-codex-spark` + `high` |
+| `开发负责人 / Dev Lead` | `gpt-5.5` + `xhigh` |
+| `开发执行 subagent` | `gpt-5.3-codex-spark` + `xhigh`，窗口内一次性 worker，只执行单一、短、小、可验证的代码任务 |
+| `QA` 普通验收 | `gpt-5.5` + `medium` |
 | `QA` 关键 PR / 对抗式审查 / 发布门禁 | `gpt-5.5` + `xhigh` |
 | `技能维护` / `文档/交付` | `gpt-5.3-codex-spark` + `high`，小文档可用 `gpt-5.4-mini` |
 | `内容主编` / 内容执行角色 | 默认 `gpt-5.3-codex-spark` + `high`，高风险定位或公开声明升 `gpt-5.5` + `xhigh` |
@@ -211,7 +226,11 @@ python skills/agent-role-orchestrator/scripts/aggregate_skill_hits.py \
 推荐用 Codex 本地窗口承接：
 
 - `架构 / CTO` 拆分后的代码实现。
+- `开发` 默认是 `开发负责人 / Dev Lead`：用 `gpt-5.5` + `xhigh` 拆解任务、整合结果、纠偏、最终验证和提交。
+- `开发执行 subagent` 默认用 `gpt-5.3-codex-spark` + `xhigh`，是当前开发负责人窗口内的一次性 worker；不写入 `.codex/role-windows.md`，任务结束后关闭，不作为角色窗口复用。
+- 不要让 Spark subagent 独立承担长任务负责人、架构判断、跨文件整合、最终提交或完整上下文恢复。
 - 开发全过程默认遵循第一性原理：先还原目标、事实、约束/不变量、最小可证伪假设、最小改动和验证证据，再动手实现。
+- 长任务或容易 compact 的任务先由 Dev Lead 写任务卡，包含目标、文件白名单、禁止范围、验证命令、预期输出和回调对象，再派发给开发执行 subagent。
 - 前端/UI/PPT/社交卡/视频产物；纯前端或视觉保真任务默认先由 `UI/PPT` / `UI/Frontend` 定视觉路线，再让 `开发` 按范围实现。
 - 公众号文章和小红书笔记的草稿、预览、发布包和明确授权后的发布自动化。
 - 交付文档包和个人知识库整理。
@@ -341,6 +360,8 @@ done
 ## 使用口诀
 
 - 新需求先过 `总控`。
+- 总控先选 loop 深度，不默认走最长链路。
+- 总控只找负责人层，技术找架构，内容找主编。
 - 技术复杂需求交给 `架构 / CTO` 看多条技术路线，选定路线再拆下游。
 - 新本地代码项目由 `架构 / CTO` 先检查或初始化 CodeGraph，未安装则提示安装或在可行时静默安装。
 - `架构 / CTO` 确认技术需求后，先做有边界的开源/可借鉴方案扫描，再决定是否拆给技术下游角色。

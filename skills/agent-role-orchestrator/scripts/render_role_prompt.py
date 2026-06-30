@@ -58,6 +58,9 @@ ROLE_TREE_POSITION = {
 
 TECHNICAL_ROLES = {"架构", "开发", "UI/PPT", "测试", "QA", "安全", "DBA", "运维"}
 CONTENT_ROLES = {"内容主编", "公众号发布", "小红书", "视频"}
+TECHNICAL_EXECUTION_ROLES = {"开发", "UI/PPT", "测试", "QA", "安全", "DBA", "运维"}
+CONTENT_EXECUTION_ROLES = {"公众号发布", "小红书", "视频"}
+OWNER_LAYER_ROLES = {"架构", "内容主编", "知识库", "技能维护", "文档/交付"}
 
 
 @dataclass(frozen=True)
@@ -79,11 +82,11 @@ def model_route(role: str, risk: str) -> ModelRoute:
     if role in {"总控", "架构"}:
         return ModelRoute("gpt-5.5", "xhigh", "降级仅限低风险摘要或已确认的机械同步。")
     if role == "开发":
-        return ModelRoute("gpt-5.3-codex-spark", "xhigh", "复杂架构决策或跨系统高风险变更回流架构/总控。")
+        return ModelRoute("gpt-5.5", "xhigh", "开发执行 subagent 默认使用 gpt-5.3-codex-spark + xhigh；复杂架构决策或跨系统高风险变更回流架构/总控。")
     if role == "QA":
         if risk == "critical":
-            return ModelRoute("gpt-5.5", "xhigh", "普通验收可降级到 gpt-5.3-codex-spark + high。")
-        return ModelRoute("gpt-5.3-codex-spark", "high", "关键 PR、对抗式审查、发布门禁升级到 gpt-5.5 + xhigh。")
+            return ModelRoute("gpt-5.5", "xhigh", "普通验收可降级到 gpt-5.5 + medium。")
+        return ModelRoute("gpt-5.5", "medium", "关键 PR、对抗式审查、发布门禁升级到 gpt-5.5 + xhigh。")
     if role in {"技能维护", "文档/交付", "知识库"}:
         return ModelRoute("gpt-5.3-codex-spark", "high", "小型文档/registry 机械编辑可降级到 gpt-5.4-mini。")
     if role in CONTENT_ROLES:
@@ -105,8 +108,58 @@ def route_check_value(value: bool) -> str:
     return "是" if value else "待确认"
 
 
+def validate_source_route(role: str, args: argparse.Namespace) -> None:
+    source_role = args.source_role or ""
+    if source_role != "总控":
+        return
+    if role in OWNER_LAYER_ROLES:
+        return
+    if role in TECHNICAL_EXECUTION_ROLES:
+        if not args.allow_ceo_direct_dispatch:
+            raise ValueError("总控不能直接派发技术执行角色；请先派给 架构 / CTO，由架构拆给开发、UI/PPT、测试、QA、安全、DBA 或运维。")
+        if not args.override_reason:
+            raise ValueError("总控直派技术执行角色必须提供 --override-reason，说明用户为何明确要求绕过 架构 / CTO。")
+    if role in CONTENT_EXECUTION_ROLES:
+        if not args.allow_ceo_direct_dispatch:
+            raise ValueError("总控不能直接派发内容执行角色；请先派给 内容主编，由内容主编拆给公众号发布、小红书或视频。")
+        if not args.override_reason:
+            raise ValueError("总控直派内容执行角色必须提供 --override-reason，说明用户为何明确要求绕过 内容主编。")
+
+
+def default_forbidden(role: str) -> str:
+    defaults = "未授权的生产环境、账号设置、凭据、发布动作、数据库写操作、无关重构"
+    if role == "总控":
+        return defaults + "、代码实现、测试脚本、验收脚本、自动化验证脚本、直接指挥技术或内容执行角色"
+    return defaults
+
+
+def loop_depth_explanation(depth: str, override_reason: str | None) -> str:
+    override = f"\n- 本次 override：{override_reason}" if override_reason else ""
+    return f"""Loop 深度（可折叠路由）：
+- 本次深度：{depth}
+- L0：用户明确指定执行角色，直接执行一个低风险小任务；来源是用户，不是总控。
+- L1：总控只对接负责人层（架构 / CTO、内容主编、知识库、技能维护、文档/交付），负责人给出方案、风险、验收建议或是否需要拆下游。
+- L2：负责人拆给执行角色，执行角色回调负责人，负责人收敛后回总控。
+- L3：高风险闭环，在 L2 基础上加入测试、QA、安全、DBA、运维等独立复核或门禁。
+- 选择原则：能 L0/L1 解决就不要升级到 L2/L3；一旦进入总控管理流，总控不直接指挥执行层。{override}
+"""
+
+
+def role_execution_guidance(role: str) -> str:
+    if role != "开发":
+        return ""
+    return """开发负责人 / Dev Lead 执行规则：
+- 本窗口默认是开发负责人 / Dev Lead，使用 gpt-5.5 + xhigh，负责拆解、集成、纠偏、最终提交。
+- 需要并行或长任务时，先拆成任务卡，再把单一、短、小、可验证的代码任务交给开发执行 subagent。
+- 开发执行 subagent 是窗口内一次性 subagent，不是新的角色窗口；不写入 .codex/role-windows.md，不作为后续任务复用。
+- 开发执行 subagent 默认模型：gpt-5.3-codex-spark + xhigh；只执行单一、短、小、可验证的代码任务；任务结束后关闭，不作为角色窗口复用。
+- subagent 必须带文件白名单、禁止范围、验收命令和退出条件；不要让 subagent 承担架构判断、跨文件整合或最终提交。
+"""
+
+
 def build_prompt(args: argparse.Namespace) -> str:
     role = canonical_role(args.role)
+    validate_source_route(role, args)
     route = model_route(role, args.risk)
     source_role = args.source_role or ("用户" if role in {"总控", "架构"} else "待确认")
     source_thread = args.source_thread or "待确认"
@@ -140,8 +193,16 @@ def build_prompt(args: argparse.Namespace) -> str:
 - thinking：{route.thinking}
 - 升级/降级条件：{route.escalation}
 
+{role_execution_guidance(role)}
 角色树位置（总控/架构/内容主编/执行角色）：
 {ROLE_TREE_POSITION[role]}
+
+{loop_depth_explanation(args.loop_depth, args.override_reason)}
+负责人交互边界：
+- 总控 / CEO 只直接对接负责人层或治理角色：架构 / CTO、内容主编、知识库、技能维护、文档/交付，或用户明确指定的例外。
+- 技术执行角色（开发、UI/PPT、测试、QA、安全、DBA、运维）默认由架构 / CTO 派发、验收和回流；总控只接收架构汇总的项目结果、风险、决策点和最终验收建议。
+- 内容执行角色（公众号发布、小红书、视频）默认由内容主编派发、验收和回流；总控只接收内容主编汇总的内容结果、发布风险、授权点和最终验收建议。
+- 总控不编写或修改代码、测试脚本、验收脚本、自动化验证脚本；需要这类产物时，交给开发或测试实现，由架构/QA复核证据。
 
 技术方案（架构/CTO 处理复杂技术需求必填；已选定则写明选型）：
 - 状态：{needs_technical}
@@ -161,7 +222,7 @@ def build_prompt(args: argparse.Namespace) -> str:
 {lines_or_default(allowed, "待确认；未确认前只读")}
 
 禁止修改：
-{lines_or_default(forbidden, "未授权的生产环境、账号设置、凭据、发布动作、数据库写操作、无关重构")}
+{lines_or_default(forbidden, default_forbidden(role))}
 
 实现/工作要求：
 {args.work_requirements or "按角色边界推进；不确定信息写待确认；不要编造线程、事实、验证结果或发布状态。"}
@@ -263,6 +324,7 @@ def parse_args(argv: list[str]) -> argparse.Namespace:
     parser.add_argument("--objective", required=True, help="Concrete task objective. Required to avoid blank prompts.")
     parser.add_argument("--project", help="Project path or scope.")
     parser.add_argument("--mode", default="新建", choices=["新建", "继承", "接续", "重置"])
+    parser.add_argument("--loop-depth", default="L1", choices=["L0", "L1", "L2", "L3"], help="Collapsible routing depth. L0 direct user-to-executor; L1 owner layer; L2 owner-to-executor loop; L3 high-risk gated loop.")
     parser.add_argument("--risk", default="normal", choices=["normal", "critical"], help="Use critical for release gates, adversarial QA, compliance, or high-risk public claims.")
     parser.add_argument("--source-role", help="Source/callback role. Defaults to 用户 only for 总控/架构, otherwise 待确认.")
     parser.add_argument("--source-thread", help="Source thread id. Defaults to 待确认.")
@@ -287,6 +349,8 @@ def parse_args(argv: list[str]) -> argparse.Namespace:
     parser.add_argument("--read-orchestrator", action="store_true", help="Mark orchestrator skill as read.")
     parser.add_argument("--read-ledger", action="store_true", help="Mark project role ledger as read.")
     parser.add_argument("--new-code-project", action="store_true", help="Require CodeGraph status fields.")
+    parser.add_argument("--allow-ceo-direct-dispatch", action="store_true", help="Allow an explicit user override for 总控 -> execution-role direct dispatch.")
+    parser.add_argument("--override-reason", help="Required when --allow-ceo-direct-dispatch bypasses 架构 / CTO or 内容主编.")
     parser.add_argument("--output", type=Path, help="Write prompt to file instead of stdout.")
     return parser.parse_args(argv)
 
