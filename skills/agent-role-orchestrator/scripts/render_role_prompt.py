@@ -157,6 +157,18 @@ def role_execution_guidance(role: str) -> str:
 """
 
 
+def content_research_guidance(role: str) -> str:
+    if role not in CONTENT_ROLES:
+        return ""
+    return """X MCP 内容研究源（可选、只读、需授权）：
+- 适用：爆款内容研究、热点扫描、选题池、对标账号、跨平台讨论脉络。
+- 默认由内容主编统筹调用；公众号发布、小红书、视频可继承内容主编结论，或在被明确指派时使用。
+- 官方文档：https://docs.x.com/tools/mcp；X MCP 通过 https://api.x.com/mcp + xurl mcp 连接，Docs MCP 可用于查询 X API 文档。
+- 默认只读：搜索 posts、用户、用户时间线、trends/news 和公开讨论；需要 X Developer app 与 OAuth 授权，不把 CLIENT_ID/CLIENT_SECRET 写入 repo。
+- 禁止发帖、发布 Article、关注/取关、点赞、转发、私信、账号设置；任何写操作都需要用户单独明确授权。
+"""
+
+
 def build_prompt(args: argparse.Namespace) -> str:
     role = canonical_role(args.role)
     validate_source_route(role, args)
@@ -194,6 +206,7 @@ def build_prompt(args: argparse.Namespace) -> str:
 - 升级/降级条件：{route.escalation}
 
 {role_execution_guidance(role)}
+{content_research_guidance(role)}
 角色树位置（总控/架构/内容主编/执行角色）：
 {ROLE_TREE_POSITION[role]}
 
