@@ -44,12 +44,16 @@ PROMPT_REQUIRED_MARKERS = [
     "闭环状态：",
     "路由前检查",
     "技能路由台账",
+    "上下文预算：",
     "回调/通知规则：",
     "结构化反馈格式",
     "压缩回调：",
     "技能命中回传：",
     "规则沉淀：",
 ]
+
+LEDGER_REQUIRED_HEADERS = ["角色", "状态", "thread id", "来源窗口", "当前职责", "下一步", "循环状态"]
+TOP_LEVEL_REQUIRED_ROLES = {"总控", "架构", "内容主编"}
 
 CALLBACK_REQUIRED_MARKERS = [
     "压缩回调：",
@@ -122,6 +126,56 @@ def split_skill_list(value: str) -> set[str]:
     return cleaned
 
 
+def split_markdown_row(line: str) -> list[str]:
+    stripped = line.strip()
+    if not stripped.startswith("|") or not stripped.endswith("|"):
+        return []
+    return [cell.strip() for cell in stripped.strip("|").split("|")]
+
+
+def is_separator_row(cells: list[str]) -> bool:
+    return bool(cells) and all(re.fullmatch(r":?-{3,}:?", cell.strip()) for cell in cells)
+
+
+def is_canonical_or_numbered_role(role: str) -> bool:
+    if role in CANONICAL_ROLES:
+        return True
+    return any(re.fullmatch(rf"{re.escape(base)}\d+号", role) for base in CANONICAL_ROLES)
+
+
+def parse_ledger_table(text: str) -> tuple[list[dict[str, str]], list[str]]:
+    errors: list[str] = []
+    lines = text.splitlines()
+    for index, line in enumerate(lines):
+        headers = split_markdown_row(line)
+        if not headers:
+            continue
+        normalized = [header.lower() for header in headers]
+        if not all(required.lower() in normalized for required in LEDGER_REQUIRED_HEADERS):
+            continue
+        canonical_headers = [
+            next((required for required in LEDGER_REQUIRED_HEADERS if required.lower() == header.lower()), header)
+            for header in headers
+        ]
+        if index + 1 >= len(lines) or not is_separator_row(split_markdown_row(lines[index + 1])):
+            errors.append("ledger table header must be followed by a markdown separator row")
+            return [], errors
+
+        rows: list[dict[str, str]] = []
+        for row_line in lines[index + 2 :]:
+            cells = split_markdown_row(row_line)
+            if not cells:
+                break
+            if len(cells) != len(canonical_headers):
+                errors.append(f"ledger table row has {len(cells)} cells but header has {len(canonical_headers)}: {row_line.strip()}")
+                continue
+            rows.append(dict(zip(canonical_headers, cells)))
+        return rows, errors
+
+    errors.append("ledger missing recommended table header: " + " | ".join(LEDGER_REQUIRED_HEADERS))
+    return [], errors
+
+
 def validate_ledger(path: Path) -> CheckResult:
     errors: list[str] = []
     warnings: list[str] = []
@@ -131,37 +185,55 @@ def validate_ledger(path: Path) -> CheckResult:
         return CheckResult(str(path), [f"ledger missing: {path}"], warnings, metrics)
 
     text = read_text(path)
-    seen_roles = set()
-    seen_statuses = set()
+    rows, table_errors = parse_ledger_table(text)
+    errors.extend(table_errors)
 
-    for role in CANONICAL_ROLES:
-        if role in text:
-            seen_roles.add(role)
+    seen_roles: set[str] = set()
+    seen_statuses: set[str] = set()
+    thread_ids: dict[str, str] = {}
 
-    for line_no, line in enumerate(text.splitlines(), 1):
-        stripped = line.strip()
-        if not stripped:
+    for row_index, row in enumerate(rows, 1):
+        role = row.get("角色", "").strip()
+        status = row.get("状态", "").strip()
+        thread_id = row.get("thread id", "").strip()
+        source = row.get("来源窗口", "").strip()
+        responsibility = row.get("当前职责", "").strip()
+        next_step = row.get("下一步", "").strip()
+        loop_state = row.get("循环状态", "").strip()
+
+        if not role:
+            errors.append(f"ledger row {row_index}: blank role")
             continue
-        if has_placeholder_value(stripped):
-            errors.append(f"line {line_no}: placeholder value is not allowed: {stripped}")
-        for role in CANONICAL_ROLES:
-            if role not in stripped:
-                continue
-            statuses = {status for status in ALLOWED_STATUSES if status in stripped}
-            if statuses:
-                seen_statuses.update(statuses)
-            elif re.search(rf"(^|\s|-){re.escape(role)}\s*[:：]", stripped):
-                errors.append(f"line {line_no}: role {role} has no allowed lifecycle status")
-        if re.search(r"(thread|线程|thread id|thread_id)\s*[:：]\s*$", stripped, re.IGNORECASE):
-            errors.append(f"line {line_no}: blank thread id; use 待确认 when unknown")
+        seen_roles.add(role)
 
-    if not seen_roles:
-        errors.append("ledger does not mention any canonical role")
-    for expected in ("总控", "架构"):
+        if not is_canonical_or_numbered_role(role):
+            errors.append(f"ledger row {row_index}: unknown role: {role}")
+        if status not in ALLOWED_STATUSES:
+            errors.append(f"ledger row {row_index}: invalid status for {role}: {status}")
+        else:
+            seen_statuses.add(status)
+        if not thread_id:
+            errors.append(f"ledger row {row_index}: blank thread id; use 待确认 when unknown")
+        elif thread_id not in {"待确认", "无", "不适用"}:
+            if thread_id in thread_ids:
+                errors.append(f"ledger row {row_index}: duplicate thread id {thread_id} for {role}; already used by {thread_ids[thread_id]}")
+            else:
+                thread_ids[thread_id] = role
+
+        for field_name, value in (
+            ("来源窗口", source),
+            ("当前职责", responsibility),
+            ("下一步", next_step),
+            ("循环状态", loop_state),
+        ):
+            if value in PLACEHOLDERS:
+                errors.append(f"ledger row {row_index}: blank or placeholder {field_name} for {role}")
+
+    if not rows:
+        errors.append("ledger does not contain any role-window table rows")
+    for expected in TOP_LEVEL_REQUIRED_ROLES:
         if expected not in seen_roles:
             errors.append(f"ledger missing top-level role: {expected}")
-    if not seen_statuses:
-        errors.append("ledger does not contain any allowed lifecycle status")
 
     if "待确认" in text:
         warnings.append("ledger contains 待确认; confirm before creating/continuing affected windows")

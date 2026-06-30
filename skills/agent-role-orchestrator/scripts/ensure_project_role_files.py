@@ -18,7 +18,7 @@ AGENTS_BLOCK = f"""{AGENTS_BEGIN}
 
 - 总控/架构/多角色/派发/回调/台账类任务必须先使用 agent-role-orchestrator。
 - 执行前必须读取：
-  - C:\\Users\\12156\\.codex\\skills\\agent-role-orchestrator\\SKILL.md
+  - 已安装的 agent-role-orchestrator/SKILL.md（通常位于 `${{CODEX_HOME:-$HOME/.codex}}/skills/agent-role-orchestrator/SKILL.md` 或 Windows `%USERPROFILE%\\.codex\\skills\\agent-role-orchestrator\\SKILL.md`）
   - .codex/role-windows.md
 - 若未读取，不允许创建、继续或派发角色窗口；状态未知一律写“待确认”。
 - .codex/role-windows.md 是角色路由 source of truth：有线程 ID 就复用，不新建；误开、废弃、纠偏也必须记录。
@@ -52,6 +52,14 @@ LEDGER_TEMPLATE = """# 角色窗口台账
 ## 最近回调
 
 - 待确认
+
+## 压缩交接卡
+
+- 最近摘要：待确认
+- 关键决策：待确认
+- 当前证据：待确认
+- 下一步：待确认
+- 新窗口接续提示：待确认
 """
 
 

@@ -22,6 +22,9 @@ ROLE_CARDS = ORCHESTRATOR / "references" / "role-cards.md"
 RENDER_PROMPT = ORCHESTRATOR / "scripts" / "render_role_prompt.py"
 VALIDATE_LOOP = ORCHESTRATOR / "scripts" / "validate_role_loop.py"
 ENSURE_FILES = ORCHESTRATOR / "scripts" / "ensure_project_role_files.py"
+CHECK_CODEGRAPH = ORCHESTRATOR / "scripts" / "check_codegraph.py"
+AGGREGATE_SKILL_HITS = ORCHESTRATOR / "scripts" / "aggregate_skill_hits.py"
+ROLE_SCRIPTS = (RENDER_PROMPT, VALIDATE_LOOP, ENSURE_FILES, CHECK_CODEGRAPH, AGGREGATE_SKILL_HITS)
 
 
 def read(path: Path) -> str:
@@ -67,6 +70,9 @@ def validate_docs(errors: list[str]) -> None:
             "render_role_prompt.py",
             "validate_role_loop.py",
             "ensure_project_role_files.py",
+            "check_codegraph.py",
+            "aggregate_skill_hits.py",
+            "上下文预算",
         ],
         errors,
     )
@@ -80,6 +86,9 @@ def validate_docs(errors: list[str]) -> None:
             "render_role_prompt.py",
             "validate_role_loop.py",
             "ensure_project_role_files.py",
+            "check_codegraph.py",
+            "aggregate_skill_hits.py",
+            "压缩交接卡",
         ],
         errors,
     )
@@ -94,11 +103,14 @@ def validate_orchestrator(errors: list[str]) -> None:
             "render_role_prompt.py",
             "validate_role_loop.py",
             "ensure_project_role_files.py",
+            "check_codegraph.py",
+            "aggregate_skill_hits.py",
             "总控 / CEO",
             "架构 / CTO",
             "内容主编",
             "模型建议：",
             "技能命中回传：",
+            "上下文预算",
         ],
         errors,
     )
@@ -110,6 +122,8 @@ def validate_orchestrator(errors: list[str]) -> None:
             "## 内容主编",
             "ensure_project_role_files.py",
             "validate_role_loop.py",
+            "check_codegraph.py",
+            "aggregate_skill_hits.py",
         ],
         errors,
     )
@@ -139,11 +153,11 @@ def validate_registry(errors: list[str]) -> None:
 
 
 def validate_scripts(errors: list[str]) -> None:
-    for script in (RENDER_PROMPT, VALIDATE_LOOP, ENSURE_FILES):
+    for script in ROLE_SCRIPTS:
         if not script.is_file():
             errors.append(f"missing role-system script: {script.relative_to(ROOT)}")
 
-    run([PYTHON, "-m", "py_compile", str(RENDER_PROMPT), str(VALIDATE_LOOP), str(ENSURE_FILES), str(Path(__file__))], errors)
+    run([PYTHON, "-m", "py_compile", *(str(script) for script in ROLE_SCRIPTS), str(Path(__file__))], errors)
 
     with tempfile.TemporaryDirectory() as temp:
         temp_path = Path(temp)
@@ -238,6 +252,50 @@ def validate_scripts(errors: list[str]) -> None:
             errors.append("AGENTS.md managed block is missing or duplicated")
         if ledger.exists() and "| 总控 | 待确认 | 待确认 | 用户 | 入口分流" not in ledger.read_text(encoding="utf-8"):
             errors.append("role-windows.md missing default 总控 row")
+        if agents.exists():
+            agents_text = agents.read_text(encoding="utf-8")
+            machine_path_fragment = "\\".join(["C:", "Users"]) + "\\"
+            if machine_path_fragment in agents_text:
+                errors.append("AGENTS.md template contains a machine-specific Windows user path")
+        if ledger.exists() and "## 压缩交接卡" not in ledger.read_text(encoding="utf-8"):
+            errors.append("role-windows.md missing 压缩交接卡 section")
+
+        run([PYTHON, str(VALIDATE_LOOP), "--project", str(project)], errors)
+
+        codegraph = run([PYTHON, str(CHECK_CODEGRAPH), "--project", str(project), "--json"], errors)
+        try:
+            codegraph_payload = json.loads(codegraph.stdout)
+            if codegraph_payload.get("initialization_status") not in {"已初始化", "未初始化"}:
+                errors.append("check_codegraph.py returned an invalid initialization_status")
+        except Exception as exc:  # noqa: BLE001
+            errors.append(f"check_codegraph.py did not emit JSON: {exc}")
+
+        aggregate = run([PYTHON, str(AGGREGATE_SKILL_HITS), str(good_callback), "--json"], errors)
+        try:
+            aggregate_payload = json.loads(aggregate.stdout)
+            if aggregate_payload.get("required_skill_count") != 0:
+                errors.append("aggregate_skill_hits.py should not infer required skills from callback-only fixture")
+        except Exception as exc:  # noqa: BLE001
+            errors.append(f"aggregate_skill_hits.py did not emit JSON: {exc}")
+
+
+def validate_no_machine_specific_paths(errors: list[str]) -> None:
+    forbidden_fragments = [
+        "\\".join(["C:", "Users"]) + "\\",
+        "/".join(["C:", "Users", ""]),
+        "12" + "156",
+    ]
+    allowed_suffixes = {".png", ".jpg", ".jpeg", ".gif", ".ico", ".pdf", ".zip", ".jar", ".class", ".pyc"}
+    for root_name in ("README.md", "docs", "registry", "scripts", "skills"):
+        root = ROOT / root_name
+        paths = [root] if root.is_file() else [path for path in root.rglob("*") if path.is_file()]
+        for path in paths:
+            if path.suffix.lower() in allowed_suffixes:
+                continue
+            text = path.read_text(encoding="utf-8", errors="ignore")
+            for fragment in forbidden_fragments:
+                if fragment in text:
+                    errors.append(f"{path.relative_to(ROOT)} contains machine-specific path fragment: {fragment}")
 
 
 def main() -> int:
@@ -246,6 +304,7 @@ def main() -> int:
     validate_orchestrator(errors)
     validate_registry(errors)
     validate_scripts(errors)
+    validate_no_machine_specific_paths(errors)
 
     if errors:
         print("Role system validation failed:")
