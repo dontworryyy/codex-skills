@@ -174,6 +174,11 @@ def build_prompt(args: argparse.Namespace) -> str:
 - 上一轮反馈：{args.previous_feedback or "无 / 待确认"}
 - 本轮退出条件：{args.exit_condition or "完成目标、阻塞并说明证据、或需要来源窗口决策"}
 
+上下文预算：
+- 不搬运完整聊天记录、长日志或大段源码；默认只传状态增量、证据句柄、决策需求和下一回流对象。
+- 每次派发、回调、阻塞、完成或纠偏后，更新 .codex/role-windows.md；长任务同时刷新“压缩交接卡”。
+- 当上下文接近过长、compact 失败、或任务跨越多个闭环时，先用台账、提交、PR、文件证据和压缩交接卡接续，不要求新窗口读取完整旧线程。
+
 CodeGraph 状态（新本地代码项目必填；不适用时写明原因）：
 - 可用性：{needs_codegraph}
 - 初始化状态：待确认
