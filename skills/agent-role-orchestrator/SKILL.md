@@ -521,6 +521,18 @@ For roles that produce outward-facing Chinese copy (`公众号发布`, `小红�
 - Use `$story-deslop` only when the public copy itself is narrative prose, story fragments, character dialogue, or fiction-like scenario writing. Normal WeChat/Xiaohongshu marketing or analysis copy still defaults to `$humanizer-zh`.
 - Skip this gate only for rough outlines, internal notes, diagnostics, or non-public technical/docs output, and say it was not formal public copy.
 
+### X MCP Content Research Source
+
+`X MCP` is an optional, read-only, user-authorized content research source for `内容主编`, `小红书`, `公众号发布`, and `视频`. Use it for viral-content research, trend scanning, topic pools, benchmark accounts, public discussion timelines, and cross-platform signal gathering.
+
+Boundaries:
+- Default coordinator: `内容主编`. Platform roles should usually inherit the editor's findings; they may call X MCP directly only when assigned.
+- Official docs: https://docs.x.com/tools/mcp. X MCP connects through `https://api.x.com/mcp` via `xurl mcp`; Docs MCP at `https://docs.x.com/mcp` is for X API documentation lookup.
+- Default allowed use: read/search posts, users, user timelines, trends/news, public discussions, and public source context that the authorized account can access.
+- Default forbidden use: posting, publishing Articles, following/unfollowing, liking, reposting, DMs, account settings, bookmark mutation, engagement manipulation, or any write action.
+- Secrets and OAuth: require the user's X Developer app and OAuth flow when real access is needed; never write `CLIENT_ID`, `CLIENT_SECRET`, tokens, cookies, or account-specific state into this repo.
+- Interpretation: X data is a trend and benchmark signal, not direct proof that a Xiaohongshu or WeChat piece will perform. Pair it with platform-local skills such as `$cheat-on-content`, `$xhs-comment-research`, and `$humanizer-zh` before final content.
+
 For role tools sourced from external GitHub skills or Hermes-owned operational skills, name them as dependencies instead of treating them as local role logic:
 - `总控` CEO/product pressure, role route, and model-budget review: `$gstack-office-hours`, `$gstack-plan-ceo-review`, `$startup-pressure-test`;
 - `架构` gstack method routing / plan lock-in before technical downstream windows: `$gstack`;

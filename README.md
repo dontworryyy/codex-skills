@@ -187,6 +187,7 @@ python skills/agent-role-orchestrator/scripts/aggregate_skill_hits.py \
 | 代码实现、调查、评审 | 开发角色 + `gstack-investigate/review/ship/health` |
 | UI、网页 PPT、社交卡、封面 | UI/PPT 角色 + `design-taste-frontend`、`guizang-*` |
 | 内容规划和跨平台分发 | `内容主编` + 内容角色工具 |
+| 爆款内容研究、热点扫描、对标账号 | `内容主编` + X MCP 内容研究源（只读、需授权，见 https://docs.x.com/tools/mcp） |
 | 公众号发布 | `wechat-ai-app-ops`、`wechat-tech-writer`、`wechat-article-formatter` |
 | 小红书发布与内容实验 | `cheat-on-content`、`xhs-publish-assistant`、`xhs-comment-research` |
 | 中文正式对外文案 | `humanizer-zh`，叙事类再按需用 `story-deslop` |
@@ -214,6 +215,16 @@ python skills/agent-role-orchestrator/scripts/aggregate_skill_hits.py \
 新建窗口时由 `总控` 或 `架构` 显式指定 model/thinking；已开窗口优先复用，并可在后续消息里覆盖 model/thinking，覆盖只影响之后的回复。
 
 长任务不要让 Spark 独立扛完整上下文。`开发负责人 / Dev Lead` 先写任务卡，明确目标、文件白名单、禁止范围、验证命令、期望输出和回调对象，再把短小执行片段派给 `开发执行 subagent`。这里的 subagent 是当前窗口内的一次性 worker：任务结束后关闭，不写入 `.codex/role-windows.md`，不作为角色窗口复用。最终 review、整合、纠偏、验证和提交仍由 Dev Lead 负责。
+
+### X MCP 内容研究源
+
+X MCP 可作为内容角色的只读研究源，用来研究爆款内容、热点话题、对标账号、公开讨论脉络和选题池。默认由 `内容主编` 统筹，`小红书`、`公众号发布`、`视频` 继承研究结论或在被明确指派时使用。
+
+- 官方文档：https://docs.x.com/tools/mcp
+- 默认只读：搜索 posts、用户、用户时间线、trends/news 和公开讨论。
+- 需要授权：真实访问需要 X Developer app、OAuth 和本机 `xurl mcp` 配置；不要把 `CLIENT_ID`、`CLIENT_SECRET`、token、cookie 或账号状态写进仓库。
+- 默认禁止：发帖、发布 Article、关注/取关、点赞、转发、私信、账号设置、书签变更和任何互动/写操作。
+- 平台化处理：X 数据只是趋势和对标信号，不能直接等同于小红书或公众号爆款规律；最终仍要结合 `$cheat-on-content`、`$xhs-comment-research`、`$humanizer-zh` 等平台技能加工。
 
 ### 7. Measured Skill Routing and Token-Aware Loops
 

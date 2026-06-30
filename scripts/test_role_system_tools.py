@@ -292,6 +292,25 @@ def test_render_prompt_routes_qa_default_and_critical_models() -> None:
     assert "thinking：xhigh" in critical.stdout
 
 
+def test_render_prompt_includes_readonly_x_mcp_for_content_roles() -> None:
+    editor = run(
+        [
+            PYTHON,
+            str(RENDER_PROMPT),
+            "--role",
+            "内容主编",
+            "--objective",
+            "研究爆款选题和对标账号",
+            "--source-role",
+            "总控",
+        ]
+    )
+    assert "X MCP 内容研究源" in editor.stdout
+    assert "只读、需授权" in editor.stdout
+    assert "爆款内容研究、热点扫描、选题池、对标账号" in editor.stdout
+    assert "禁止发帖、发布 Article、关注/取关、点赞、转发、私信、账号设置" in editor.stdout
+
+
 def test_role_system_validator() -> None:
     result = run([PYTHON, str(VALIDATE_ROLE_SYSTEM)])
     assert "Role system validation passed" in result.stdout
@@ -309,6 +328,7 @@ def main() -> int:
         test_render_prompt_allows_ceo_to_owner_layer_and_explicit_override,
         test_render_prompt_routes_development_lead_and_subagents,
         test_render_prompt_routes_qa_default_and_critical_models,
+        test_render_prompt_includes_readonly_x_mcp_for_content_roles,
         test_role_system_validator,
     ]
     for test in tests:
