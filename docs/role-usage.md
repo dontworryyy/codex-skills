@@ -18,6 +18,8 @@
 │   ├── validate_role_system.py
 │   └── test_role_system_tools.py
 ├── skills/agent-role-orchestrator/scripts/
+│   ├── aggregate_skill_hits.py
+│   ├── check_codegraph.py
 │   ├── ensure_project_role_files.py
 │   ├── render_role_prompt.py
 │   └── validate_role_loop.py
@@ -97,7 +99,7 @@
 2. `总控` 读取项目上下文，判断需求类型、风险、模型预算、是否需要多角色，以及是否进入 `架构`、`内容主编`、`知识库` 或 `技能维护`。
 3. 总控/架构/多角色/派发/回调/台账类任务必须先读取已安装的 `agent-role-orchestrator/SKILL.md` 和项目 `.codex/role-windows.md`；若台账缺失或不可读，状态写 `待确认`，不要编造线程 ID。项目允许写入时，优先用 `ensure_project_role_files.py --write` 创建或刷新 `AGENTS.md` 托管规则块和初始台账模板。
 4. 技术复杂需求交给 `架构 / CTO` 输出 3-5 个可行技术路线的选型简报，再进入下游实施。
-5. 新本地代码项目由 `架构 / CTO` 默认先检查或初始化 CodeGraph；未安装时提示安装，或在环境允许且安装方式明确时做用户级静默安装。
+5. 新本地代码项目由 `架构 / CTO` 默认先用 `check_codegraph.py --project <path>` 检查 CodeGraph；未初始化时在允许写入的前提下初始化并重查，未安装时提示安装，或在环境允许且安装方式明确时做用户级静默安装。
 6. 技术需求确认到足以描述问题后，`架构 / CTO` 先做有边界的开源/可借鉴方案扫描；若网络不可用、用户禁用或上下文敏感，要写明跳过原因。
 7. 内容任务由 `内容主编` 判断是否拆给 `公众号发布`、`小红书`、`视频` 或 `UI/PPT` 视觉资产协作。
 8. `总控`、`架构`、`内容主编` 只在必要时输出下游提示词，并写清模型建议、文件范围、禁止范围、验证和回调；脚本可用时优先用 `render_role_prompt.py` 生成骨架。
@@ -151,7 +153,33 @@ python skills/agent-role-orchestrator/scripts/validate_role_loop.py \
   --callback /path/to/callback.md
 ```
 
+检查 CodeGraph 状态：
+
+```bash
+python skills/agent-role-orchestrator/scripts/check_codegraph.py \
+  --project /path/to/project
+```
+
+聚合技能命中率：
+
+```bash
+python skills/agent-role-orchestrator/scripts/aggregate_skill_hits.py \
+  /path/to/callbacks-or-ledgers
+```
+
 校验失败时不要派发、继续或关闭 loop；先补齐缺失字段，或把不确定状态明确写成 `待确认` 并说明原因。
+
+`.codex/role-windows.md` 推荐使用固定表格：
+
+```markdown
+| 角色 | 状态 | thread id | 来源窗口 | 当前职责 | 下一步 | 循环状态 |
+| --- | --- | --- | --- | --- | --- | --- |
+| 总控 | 待确认 | 待确认 | 用户 | 入口分流、模型预算、最终验收 | 待确认 | 待总控分流 |
+| 架构 | 待确认 | 待确认 | 总控 | CTO 技术拆解和技术角色闭环 | 待确认 | 待架构拆解 |
+| 内容主编 | 待确认 | 待确认 | 总控 | 内容域分流和平台角色闭环 | 待确认 | 待内容主编拆解 |
+```
+
+表格后保留 `压缩交接卡`：最近摘要、关键决策、当前证据、下一步、新窗口接续提示。长任务和多轮返工都从这里接续，不要求新窗口读取完整旧线程。
 
 ### 技能命中和 Token 压缩
 
@@ -159,6 +187,8 @@ python skills/agent-role-orchestrator/scripts/validate_role_loop.py \
 - 下游角色完成、阻塞或需要决策时，用 `技能命中回传` 说明已加载并使用、来源窗口要求但未使用、临时发现应补用、误召/无效加载和真正影响产出的 skill。
 - 来源窗口验收时必须检查 `技能命中回传`；缺失时退回补 callback，不算闭环完成。
 - 多窗口 loop 默认用 `压缩回调`，只传当前状态、本轮变化、证据链接/文件/命令、需要决策、下一回流对象和可复用优化沉淀状态。
+- 当上下文接近过长、remote compact 失败、或同一任务跨多个 PR/闭环时，优先开新窗口或接续既有角色窗口；输入只用 `.codex/role-windows.md`、压缩交接卡、提交/PR、文件证据和必要短摘要。
+- 有回调文件或台账快照时，用 `aggregate_skill_hits.py` 聚合命中率，不靠总控或架构凭记忆估算。
 - `总控` 负责本次任务的全局路由判断和聚合视图；`架构` 与 `内容主编` 负责各自子树。长期的漏召、误召、触发描述过期、registry 漂移、README 说明混乱或跨角色 token 过重，转给 `技能维护`。
 - `技能维护` 只沉淀可公开复用的 skill 体系改进，不接收项目私有 `.codex/role-windows.md`、本机 memory、账号登录态或生产细节。
 

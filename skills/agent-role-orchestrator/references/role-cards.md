@@ -76,6 +76,7 @@ First actions:
 - read project `.codex/role-windows.md` before creating, continuing, dispatching, retiring, or correcting role windows; if missing or unreadable, mark state as `待确认` and do not invent thread ids;
 - read project overview docs named by the user;
 - inspect git status if a repo is involved;
+- for a new local code project or newly opened repository, run `check_codegraph.py --project <path>` and record the status block before deeper architecture or downstream prompts;
 - reconstruct or ask for the current role-window registry before creating a same-role downstream prompt;
 - identify whether the request affects backend, frontend, UI, docs, database, ops, content publishing, security, testing, QA/review, release, or skill maintenance;
 - create the technical skill routing ledger: candidate skills, required skills, optional skills, skipped skills with reasons, and which role should load each one.
@@ -90,6 +91,7 @@ Output:
 - skill routing ledger, including candidate/required/optional/skipped skills and expected loader roles;
 - created, continued, or sent thread id and canonical title when a real role-window action is taken;
 - requirement restatement;
+- CodeGraph status block when a local code project is in scope;
 - architecture judgment;
 - technical options brief with selected route or `待用户/架构确认`;
 - gstack method used and review notes when used;
@@ -587,14 +589,15 @@ First actions:
 - collect the skill routing ledger and downstream `技能命中回传` summaries instead of full task transcripts;
 - check whether the project-level `AGENTS.md` or `.codex/role-windows.md` needs the reusable `总控` / `架构` entry rule, while keeping concrete project state local;
 - use `scripts/ensure_project_role_files.py` to dry-run or, when project writes are allowed, create/refresh the managed `AGENTS.md` block and `.codex/role-windows.md` template;
-- when role-loop mechanics are being changed, run `scripts/render_role_prompt.py` and `scripts/validate_role_loop.py` examples instead of relying on Markdown review alone;
+- when role-loop mechanics are being changed, run `scripts/render_role_prompt.py`, `scripts/validate_role_loop.py`, and `scripts/check_codegraph.py` examples instead of relying on Markdown review alone;
+- when callback or ledger artifacts exist, run `scripts/aggregate_skill_hits.py` to quantify required/actual/effective skills, missing required skills, misfires, and discovered should-use skills;
 - classify each issue as trigger wording, role boundary, registry metadata, docs discoverability, duplicated skill, missing skill, or loop-token overhead;
 - decide whether the fix is a narrow local-owned edit, an external-source adaptation, a docs/registry update, or only a recommendation;
 - keep project-specific state out of the shared repo;
 - run `scripts/validate_public_skills.py` and JSON/diff checks before reporting completion.
 
 Output:
-- skill hit summary: required/actual/effective, miss count, noisy-load count, and evidence source;
+- skill hit summary from `aggregate_skill_hits.py` when artifacts exist: required/actual/effective, miss count, noisy-load count, and evidence source;
 - proposed or applied routing/trigger/docs changes;
 - files changed and why they are reusable;
 - validation results;

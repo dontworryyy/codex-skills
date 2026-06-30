@@ -13,7 +13,7 @@
 - [ ] 已记录 `consumed_by_roles`，说明哪些角色会默认调用该 skill。
 - [ ] `python3 scripts/validate_role_system.py` 通过。
 - [ ] `python3 scripts/validate_public_skills.py` 通过。
-- [ ] 若修改 `agent-role-orchestrator`，已运行 `ensure_project_role_files.py` dry-run/write 正例、`render_role_prompt.py` 正例和 `validate_role_loop.py` 正/负例。
+- [ ] 若修改 `agent-role-orchestrator`，已运行 `ensure_project_role_files.py` dry-run/write 正例、`render_role_prompt.py` 正例、`validate_role_loop.py` 正/负例、`check_codegraph.py` 状态例和 `aggregate_skill_hits.py` 聚合例。
 - [ ] README 或 `registry/skills.json` 已更新。
 
 安全类 skill 额外确认：
