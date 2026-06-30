@@ -7,7 +7,9 @@
     "upstream_url": null,
     "maintenance": "local-owned",
     "consumed_by_roles": [
+      "总控",
       "架构",
+      "内容主编",
       "开发",
       "UI/PPT",
       "视频",
@@ -22,7 +24,7 @@
       "知识库",
       "技能维护"
     ],
-    "summary": "架构先行的多窗口角色编排、CodeGraph 启动、开源参考扫描、多方案选型、项目台账入口守卫、开发第一性原理、QA 对抗式审查、源窗口回调、技能命中治理、Token 压缩、技能维护角色和可复用优化沉淀提示词"
+    "summary": "总控/CEO 先行的多窗口角色编排，含 CTO 技术闭环、内容主编分流、模型路由默认值、fail-closed 提示词/台账/回调校验脚本、AGENTS.md/role-windows bootstrap、CodeGraph 启动、开源参考扫描、多方案选型、项目台账入口守卫、开发第一性原理、QA 对抗式审查、源窗口回调、技能命中治理、Token 压缩、技能维护角色和可复用优化沉淀提示词"
   },
   {
     "name": "delivery-document-package",
@@ -110,6 +112,7 @@
     "maintenance": "vendored-upstream",
     "consumed_by_roles": [
       "UI/PPT",
+      "内容主编",
       "公众号发布",
       "小红书"
     ],
@@ -125,6 +128,7 @@
     "consumed_by_roles": [
       "UI/PPT",
       "视频",
+      "内容主编",
       "公众号发布",
       "小红书"
     ],
@@ -139,7 +143,7 @@
     "source_note": "Extracted from upstream HEAD ef8ae1e30fb01aee7ea3bc451d9e3e92a9287b9b; only the story-deslop skill, its references, and punctuation script are included. Story setup, scan, analyze, write, cover, agents, hooks, and browser skills are intentionally excluded.",
     "maintenance": "vendored-adapted",
     "consumed_by_roles": [
-      "架构",
+      "内容主编",
       "公众号发布",
       "小红书",
       "视频"
@@ -156,7 +160,7 @@
     "maintenance": "vendored-adapted",
     "consumed_by_roles": [
       "小红书",
-      "架构"
+      "内容主编"
     ],
     "summary": "社交内容选题打分、盲预测、发布复盘、rubric 迭代和内容实验工作流"
   },
@@ -168,6 +172,7 @@
     "upstream_url": null,
     "maintenance": "local-owned",
     "consumed_by_roles": [
+      "内容主编",
       "小红书"
     ],
     "summary": "小红书发布前复制包整理、标题长度检查、标签数量检查、配图目录和图片尺寸检查"
@@ -181,7 +186,7 @@
     "maintenance": "local-owned",
     "consumed_by_roles": [
       "小红书",
-      "架构"
+      "内容主编"
     ],
     "summary": "读取和分析小红书/Rednote 评论，用于内容选题、受众研究和回复策略"
   },
@@ -194,7 +199,7 @@
     "maintenance": "local-owned",
     "consumed_by_roles": [
       "公众号发布",
-      "架构",
+      "内容主编",
       "UI/PPT"
     ],
     "summary": "微信公众号 AI 应用文章、周刊连续性、图文排版、草稿箱 API 和发布面板提醒工作流"
@@ -208,6 +213,7 @@
     "maintenance": "local-owned",
     "consumed_by_roles": [
       "公众号发布",
+      "内容主编",
       "UI/PPT"
     ],
     "summary": "将 Markdown 文章转换为适配微信公众号编辑器的美化 HTML"
@@ -221,7 +227,7 @@
     "maintenance": "local-owned",
     "consumed_by_roles": [
       "公众号发布",
-      "架构"
+      "内容主编"
     ],
     "summary": "搜索、整理和改写技术内容，生成适合微信公众号的中文技术科普初稿"
   },
@@ -233,6 +239,7 @@
     "upstream_url": "https://github.com/garrytan/gstack",
     "maintenance": "vendored-adapted",
     "consumed_by_roles": [
+      "总控",
       "架构",
       "开发",
       "UI/PPT",
@@ -251,6 +258,7 @@
     "upstream_url": "https://github.com/garrytan/gstack/tree/e722c5bf89acdde034b5efa4c6b4bf612c48e610/office-hours",
     "maintenance": "vendored-adapted",
     "consumed_by_roles": [
+      "总控",
       "架构"
     ],
     "summary": "早期想法、需求现实性和最小切入口梳理"
@@ -288,7 +296,7 @@
     "upstream_url": "https://github.com/garrytan/gstack/tree/e722c5bf89acdde034b5efa4c6b4bf612c48e610/plan-ceo-review",
     "maintenance": "vendored-adapted",
     "consumed_by_roles": [
-      "架构"
+      "总控"
     ],
     "summary": "战略、范围、用户价值和业务风险审查"
   },
@@ -802,7 +810,7 @@
     "upstream_url": null,
     "maintenance": "local-owned",
     "consumed_by_roles": [
-      "架构"
+      "总控"
     ],
     "summary": "创业想法压力测试、MVP 和首批客户计划"
   },

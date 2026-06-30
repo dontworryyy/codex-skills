@@ -1,0 +1,261 @@
+#!/usr/bin/env python3
+"""Validate the reusable role-system contract for PR checks."""
+
+from __future__ import annotations
+
+import json
+import subprocess
+import sys
+import tempfile
+from pathlib import Path
+
+
+ROOT = Path(__file__).resolve().parents[1]
+PYTHON = sys.executable
+README = ROOT / "README.md"
+ROLE_USAGE = ROOT / "docs" / "role-usage.md"
+PUBLICATION_CHECKLIST = ROOT / "docs" / "publication-checklist.md"
+REGISTRY = ROOT / "registry" / "skills.json"
+ORCHESTRATOR = ROOT / "skills" / "agent-role-orchestrator"
+SKILL_MD = ORCHESTRATOR / "SKILL.md"
+ROLE_CARDS = ORCHESTRATOR / "references" / "role-cards.md"
+RENDER_PROMPT = ORCHESTRATOR / "scripts" / "render_role_prompt.py"
+VALIDATE_LOOP = ORCHESTRATOR / "scripts" / "validate_role_loop.py"
+ENSURE_FILES = ORCHESTRATOR / "scripts" / "ensure_project_role_files.py"
+
+
+def read(path: Path) -> str:
+    return path.read_text(encoding="utf-8")
+
+
+def run(args: list[str], errors: list[str], expect_success: bool = True) -> subprocess.CompletedProcess[str]:
+    result = subprocess.run(
+        args,
+        cwd=str(ROOT),
+        text=True,
+        capture_output=True,
+        check=False,
+    )
+    if expect_success and result.returncode != 0:
+        errors.append(
+            f"command failed ({result.returncode}): {' '.join(args)}\n"
+            f"stdout:\n{result.stdout}\nstderr:\n{result.stderr}"
+        )
+    if not expect_success and result.returncode == 0:
+        errors.append(
+            f"command unexpectedly succeeded: {' '.join(args)}\n"
+            f"stdout:\n{result.stdout}\nstderr:\n{result.stderr}"
+        )
+    return result
+
+
+def require_contains(path: Path, needles: list[str], errors: list[str]) -> None:
+    text = read(path)
+    for needle in needles:
+        if needle not in text:
+            errors.append(f"{path.relative_to(ROOT)} missing required text: {needle}")
+
+
+def validate_docs(errors: list[str]) -> None:
+    require_contains(
+        README,
+        [
+            "总控 / CEO",
+            "架构 / CTO",
+            "内容主编",
+            "Fail-Closed Tool Layer",
+            "render_role_prompt.py",
+            "validate_role_loop.py",
+            "ensure_project_role_files.py",
+        ],
+        errors,
+    )
+    require_contains(
+        ROLE_USAGE,
+        [
+            "总控 / CEO",
+            "架构 / CTO",
+            "内容主编",
+            "Fail-Closed 工具层",
+            "render_role_prompt.py",
+            "validate_role_loop.py",
+            "ensure_project_role_files.py",
+        ],
+        errors,
+    )
+    require_contains(PUBLICATION_CHECKLIST, ["validate_role_system.py", "ensure_project_role_files.py"], errors)
+
+
+def validate_orchestrator(errors: list[str]) -> None:
+    require_contains(
+        SKILL_MD,
+        [
+            "Fail-Closed Tool Layer Rule",
+            "render_role_prompt.py",
+            "validate_role_loop.py",
+            "ensure_project_role_files.py",
+            "总控 / CEO",
+            "架构 / CTO",
+            "内容主编",
+            "模型建议：",
+            "技能命中回传：",
+        ],
+        errors,
+    )
+    require_contains(
+        ROLE_CARDS,
+        [
+            "## 总控",
+            "Act as `架构` / `CTO`",
+            "## 内容主编",
+            "ensure_project_role_files.py",
+            "validate_role_loop.py",
+        ],
+        errors,
+    )
+
+
+def validate_registry(errors: list[str]) -> None:
+    try:
+        registry = json.loads(REGISTRY.read_text(encoding="utf-8"))
+    except Exception as exc:  # noqa: BLE001
+        errors.append(f"cannot parse registry/skills.json: {exc}")
+        return
+
+    item = next((entry for entry in registry if entry.get("name") == "agent-role-orchestrator"), None)
+    if not item:
+        errors.append("registry missing agent-role-orchestrator")
+        return
+
+    roles = set(item.get("consumed_by_roles") or [])
+    missing_roles = {"总控", "架构", "内容主编"} - roles
+    if missing_roles:
+        errors.append("agent-role-orchestrator registry missing consumed_by_roles: " + "、".join(sorted(missing_roles)))
+
+    summary = item.get("summary", "")
+    for needle in ("总控/CEO", "CTO", "内容主编", "fail-closed"):
+        if needle not in summary:
+            errors.append(f"agent-role-orchestrator summary missing: {needle}")
+
+
+def validate_scripts(errors: list[str]) -> None:
+    for script in (RENDER_PROMPT, VALIDATE_LOOP, ENSURE_FILES):
+        if not script.is_file():
+            errors.append(f"missing role-system script: {script.relative_to(ROOT)}")
+
+    run([PYTHON, "-m", "py_compile", str(RENDER_PROMPT), str(VALIDATE_LOOP), str(ENSURE_FILES), str(Path(__file__))], errors)
+
+    with tempfile.TemporaryDirectory() as temp:
+        temp_path = Path(temp)
+        prompt = temp_path / "prompt.md"
+        good_callback = temp_path / "good-callback.md"
+        bad_callback = temp_path / "bad-callback.md"
+        project = temp_path / "project"
+        project.mkdir()
+
+        run(
+            [
+                PYTHON,
+                str(RENDER_PROMPT),
+                "--role",
+                "开发",
+                "--objective",
+                "实现订单列表筛选修复",
+                "--source-role",
+                "架构",
+                "--source-thread",
+                "thread-123",
+                "--read-orchestrator",
+                "--read-ledger",
+                "--required-skill",
+                "gstack-investigate",
+                "--validation",
+                "npm test",
+                "--output",
+                str(prompt),
+            ],
+            errors,
+        )
+        run([PYTHON, str(VALIDATE_LOOP), "--prompt", str(prompt)], errors)
+
+        good_callback.write_text(
+            """压缩回调：
+- 当前状态：完成
+- 本轮变化：已实现并验证订单列表筛选修复
+- 证据链接/文件/命令：npm test
+- 需要决策：无
+- 下一回流对象：架构
+技能命中回传：
+- 已加载并使用：gstack-investigate
+- 来源窗口要求但未使用：无
+- 临时发现应补用：无
+- 误召/无效加载：无
+- 影响产出的 skill：gstack-investigate
+规则沉淀：
+- 可复用优化沉淀：无
+""",
+            encoding="utf-8",
+        )
+        bad_callback.write_text(
+            """压缩回调：
+- 当前状态：完成
+- 本轮变化：修复
+- 证据链接/文件/命令：npm test
+- 需要决策：无
+- 下一回流对象：
+技能命中回传：
+- 已加载并使用：
+- 来源窗口要求但未使用：
+- 临时发现应补用：无
+- 误召/无效加载：无
+- 影响产出的 skill：无
+规则沉淀：
+- 可复用优化沉淀：无
+""",
+            encoding="utf-8",
+        )
+        run([PYTHON, str(VALIDATE_LOOP), "--callback", str(good_callback), "--required-skill", "gstack-investigate"], errors)
+        run(
+            [PYTHON, str(VALIDATE_LOOP), "--callback", str(bad_callback), "--required-skill", "gstack-investigate"],
+            errors,
+            expect_success=False,
+        )
+
+        dry_run = run([PYTHON, str(ENSURE_FILES), "--project", str(project)], errors)
+        if "DRY-RUN" not in dry_run.stdout:
+            errors.append("ensure_project_role_files dry-run did not report DRY-RUN")
+        if (project / "AGENTS.md").exists():
+            errors.append("ensure_project_role_files created AGENTS.md without --write")
+
+        run([PYTHON, str(ENSURE_FILES), "--project", str(project), "--write"], errors)
+        agents = project / "AGENTS.md"
+        ledger = project / ".codex" / "role-windows.md"
+        if not agents.exists():
+            errors.append("ensure_project_role_files --write did not create AGENTS.md")
+        if not ledger.exists():
+            errors.append("ensure_project_role_files --write did not create .codex/role-windows.md")
+        if agents.exists() and agents.read_text(encoding="utf-8").count("BEGIN agent-role-orchestrator entry rule") != 1:
+            errors.append("AGENTS.md managed block is missing or duplicated")
+        if ledger.exists() and "| 总控 | 待确认 | 待确认 | 用户 | 入口分流" not in ledger.read_text(encoding="utf-8"):
+            errors.append("role-windows.md missing default 总控 row")
+
+
+def main() -> int:
+    errors: list[str] = []
+    validate_docs(errors)
+    validate_orchestrator(errors)
+    validate_registry(errors)
+    validate_scripts(errors)
+
+    if errors:
+        print("Role system validation failed:")
+        for error in errors:
+            print(f"- {error}")
+        return 1
+
+    print("Role system validation passed.")
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
