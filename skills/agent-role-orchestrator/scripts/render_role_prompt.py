@@ -58,6 +58,7 @@ ROLE_TREE_POSITION = {
 
 TECHNICAL_ROLES = {"架构", "开发", "UI/PPT", "测试", "QA", "安全", "DBA", "运维"}
 CONTENT_ROLES = {"内容主编", "公众号发布", "小红书", "视频"}
+PUBLIC_COPY_ROLES = CONTENT_ROLES | {"UI/PPT"}
 TECHNICAL_EXECUTION_ROLES = {"开发", "UI/PPT", "测试", "QA", "安全", "DBA", "运维"}
 CONTENT_EXECUTION_ROLES = {"公众号发布", "小红书", "视频"}
 OWNER_LAYER_ROLES = {"架构", "内容主编", "知识库", "技能维护", "文档/交付"}
@@ -169,6 +170,19 @@ def content_research_guidance(role: str) -> str:
 """
 
 
+def content_tone_gate(role: str) -> str:
+    if role not in PUBLIC_COPY_ROLES:
+        return ""
+    return """反老登味 / 反 AI 味内容闸门：
+- 正式对外内容必须先过这道闸门，再交付预览、发布包、复制文本、封面/社交卡文案或视频脚本。
+- 反老登味：避免说教、爹味、上位者口吻、油腻成功学、年龄/资历压人、替读者下判断。
+- 反 AI 味：避免模板化、空泛排比、万能套话、机械转折、过度总结、没有个人判断。
+- 改写原则：保留真实经验、具体细节、自然口语、平台语感和读者处境。
+- 安全边界：不改变事实、数据、价格、日期、来源、授权边界；不新增背书、效果承诺或发布状态。
+- 执行方式：内容主编负责定义口径并验收；公众号发布、小红书、视频和含公开中文文案的 UI/PPT 产物执行；最终正式中文文案仍需加载并使用 $humanizer-zh。
+"""
+
+
 def build_prompt(args: argparse.Namespace) -> str:
     role = canonical_role(args.role)
     validate_source_route(role, args)
@@ -207,6 +221,7 @@ def build_prompt(args: argparse.Namespace) -> str:
 
 {role_execution_guidance(role)}
 {content_research_guidance(role)}
+{content_tone_gate(role)}
 角色树位置（总控/架构/内容主编/执行角色）：
 {ROLE_TREE_POSITION[role]}
 

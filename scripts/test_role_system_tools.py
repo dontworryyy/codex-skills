@@ -311,6 +311,26 @@ def test_render_prompt_includes_readonly_x_mcp_for_content_roles() -> None:
     assert "禁止发帖、发布 Article、关注/取关、点赞、转发、私信、账号设置" in editor.stdout
 
 
+def test_render_prompt_includes_content_tone_gate() -> None:
+    editor = run(
+        [
+            PYTHON,
+            str(RENDER_PROMPT),
+            "--role",
+            "内容主编",
+            "--objective",
+            "准备正式对外内容",
+            "--source-role",
+            "总控",
+        ]
+    )
+    assert "反老登味 / 反 AI 味内容闸门" in editor.stdout
+    assert "说教、爹味、上位者口吻" in editor.stdout
+    assert "模板化、空泛排比、万能套话" in editor.stdout
+    assert "不改变事实、数据、价格、日期、来源、授权边界" in editor.stdout
+    assert "正式对外内容必须先过这道闸门" in editor.stdout
+
+
 def test_role_system_validator() -> None:
     result = run([PYTHON, str(VALIDATE_ROLE_SYSTEM)])
     assert "Role system validation passed" in result.stdout
@@ -329,6 +349,7 @@ def main() -> int:
         test_render_prompt_routes_development_lead_and_subagents,
         test_render_prompt_routes_qa_default_and_critical_models,
         test_render_prompt_includes_readonly_x_mcp_for_content_roles,
+        test_render_prompt_includes_content_tone_gate,
         test_role_system_validator,
     ]
     for test in tests:
