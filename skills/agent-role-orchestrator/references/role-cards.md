@@ -16,6 +16,7 @@ Owns:
 - maintain the top-level role-window registry, source-window callback contract, loop state, final acceptance gate, and model/thinking routing plan;
 - choose model and thinking overrides when creating or continuing role windows, and record the intended route in prompts when thread tools are unavailable;
 - keep token use bounded by preferring existing role windows, compressed callbacks, evidence handles, and narrow role prompts;
+- treat owner-layer completion as fail-closed: a downstream owner or execution role is not closed until `.codex/role-windows.md` is updated/committed and a compressed callback reaches its source thread;
 - decide when a reusable workflow issue should be routed to `技能维护`.
 
 Does not own:
@@ -40,6 +41,7 @@ Output:
 - role-window registry with established roles and numbered instances;
 - model/thinking route plan for any created or continued windows;
 - route preflight checklist showing whether `agent-role-orchestrator` and `.codex/role-windows.md` were read, whether existing threads are reused, and whether the registry needs updating;
+- fail-closed callback status: ledger updated and committed, compressed callback received or still missing;
 - skill routing ledger at the level needed for the selected route;
 - created, continued, or sent thread id and canonical title when a real role-window action is taken;
 - copy-paste prompt when thread tools are unavailable or the user asks for prompt only;
@@ -59,6 +61,7 @@ Owns:
 - produce a multi-option technical options brief for complex new requirements before downstream implementation starts;
 - maintain the technical slice of the role-window registry and lightweight skill routing ledger for the project/workstream;
 - treat `.codex/role-windows.md` as the source of truth for role routing when it exists;
+- when completing, blocking, or asking `总控` / source-window for a decision, update and commit `.codex/role-windows.md`, then actively send a compressed callback to the source thread;
 - establish or continue real technical downstream role windows by default when thread tools are available and the project registry can be updated;
 - decide whether each downstream role should be `新建`, `继承`, `接续`, or explicitly numbered such as `开发1号` / `开发2号`;
 - decide whether technical downstream role windows are needed;
@@ -103,6 +106,7 @@ Output:
 - recommended technical split, or `单架构继续澄清` if downstream windows are not yet needed;
 - copy-paste prompt for each downstream role, marked as `新建`, `继承`, `接续`, or numbered parallel instance;
 - when thread tools are unavailable or the user asks for prompt only, the copy-paste prompt and pending registry status;
+- fail-closed callback status: `.codex/role-windows.md` update/commit and source-thread compressed callback evidence; if no send tool exists, output starts with `<codex_delegation>` or `压缩回调`;
 - decision points for the user.
 
 ## 开发
@@ -251,6 +255,7 @@ Owns:
 - use X MCP as an optional read-only research source for viral-content research, topic pools, benchmark accounts, trend/news scanning, and public discussion timelines when the user has authorized X access;
 - own the `反老登味 / 反 AI 味内容闸门` for public copy: avoid 说教、爹味、上位者口吻、油腻成功学、年龄/资历压人、替读者下判断, plus 模板化、空泛排比、万能套话、机械转折、过度总结、没有个人判断;
 - keep outward-facing facts, dates, claims, links, attribution, prices, and account boundaries stable across content roles;
+- when completing, blocking, or asking `总控` / source-window for a decision, update and commit `.codex/role-windows.md`, then actively send a compressed callback to the source thread;
 - enforce explicit approval gates before final publish, mass send, deletion, account setting changes, credential changes, comment automation, or engagement manipulation;
 - coordinate `UI/PPT` only for content visuals such as WeChat covers, Xiaohongshu carousels, social cards, thumbnails, and presentation-like assets.
 
@@ -278,6 +283,7 @@ Output:
 - platform/account boundary and final-publish authorization status;
 - prompts for `公众号发布`, `小红书`, `视频`, or `UI/PPT` visual assets;
 - public-copy tone gate and polish gate status;
+- fail-closed callback status: `.codex/role-windows.md` update/commit and source-thread compressed callback evidence; if no send tool exists, output starts with `<codex_delegation>` or `压缩回调`;
 - manual approval checkpoints and residual content risks.
 
 ## 公众号发布
