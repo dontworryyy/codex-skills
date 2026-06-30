@@ -162,12 +162,12 @@ Default model routes:
 - `总控` / `CEO`: `gpt-5.5` + `xhigh`.
 - `架构` / `CTO`: `gpt-5.5` + `xhigh`.
 - `开发负责人` / `Dev Lead` (`开发` window): `gpt-5.5` + `xhigh`; it owns task breakdown, integration, correction, and final commit.
-- `开发执行 subagent`: `gpt-5.3-codex-spark` + `xhigh`; it only executes a single, short, small, verifiable coding task from a written task card.
+- `开发执行 subagent`: `gpt-5.3-codex-spark` + `xhigh`; it is an in-window one-shot subagent, not a persistent role window, and only executes a single, short, small, verifiable coding task from a written task card.
 - `QA`: ordinary acceptance checks use `gpt-5.5` + `medium`; critical PR, adversarial review, release gate, or final risk review uses `gpt-5.5` + `xhigh`.
 - `技能维护` and `文档/交付`: `gpt-5.3-codex-spark` + `high`, or `gpt-5.4-mini` for small docs/registry edits.
 - `内容主编`, `公众号发布`, `小红书`, and `视频`: default to `gpt-5.3-codex-spark` + `high`; escalate to `gpt-5.5` + `xhigh` only for high-risk positioning, public claims, compliance, or cross-platform strategy.
 
-For long or compact-prone development tasks, do not make `gpt-5.3-codex-spark` the long-running owner. Keep ownership in the `开发负责人` / `Dev Lead` window and delegate only bounded execution slices to Spark subagents. The Dev Lead must write the task card first: goal, allowed files, forbidden scope, validation command, expected output, and callback target. Spark subagents must not own architecture decisions, cross-file integration, correction strategy, final verification, or commits unless the Dev Lead explicitly narrows that responsibility.
+For long or compact-prone development tasks, do not make `gpt-5.3-codex-spark` the long-running owner. Keep ownership in the `开发负责人` / `Dev Lead` window and delegate only bounded execution slices to Spark subagents. These are in-window one-shot subagents, not reusable role windows: do not write them into `.codex/role-windows.md`, do not assign them persistent thread ids, and close them after the task ends. The Dev Lead must write the task card first: goal, allowed files, forbidden scope, validation command, expected output, and callback target. Spark subagents must not own architecture decisions, cross-file integration, correction strategy, final verification, or commits unless the Dev Lead explicitly narrows that responsibility.
 
 If thread tools are unavailable or the output is copy-paste only, include this block in the prompt:
 
@@ -211,7 +211,7 @@ Use `开发` for implementation plumbing, data models, build/test scripts, asset
 - minimal change that should satisfy the hypothesis;
 - validation evidence that can disprove or confirm the result.
 
-When subagents are available and the work is long, compact-prone, or parallelizable, the Dev Lead should split execution into narrow task cards and send only those cards to `开发执行 subagent` workers. Each subagent task must be single-purpose, short, small, and verifiable, with disjoint write scope when multiple subagents run in parallel. The Dev Lead remains responsible for reviewing diffs, integrating results, rerunning final validation, correcting failed assumptions, committing, and reporting back to `架构` / `CTO`.
+When subagents are available and the work is long, compact-prone, or parallelizable, the Dev Lead should split execution into narrow task cards and send only those cards to `开发执行 subagent` workers. Each subagent task must be single-purpose, short, small, and verifiable, with disjoint write scope when multiple subagents run in parallel. Treat every execution subagent as an in-window one-shot worker: it is not a new role window, it is not recorded as a reusable `.codex/role-windows.md` role, and it is closed after the task returns. The Dev Lead remains responsible for reviewing diffs, integrating results, rerunning final validation, correcting failed assumptions, committing, and reporting back to `架构` / `CTO`.
 
 When a correction is requested, do not stack patches on top of a failed assumption. Name the failed assumption or violated invariant first, then make the smallest verifiable fix.
 

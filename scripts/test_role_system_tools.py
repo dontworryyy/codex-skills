@@ -253,6 +253,9 @@ def test_render_prompt_routes_development_lead_and_subagents() -> None:
     assert "开发执行 subagent" in dev.stdout
     assert "gpt-5.3-codex-spark" in dev.stdout
     assert "只执行单一、短、小、可验证的代码任务" in dev.stdout
+    assert "窗口内一次性 subagent" in dev.stdout
+    assert "不写入 .codex/role-windows.md" in dev.stdout
+    assert "任务结束后关闭，不作为角色窗口复用" in dev.stdout
 
 
 def test_render_prompt_routes_qa_default_and_critical_models() -> None:

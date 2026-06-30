@@ -205,7 +205,7 @@ python skills/agent-role-orchestrator/scripts/aggregate_skill_hits.py \
 | `总控 / CEO` | `gpt-5.5` + `xhigh` |
 | `架构 / CTO` | `gpt-5.5` + `xhigh` |
 | `开发负责人 / Dev Lead` | `gpt-5.5` + `xhigh` |
-| `开发执行 subagent` | `gpt-5.3-codex-spark` + `xhigh`，只执行单一、短、小、可验证的代码任务 |
+| `开发执行 subagent` | `gpt-5.3-codex-spark` + `xhigh`，窗口内一次性 worker，只执行单一、短、小、可验证的代码任务 |
 | `QA` 普通验收 | `gpt-5.5` + `medium` |
 | `QA` 关键 PR / 对抗式审查 / 发布门禁 | `gpt-5.5` + `xhigh` |
 | `技能维护` / `文档/交付` | `gpt-5.3-codex-spark` + `high`，小文档可用 `gpt-5.4-mini` |
@@ -213,7 +213,7 @@ python skills/agent-role-orchestrator/scripts/aggregate_skill_hits.py \
 
 新建窗口时由 `总控` 或 `架构` 显式指定 model/thinking；已开窗口优先复用，并可在后续消息里覆盖 model/thinking，覆盖只影响之后的回复。
 
-长任务不要让 Spark 独立扛完整上下文。`开发负责人 / Dev Lead` 先写任务卡，明确目标、文件白名单、禁止范围、验证命令、期望输出和回调对象，再把短小执行片段派给 `开发执行 subagent`；最终 review、整合、纠偏、验证和提交仍由 Dev Lead 负责。
+长任务不要让 Spark 独立扛完整上下文。`开发负责人 / Dev Lead` 先写任务卡，明确目标、文件白名单、禁止范围、验证命令、期望输出和回调对象，再把短小执行片段派给 `开发执行 subagent`。这里的 subagent 是当前窗口内的一次性 worker：任务结束后关闭，不写入 `.codex/role-windows.md`，不作为角色窗口复用。最终 review、整合、纠偏、验证和提交仍由 Dev Lead 负责。
 
 ### 7. Measured Skill Routing and Token-Aware Loops
 

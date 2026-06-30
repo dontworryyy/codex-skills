@@ -151,7 +151,8 @@ def role_execution_guidance(role: str) -> str:
     return """开发负责人 / Dev Lead 执行规则：
 - 本窗口默认是开发负责人 / Dev Lead，使用 gpt-5.5 + xhigh，负责拆解、集成、纠偏、最终提交。
 - 需要并行或长任务时，先拆成任务卡，再把单一、短、小、可验证的代码任务交给开发执行 subagent。
-- 开发执行 subagent 默认模型：gpt-5.3-codex-spark + xhigh；只执行单一、短、小、可验证的代码任务。
+- 开发执行 subagent 是窗口内一次性 subagent，不是新的角色窗口；不写入 .codex/role-windows.md，不作为后续任务复用。
+- 开发执行 subagent 默认模型：gpt-5.3-codex-spark + xhigh；只执行单一、短、小、可验证的代码任务；任务结束后关闭，不作为角色窗口复用。
 - subagent 必须带文件白名单、禁止范围、验收命令和退出条件；不要让 subagent 承担架构判断、跨文件整合或最终提交。
 """
 
