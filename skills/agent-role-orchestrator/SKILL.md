@@ -350,6 +350,12 @@ When window `A` assigns, delegates, or hands off a task to window `B`:
 - do not tell every downstream role to report to `总控` or `架构` unless that role is actually the source window, the designated coordinator, or the user explicitly says so;
 - if `B` delegates a subtask to `C`, `B` becomes the source for `C` while still remaining responsible for reporting its own task state back to `A`.
 
+Completion is fail-closed. When a role window is complete, blocked, or needs a source-window decision, it must do both:
+1. update `.codex/role-windows.md` and commit the ledger update when project writes are allowed and the project is a git repo;
+2. actively send a `压缩回调` to the source thread.
+
+Only doing item 1 is not a closed loop. If the current window has no sending tool, the final output must start with `<codex_delegation>` or `压缩回调` so the system or user can forward it. If the project is not a git repo, writes are forbidden, or committing is impossible, say that in the callback with the replacement evidence.
+
 This callback rule is separate from user-facing final reports. A downstream window may summarize for the user, but it must still close the loop with its task source.
 
 ## Context Budget And Compact Handoff Rule
@@ -358,6 +364,7 @@ Long-running role windows must avoid depending on the full chat transcript. The 
 
 Required behavior:
 - after every dispatch, callback, block, completion, or correction, update `.codex/role-windows.md` when project writes are allowed;
+- after every completion, block, or source-decision request, update `.codex/role-windows.md`, commit it when possible, and send the source thread a `压缩回调`; do not count the loop closed until both ledger and callback are done;
 - for long-running work, keep `.codex/role-windows.md`'s `压缩交接卡` current with latest summary, decisions, evidence handles, next action, and the prompt needed for a new window to continue;
 - do not paste full transcripts, long logs, or large code blocks into callbacks. Use file paths, commit hashes, PR links, commands, screenshots, or short evidence excerpts;
 - if remote compact fails with a context-window error, stop relying on the old conversation. Start or continue from `.codex/role-windows.md`, the latest compact callback, PR/commit state, and source files;
@@ -368,7 +375,7 @@ Add this section to role prompts:
 ```text
 上下文预算：
 - 不搬运完整聊天记录、长日志或大段源码；默认只传状态增量、证据句柄、决策需求和下一回流对象。
-- 每次派发、回调、阻塞、完成或纠偏后，更新 .codex/role-windows.md；长任务同时刷新“压缩交接卡”。
+- 每次派发、回调、阻塞、完成或纠偏后，更新 .codex/role-windows.md；长任务同时刷新“压缩交接卡”；完成/阻塞/需决策时还必须提交台账并向来源 thread 主动发送压缩回调。
 - 当上下文接近过长、compact 失败、或任务跨越多个闭环时，先用台账、提交、PR、文件证据和压缩交接卡接续，不要求新窗口读取完整旧线程。
 ```
 
@@ -416,6 +423,8 @@ If the ledger reveals recurring misses, noisy triggers, stale descriptions, over
 ## Loop Token Compression Rule
 
 Loop engineering must save tokens instead of multiplying them. Each callback should pass only state deltas and evidence handles, not the full transcript or all intermediate reasoning.
+
+If there is no direct send tool, the final answer that carries a callback must start with `<codex_delegation>` or `压缩回调`. Extra prose before the callback makes forwarding unreliable and should fail review.
 
 Default callback shape:
 
@@ -731,8 +740,14 @@ Loop 深度（可折叠路由）：
 
 上下文预算：
 - 不搬运完整聊天记录、长日志或大段源码；默认只传状态增量、证据句柄、决策需求和下一回流对象。
-- 每次派发、回调、阻塞、完成或纠偏后，更新 .codex/role-windows.md；长任务同时刷新“压缩交接卡”。
+- 每次派发、回调、阻塞、完成或纠偏后，更新 .codex/role-windows.md；长任务同时刷新“压缩交接卡”；项目允许写入且是 git 仓库时提交该台账更新。
 - 当上下文接近过长、compact 失败、或任务跨越多个闭环时，先用台账、提交、PR、文件证据和压缩交接卡接续，不要求新窗口读取完整旧线程。
+
+闭环完成条件：
+- 完成、阻塞或需要发起方决策时，必须同时完成两件事：1. 更新 .codex/role-windows.md 并提交；2. 向来源 thread 主动发送压缩回调。
+- 仅完成第 1 项不算闭环；来源 thread 未收到回调时，负责人层仍应视为待回流。
+- 如果当前窗口没有发送工具，最终输出必须以 <codex_delegation> 或“压缩回调”开头，供系统/用户转发。
+- 如果项目不是 git 仓库、项目禁止写入或无法提交，必须在压缩回调中说明原因和替代证据。
 
 CodeGraph 状态（新本地代码项目必填；不适用时写明原因）：
 - 项目：
@@ -773,7 +788,8 @@ CodeGraph 状态（新本地代码项目必填；不适用时写明原因）：
 回调/通知规则：
 - 本任务发起方：<角色名 + thread id，未知则写待确认>。
 - 完成、阻塞或需要发起方决策时，主动通知发起方窗口；不要只等待用户转述。
-- 如无法直接发送到发起方窗口，请输出一段可复制的“给发起方的回调消息”。
+- 必须先更新 .codex/role-windows.md 并提交，再向来源 thread 主动发送压缩回调；仅完成台账更新不算闭环。
+- 如无法直接发送到发起方窗口，请输出一段可复制的“给发起方的回调消息”，且最终输出必须以 <codex_delegation> 或“压缩回调”开头。
 
 结构化反馈格式（返工/验收失败/需要决策时必填）：
 - 问题/缺口：

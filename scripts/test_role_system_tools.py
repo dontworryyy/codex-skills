@@ -161,6 +161,36 @@ def test_aggregate_skill_hits_quantifies_required_actual_and_misfires() -> None:
         assert payload["hit_rate"] == 0.5
 
 
+def test_callback_must_start_with_forwardable_prefix() -> None:
+    with tempfile.TemporaryDirectory() as temp:
+        callback = Path(temp) / "callback.md"
+        callback.write_text(
+            """说明：这只是一个最终总结。
+
+压缩回调：
+- 当前状态：完成
+- 本轮变化：已更新台账
+- 证据链接/文件/命令：git status
+- 需要决策：无
+- 下一回流对象：总控
+
+技能命中回传：
+- 已加载并使用：agent-role-orchestrator
+- 来源窗口要求但未使用：无
+- 临时发现应补用：无
+- 误召/无效加载：无
+- 影响产出的 skill：agent-role-orchestrator
+
+规则沉淀：
+- 可复用优化沉淀：无
+""",
+            encoding="utf-8",
+        )
+        result = run([PYTHON, str(VALIDATE_LOOP), "--callback", str(callback)], check=False)
+        assert result.returncode != 0
+        assert "callback must start with <codex_delegation> or 压缩回调" in result.stdout
+
+
 def test_render_prompt_rejects_ceo_direct_technical_execution() -> None:
     result = run(
         [
@@ -331,6 +361,32 @@ def test_render_prompt_includes_content_tone_gate() -> None:
     assert "正式对外内容必须先过这道闸门" in editor.stdout
 
 
+def test_render_prompt_requires_fail_closed_source_callback() -> None:
+    architect = run(
+        [
+            PYTHON,
+            str(RENDER_PROMPT),
+            "--role",
+            "架构",
+            "--objective",
+            "验收技术闭环并回调总控",
+            "--source-role",
+            "总控",
+            "--source-thread",
+            "thread-ceo",
+            "--loop-depth",
+            "L2",
+        ]
+    )
+    assert "完成、阻塞或需要发起方决策时，必须同时完成两件事" in architect.stdout
+    assert "更新 .codex/role-windows.md 并提交" in architect.stdout
+    assert "向来源 thread 主动发送压缩回调" in architect.stdout
+    assert "仅完成第 1 项不算闭环" in architect.stdout
+    assert "当前窗口没有发送工具" in architect.stdout
+    assert "<codex_delegation>" in architect.stdout
+    assert "压缩回调" in architect.stdout
+
+
 def test_role_system_validator() -> None:
     result = run([PYTHON, str(VALIDATE_ROLE_SYSTEM)])
     assert "Role system validation passed" in result.stdout
@@ -343,6 +399,7 @@ def main() -> int:
         test_role_ledger_rejects_duplicate_threads_and_bad_status,
         test_check_codegraph_reports_state_without_guessing,
         test_aggregate_skill_hits_quantifies_required_actual_and_misfires,
+        test_callback_must_start_with_forwardable_prefix,
         test_render_prompt_rejects_ceo_direct_technical_execution,
         test_render_prompt_rejects_ceo_direct_content_execution,
         test_render_prompt_allows_ceo_to_owner_layer_and_explicit_override,
@@ -350,6 +407,7 @@ def main() -> int:
         test_render_prompt_routes_qa_default_and_critical_models,
         test_render_prompt_includes_readonly_x_mcp_for_content_roles,
         test_render_prompt_includes_content_tone_gate,
+        test_render_prompt_requires_fail_closed_source_callback,
         test_role_system_validator,
     ]
     for test in tests:

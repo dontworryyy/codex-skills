@@ -47,6 +47,7 @@ PROMPT_REQUIRED_MARKERS = [
     "路由前检查",
     "技能路由台账",
     "上下文预算：",
+    "闭环完成条件：",
     "回调/通知规则：",
     "结构化反馈格式",
     "压缩回调：",
@@ -283,6 +284,10 @@ def validate_callback(path: Path, required_skills: set[str]) -> CheckResult:
     warnings: list[str] = []
     metrics: dict[str, object] = {}
     text = read_text(path)
+    stripped_text = text.lstrip()
+
+    if not (stripped_text.startswith("<codex_delegation>") or stripped_text.startswith("压缩回调")):
+        errors.append("callback must start with <codex_delegation> or 压缩回调 for forwarding")
 
     for marker in missing_markers(text, CALLBACK_REQUIRED_MARKERS):
         errors.append(f"missing callback marker: {marker}")
