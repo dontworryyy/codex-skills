@@ -90,6 +90,7 @@ First actions:
 - create the technical skill routing ledger: candidate skills, required skills, optional skills, skipped skills with reasons, and which role should load each one.
 - for a complex new requirement, present 3 to 5 credible technical routes when plausible, including fit, tradeoffs, asset/tool dependencies, risks, validation, and a recommended route or decision gate.
 - for pure frontend or visual-fidelity work, route visual ownership to `UI/PPT` / `UI/Frontend` first, then assign `开发` only for scoped implementation under the accepted visual plan.
+- for frontend visual-fidelity work with a preview image, ask `UI/PPT` for a `预览图实现路线选择` before assigning `开发` to code.
 - if the idea is early, use `$gstack-office-hours` or `$gstack-spec` before downstream prompts.
 - before opening downstream implementation windows for a non-trivial plan, use `$gstack-autoplan` or the focused technical review skills `$gstack-plan-eng-review`, `$gstack-plan-design-review`, `$gstack-plan-devex-review`, `$gstack-plan-tune`.
 
@@ -171,6 +172,7 @@ Owns:
 - design 2D/2.5D/3D scene composition, generated background usage, toy/sprite placement, lighting targets, and visual QA crops when assigned;
 - produce slide deck or presentation artifacts when assigned;
 - produce Xiaohongshu/Rednote social cards or WeChat cover pairs when assigned;
+- choose a `预览图实现路线选择` before visual-fidelity implementation, especially when a reference image, mockup, or screenshot is provided;
 - choose the right visual-production skill for the task;
 - preserve workflow/state and existing design-system conventions;
 - update design docs if the prompt requires it;
@@ -194,6 +196,8 @@ First actions:
 - if the task is Xiaohongshu/Rednote images, social cards, carousel images, or WeChat official account cover pairs, use `$guizang-social-card-skill`;
 - if the task starts from photo references and needs a cute 3D toy concept, toy prompt pack, or GLB production route, use `$photo-to-cute-3d-toy`;
 - if the task needs rendered browser validation or UI-flow automation, use `$playwright`;
+- if a preview/reference image is provided, do not default to CSS-only reconstruction; first compare 2-4 routes such as CSS/组件复刻, 图片切片/生成资产, Canvas/SVG, Three.js/WebGL, Lottie/视频, existing libraries/components, and custom or generated assets;
+- choose the route based on interaction, responsive behavior, maintainability, performance, accessibility, animation complexity, fidelity ceiling, and asset replacement cost;
 - when the visual artifact contains formal public Chinese copy, apply the `反老登味 / 反 AI 味内容闸门`: avoid 说教、爹味、上位者口吻、模板化、空泛排比、万能套话, while preserving facts and claims;
 - before final export or handoff of public-facing Chinese cover/card/landing copy, load and run `$humanizer-zh` without changing facts, claims, dates, prices, or attribution;
 - read existing UI patterns and design docs;
@@ -202,6 +206,7 @@ First actions:
 
 Output:
 - role tool skill used, especially any external GitHub skill;
+- preview implementation route decision: recommended route, rejected routes, required assets/tools, and screenshot/visual QA acceptance method;
 - UI changes with screenshots or browser verification notes;
 - public-copy tone/polish status when public copy was part of the artifact;
 - visual acceptance baseline, including screenshots/crops and known residual gaps when frontend visual fidelity is the goal;

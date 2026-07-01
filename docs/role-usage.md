@@ -50,7 +50,7 @@
 | `总控` / `CEO` | Codex 本地窗口 | 默认入口、目标澄清、优先级、模型预算、角色路由、顶层台账、最终验收 | `agent-role-orchestrator`, `gstack-office-hours`, `gstack-plan-ceo-review`, `startup-pressure-test` |
 | `架构` / `CTO` | Codex 本地窗口 | 技术方案、多方案技术选型、新项目 CodeGraph 启动、开源/可借鉴方案扫描、管理开发/UI/测试/QA/安全/DBA/运维闭环 | `agent-role-orchestrator`, `gstack`, `gstack-spec`, `gstack-autoplan`, `gstack-plan-*` |
 | `开发负责人 / Dev Lead` | Codex 本地窗口 | 按第一性原理拆解任务、管理开发执行 subagent、整合代码、测试、提交 | 由项目技术栈决定，可辅助用 `gstack-investigate`, `gstack-review`, `gstack-ship`, `gstack-health`, `gstack-careful`, `gstack-guard`, `playwright`, `pdf` |
-| `UI/PPT` / `UI/Frontend` | Codex 本地窗口 | UI 体验、视觉改造、前端视觉保真、网页 PPT、社交卡、公众号封面、演示材料、照片到玩具资产规划 | `gstack-design-*`, `design-taste-frontend`, `guizang-ppt-skill`, `guizang-social-card-skill`, `photo-to-cute-3d-toy`, `playwright` |
+| `UI/PPT` / `UI/Frontend` | Codex 本地窗口 | UI 体验、视觉改造、前端视觉保真、预览图实现路线选择、网页 PPT、社交卡、公众号封面、演示材料、照片到玩具资产规划 | `gstack-design-*`, `design-taste-frontend`, `guizang-ppt-skill`, `guizang-social-card-skill`, `photo-to-cute-3d-toy`, `playwright` |
 | `视频` | Codex 本地窗口 | 宣传视频脚本、分镜、素材和渲染计划 | `hatch-pet` 或视频插件/工具链 |
 | `内容主编` | Codex 本地窗口 | 内容域上层协调，管理公众号发布、小红书、视频和 UI/PPT 视觉资产协作 | `agent-role-orchestrator`, `humanizer-zh`, `story-deslop`, 内容平台相关 skills |
 | `公众号发布` | Codex 本地窗口 | 公众号技术选题初稿、文章排版、草稿、预览、素材检查和授权发布自动化 | `wechat-ai-app-ops`, `wechat-tech-writer`, `wechat-article-formatter`, `humanizer-zh`；需要封面/社交卡时交给 `UI/PPT` 或 `guizang-social-card-skill` |
@@ -75,6 +75,7 @@
 | `gstack-investigate`, `gstack-review`, `gstack-ship`, `gstack-health`, `gstack-devex-review` | 开发 / QA | 根因、代码审查、发布前检查、项目健康 |
 | `gstack-careful`, `gstack-guard`, `gstack-freeze`, `gstack-unfreeze` | 开发 / 运维 / 安全 / QA | 高风险动作前的保守检查、护栏、冻结和恢复 |
 | `gstack-design-*` | UI/PPT | 视觉方向探索、HTML 原型、渲染后设计审查 |
+| `预览图实现路线选择` | UI/PPT / 架构 | 有预览图、参考图、截图或高保真目标时，先比较 CSS/组件、图片/生成资产、Canvas/SVG、Three.js/WebGL、Lottie/视频、现成库/组件等路线，再进入开发实现 |
 | `photo-to-cute-3d-toy` | UI/PPT / 视频 / 架构 | 照片参考到可爱 3D 玩具/GLB 路线、提示词包和交付清单 |
 | `wechat-ai-app-ops` | 公众号发布 / 内容主编 / UI/PPT | 公众号 AI 应用文章、周刊连续性、图文排版、草稿箱 API 和本地交接 |
 | `wechat-tech-writer`, `wechat-article-formatter` | 公众号发布 | 技术选题搜索/初稿和 Markdown 到微信公众号 HTML 排版 |
@@ -236,7 +237,7 @@ python skills/agent-role-orchestrator/scripts/aggregate_skill_hits.py \
 - 不要让 Spark subagent 独立承担长任务负责人、架构判断、跨文件整合、最终提交或完整上下文恢复。
 - 开发全过程默认遵循第一性原理：先还原目标、事实、约束/不变量、最小可证伪假设、最小改动和验证证据，再动手实现。
 - 长任务或容易 compact 的任务先由 Dev Lead 写任务卡，包含目标、文件白名单、禁止范围、验证命令、预期输出和回调对象，再派发给开发执行 subagent。
-- 前端/UI/PPT/社交卡/视频产物；纯前端或视觉保真任务默认先由 `UI/PPT` / `UI/Frontend` 定视觉路线，再让 `开发` 按范围实现。
+- 前端/UI/PPT/社交卡/视频产物；纯前端或视觉保真任务默认先由 `UI/PPT` / `UI/Frontend` 定视觉路线，再让 `开发` 按范围实现。有预览图、参考图、截图或高保真目标时，UI/PPT 先输出 2-4 条实现路线，不要默认拿 CSS 硬干；复杂插画、纹理、3D、粒子或动效优先考虑资产化、Canvas/SVG、Three.js/WebGL、Lottie/视频或专用库，并用截图对比/视觉 QA 验收。
 - 公众号文章和小红书笔记的草稿、预览、发布包和明确授权后的发布自动化。
 - 交付文档包和个人知识库整理。
 - 仓库测试、QA、Review 准备。

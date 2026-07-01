@@ -201,6 +201,23 @@ When a request is a pure frontend project, UI-heavy page, visual-fidelity pass, 
 
 Use `开发` for implementation plumbing, data models, build/test scripts, asset gates, browser-state bugs, and code execution under an accepted visual/technical spec. When both visual direction and code are needed, split them: `UI/Frontend` owns the visual route, target composition, screenshot acceptance, and responsive behavior; `开发` implements the scoped code changes from that spec; `QA` or `架构` verifies. For content visuals, `UI/PPT` can also be coordinated by `内容主编`.
 
+### UI Preview Implementation Route Rule
+
+When `UI/PPT` / `UI/Frontend` receives a preview image, reference screenshot, mockup, or visual-fidelity target, it must not default to CSS-only reconstruction. Before assigning implementation or editing code, it should give a short `预览图实现路线选择`, normally 2 to 4 plausible routes.
+
+Consider at least these routes when relevant:
+- CSS/组件复刻；
+- 图片切片/生成资产；
+- Canvas/SVG；
+- Three.js/WebGL；
+- Lottie/视频；
+- 现成库/组件；
+- 手工或生成式视觉资产。
+
+Choose based on interaction needs, responsive behavior, maintainability, performance, accessibility, animation complexity, fidelity ceiling, and future content replacement cost. If the preview depends on complex illustration, texture, 3D, particles, or animation that AI/code cannot reliably recreate with CSS, prefer an asset-based or rendering-specialist path instead of fragile CSS stacking. In short: 不要默认拿 CSS 硬干.
+
+The UI role should output the recommended route, rejected routes, required assets/tools, and acceptance method. Implementation should start only after the route is selected by `UI/PPT`, `架构`, or the user. Validation should include screenshot comparison, layout/pixel checks, or visual QA evidence when feasible.
+
 ## Development First-Principles Rule
 
 `开发` usually acts as `开发负责人` / `Dev Lead`, not merely a long-running Spark executor. It must use first-principles engineering throughout development, not only when correcting defects. Before implementing, investigating, correcting, or returning to rework, reduce the task to:
@@ -947,6 +964,7 @@ Before finalizing, check:
 - final coordination reports reusable lessons as `无`, `建议`, or `已沉淀`, with target and rationale when applicable;
 - complex technical requirements include a multi-option technical options brief from `架构` / `CTO` and an explicit route-selection gate before downstream implementation;
 - pure frontend or visual-fidelity work routes visual ownership to `UI/PPT` / `UI/Frontend` by default, with `开发` used for scoped implementation rather than as a catch-all;
+- UI/PPT preview/reference-image work includes `预览图实现路线选择` before implementation, rather than defaulting to CSS-only reconstruction;
 - existing role windows are inherited/continued by default instead of recreated;
 - numbered parallel roles appear only when explicitly requested or selected by `总控`, `架构`, or `内容主编`;
 - new local code projects check or initialize CodeGraph before deeper architecture/development work, or include an explicit skip/failure reason.
@@ -980,7 +998,7 @@ Use these defaults unless the user says otherwise:
 - `架构` / `CTO` owns technical delivery under `总控` or an explicit user/source-window assignment: technical options, CodeGraph bootstrap, bounded open-source/reference scan, technical role split, and the `开发` / `UI/PPT` / `测试` / `QA` / `安全` / `DBA` / `运维` loop.
 - `架构` uses `$gstack` for technical method routing: specs go to `$gstack-spec`; concrete plans go to `$gstack-autoplan` or focused `$gstack-plan-*` reviews.
 - `开发` is the `开发负责人` / `Dev Lead` by default: it breaks down coding work, may delegate single, short, small, verifiable coding slices to `gpt-5.3-codex-spark` + `xhigh` subagents, integrates results, runs final tests, and commits when asked or when workspace instructions require it; it should not own UI/visual direction when the dominant risk is visual fidelity.
-- `UI/PPT` (also `UI/Frontend` for frontend visual work) and `视频` produce visible artifacts and perform visual verification; when their output includes final public-facing Chinese copy, they run `$humanizer-zh` before export or handoff.
+- `UI/PPT` (also `UI/Frontend` for frontend visual work) and `视频` produce visible artifacts and perform visual verification; when UI/PPT receives a preview/reference image, it first chooses a `预览图实现路线选择` across CSS/components, asset, Canvas/SVG, Three.js/WebGL, Lottie/video, or library routes; when output includes final public-facing Chinese copy, it runs `$humanizer-zh` before export or handoff.
 - `内容主编` owns content-domain routing under `总控`: `公众号发布`, `小红书`, `视频`, and `UI/PPT` visual-asset collaboration; it enforces fact discipline, account boundaries, public-writing gates, and explicit publish approvals.
 - `公众号发布` uses `$wechat-ai-app-ops`, runs `$humanizer-zh` before final preview/draft handoff, prepares and automates WeChat Official Account article drafts/previews by default, and requires explicit approval before final publish.
 - `小红书` may use `$cheat-on-content` for social-content scoring, blind prediction, benchmark learning, and retro loops; it uses `$humanizer-zh` before final note/publish copy, uses `$xhs-publish-assistant` for copy-ready publish bundles, and requires explicit approval before final posting.
