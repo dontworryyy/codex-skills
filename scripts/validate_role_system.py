@@ -81,6 +81,7 @@ def validate_docs(errors: list[str]) -> None:
             "X MCP 内容研究源",
             "https://docs.x.com/tools/mcp",
             "反老登味 / 反 AI 味内容闸门",
+            "预览图实现路线选择",
             "仅完成台账更新不算闭环",
             "<codex_delegation>",
             "gpt-5.5` + `medium",
@@ -108,6 +109,7 @@ def validate_docs(errors: list[str]) -> None:
             "X MCP 内容研究源",
             "https://docs.x.com/tools/mcp",
             "反老登味 / 反 AI 味内容闸门",
+            "预览图实现路线选择",
             "仅完成第 1 项不算闭环",
             "<codex_delegation>",
             "gpt-5.5` + `medium",
@@ -142,6 +144,8 @@ def validate_orchestrator(errors: list[str]) -> None:
             "https://docs.x.com/tools/mcp",
             "Content Tone Gate",
             "反老登味 / 反 AI 味内容闸门",
+            "UI Preview Implementation Route Rule",
+            "不要默认拿 CSS 硬干",
             "Completion is fail-closed",
             "仅完成第 1 项不算闭环",
             "<codex_delegation>",
@@ -160,6 +164,8 @@ def validate_orchestrator(errors: list[str]) -> None:
             "check_codegraph.py",
             "aggregate_skill_hits.py",
             "反老登味 / 反 AI 味内容闸门",
+            "预览图实现路线选择",
+            "preview implementation route decision",
             "fail-closed callback status",
         ],
         errors,
@@ -184,7 +190,7 @@ def validate_registry(errors: list[str]) -> None:
         errors.append("agent-role-orchestrator registry missing consumed_by_roles: " + "、".join(sorted(missing_roles)))
 
     summary = item.get("summary", "")
-    for needle in ("总控/CEO", "CTO", "内容主编", "反老登味/反AI味内容闸门", "来源thread压缩回调闭环", "fail-closed"):
+    for needle in ("总控/CEO", "CTO", "内容主编", "反老登味/反AI味内容闸门", "UI预览图实现路线选择", "来源thread压缩回调闭环", "fail-closed"):
         if needle not in summary:
             errors.append(f"agent-role-orchestrator summary missing: {needle}")
 

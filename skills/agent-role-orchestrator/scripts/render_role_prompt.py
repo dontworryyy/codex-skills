@@ -158,6 +158,18 @@ def role_execution_guidance(role: str) -> str:
 """
 
 
+def ui_preview_route_guidance(role: str) -> str:
+    if role != "UI/PPT":
+        return ""
+    return """预览图实现路线选择：
+- 有预览图、参考图、截图或视觉保真目标时，不要默认拿 CSS 硬干；先给出 2-4 条实现路线并说明取舍。
+- 候选路线至少考虑：CSS/组件复刻、图片切片/生成资产、Canvas/SVG、Three.js/WebGL、Lottie/视频、现成库/组件、手工或生成式视觉资产。
+- 选择依据：交互需求、响应式要求、可维护性、加载性能、可访问性、动效复杂度、还原精度、后续内容替换成本。
+- 如果预览图是复杂插画、纹理、3D、粒子、复杂动效或 AI 难以稳定复刻的视觉，优先考虑资产化或专用渲染路线，不要用大量脆弱 CSS 堆效果。
+- 进入开发前输出推荐路线、拒绝路线、需要的资产/工具、验收方式；实现后用截图对比、像素/布局检查或视觉 QA 证据验证。
+"""
+
+
 def content_research_guidance(role: str) -> str:
     if role not in CONTENT_ROLES:
         return ""
@@ -220,6 +232,7 @@ def build_prompt(args: argparse.Namespace) -> str:
 - 升级/降级条件：{route.escalation}
 
 {role_execution_guidance(role)}
+{ui_preview_route_guidance(role)}
 {content_research_guidance(role)}
 {content_tone_gate(role)}
 角色树位置（总控/架构/内容主编/执行角色）：

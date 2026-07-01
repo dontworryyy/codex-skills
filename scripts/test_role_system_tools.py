@@ -361,6 +361,30 @@ def test_render_prompt_includes_content_tone_gate() -> None:
     assert "正式对外内容必须先过这道闸门" in editor.stdout
 
 
+def test_render_prompt_includes_ui_preview_route_options() -> None:
+    ui = run(
+        [
+            PYTHON,
+            str(RENDER_PROMPT),
+            "--role",
+            "UI/PPT",
+            "--objective",
+            "根据预览图实现高保真前端视觉效果",
+            "--source-role",
+            "架构",
+        ]
+    )
+    assert "预览图实现路线选择" in ui.stdout
+    assert "不要默认拿 CSS 硬干" in ui.stdout
+    assert "先给出 2-4 条实现路线" in ui.stdout
+    assert "CSS/组件复刻" in ui.stdout
+    assert "图片切片/生成资产" in ui.stdout
+    assert "Canvas/SVG" in ui.stdout
+    assert "Three.js/WebGL" in ui.stdout
+    assert "Lottie/视频" in ui.stdout
+    assert "截图对比" in ui.stdout
+
+
 def test_render_prompt_requires_fail_closed_source_callback() -> None:
     architect = run(
         [
@@ -407,6 +431,7 @@ def main() -> int:
         test_render_prompt_routes_qa_default_and_critical_models,
         test_render_prompt_includes_readonly_x_mcp_for_content_roles,
         test_render_prompt_includes_content_tone_gate,
+        test_render_prompt_includes_ui_preview_route_options,
         test_render_prompt_requires_fail_closed_source_callback,
         test_role_system_validator,
     ]
