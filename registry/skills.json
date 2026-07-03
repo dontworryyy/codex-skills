@@ -119,6 +119,20 @@
     "summary": "小红书/Rednote 图文组图、社交卡和公众号封面对生成"
   },
   {
+    "name": "xhs-visual-director",
+    "path": "skills/xhs-visual-director",
+    "status": "active",
+    "origin_type": "local",
+    "upstream_url": null,
+    "maintenance": "local-owned",
+    "consumed_by_roles": [
+      "UI/PPT",
+      "内容主编",
+      "小红书"
+    ],
+    "summary": "小红书/Rednote 高级图文视觉导演、封面重做、统一视觉母版和图像提示词"
+  },
+  {
     "name": "humanizer-zh",
     "path": "skills/humanizer-zh",
     "status": "active",
@@ -175,7 +189,7 @@
       "内容主编",
       "小红书"
     ],
-    "summary": "小红书发布前复制包整理、标题长度检查、标签数量检查、配图目录和图片尺寸检查"
+    "summary": "小红书发布前复制包整理、标题长度检查、标签数量检查、配图目录、图片尺寸和视觉方向确认检查"
   },
   {
     "name": "xhs-comment-research",
