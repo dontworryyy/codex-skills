@@ -193,7 +193,8 @@ First actions:
 - if `架构` / `CTO` is still reviewing a UI plan, use `$gstack-plan-design-review`;
 - if the task is landing/redesign/frontend taste work, use `$design-taste-frontend`;
 - if the task is web PPT, Swiss deck, magazine deck, or horizontal swipe presentation, use `$guizang-ppt-skill`;
-- if the task is Xiaohongshu/Rednote images, social cards, carousel images, or WeChat official account cover pairs, use `$guizang-social-card-skill`;
+- if the task is new Xiaohongshu/Rednote carousel visuals, cover redesign, or a full visual rewrite, use `$xhs-visual-director`;
+- if the task is a small Xiaohongshu/Rednote social-card edit, legacy carousel package, or WeChat official account cover pair, use `$guizang-social-card-skill`;
 - if the task starts from photo references and needs a cute 3D toy concept, toy prompt pack, or GLB production route, use `$photo-to-cute-3d-toy`;
 - if the task needs rendered browser validation or UI-flow automation, use `$playwright`;
 - if a preview/reference image is provided, do not default to CSS-only reconstruction; first compare 2-4 routes such as CSS/组件复刻, 图片切片/生成资产, Canvas/SVG, Three.js/WebGL, Lottie/视频, existing libraries/components, and custom or generated assets;
@@ -256,7 +257,7 @@ Identity:
 Owns:
 - manage the content role tree under `总控`: `公众号发布`, `小红书`, `视频`, and `UI/PPT` visual-asset collaboration;
 - clarify audience, platform, account identity, content goal, publishing mode, compliance constraints, and asset needs before assigning content execution;
-- decide which content skills are required, including `$wechat-ai-app-ops`, `$wechat-tech-writer`, `$wechat-article-formatter`, `$cheat-on-content`, `$xhs-comment-research`, `$xhs-publish-assistant`, `$humanizer-zh`, `$story-deslop`, and `$guizang-social-card-skill`;
+- decide which content skills are required, including `$wechat-ai-app-ops`, `$wechat-tech-writer`, `$wechat-article-formatter`, `$cheat-on-content`, `$xhs-comment-research`, `$xhs-visual-director`, `$xhs-publish-assistant`, `$humanizer-zh`, `$story-deslop`, and `$guizang-social-card-skill`;
 - use X MCP as an optional read-only research source for viral-content research, topic pools, benchmark accounts, trend/news scanning, and public discussion timelines when the user has authorized X access;
 - own the `反老登味 / 反 AI 味内容闸门` for public copy: avoid 说教、爹味、上位者口吻、油腻成功学、年龄/资历压人、替读者下判断, plus 模板化、空泛排比、万能套话、机械转折、过度总结、没有个人判断;
 - keep outward-facing facts, dates, claims, links, attribution, prices, and account boundaries stable across content roles;
@@ -344,7 +345,8 @@ Owns:
 - keep account identity explicit in local records: every note package, prediction, publish record, comment analysis, and retro should include the target account/handle; when unknown, write `account: 待确认` instead of assuming the current account;
 - use `$cheat-on-content` when the work is about content experiments: benchmark import, topic scoring, blind pre-publish prediction, post-publish retro, rubric evolution, candidate pool, or status;
 - use `$humanizer-zh` for title, caption, and body-copy humanization after source facts are approved and before the final note package;
-- use `$guizang-social-card-skill` for Xiaohongshu/Rednote carousel images or social cards when visual assets are needed;
+- use `$xhs-visual-director` for new Xiaohongshu/Rednote carousel visuals, cover redesigns, full visual rewrites, style judgment, visual master, and image prompts;
+- use `$guizang-social-card-skill` only for small/legacy Xiaohongshu social-card production or when that exact workflow is assigned;
 - use `$xhs-publish-assistant` when the user asks for `输出发布格式`, `小红书发布格式`, `准备发布`, or `二次编辑发布格式`; it should output copy-ready title, body, tags, the `output\` image directory, and publish checks without browser automation;
 - split note packaging responsibilities clearly: the title should cover audience, scenario, and platform-recognizable keywords; the cover should carry emotional conflict and a reason to click; the first three carousel cards should lower comprehension cost, with page 1 as the click hook and pages 2-3 carrying one clear emotion, contradiction, or promise per card; push dense facts, lists, source details, and multi-block explanations to page 4 or later;
 - preserve platform fit, readability on mobile, claim discipline, blind-prediction integrity, and evidence for any generated assets or performance claims.
@@ -369,7 +371,7 @@ First actions:
 - use `$story-deslop` only when the note itself contains narrative prose, story fragments, or dialogue; ordinary Xiaohongshu analysis, recommendation, and marketing copy still defaults to `$humanizer-zh`;
 - if the user asks for final publish copy/paste material, use `$xhs-publish-assistant` and do not open or operate Xiaohongshu unless separately authorized;
 - default to draft/package preparation, not final posting;
-- if assets are missing, use `$guizang-social-card-skill` for carousel/social-card production or request the missing source material.
+- if assets are missing, use `$xhs-visual-director` for new carousel/cover/full visual work, use `$guizang-social-card-skill` for small legacy social-card production, or request the missing source material.
 
 Output:
 - note package with title, caption, tag/topic list, image order, and asset paths;

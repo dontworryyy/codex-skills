@@ -104,6 +104,7 @@ For a re-edit, append one extra section:
 - XHS role decides the content strategy, title direction, body, card copy, and publish recommendation.
 - `humanizer-zh` is required before this skill returns a final copy-ready publish bundle.
 - `story-deslop` is optional and only for narrative/story/dialogue passages, not normal Xiaohongshu marketing or analysis copy.
-- `guizang-social-card-skill` generates card images before this skill checks the output directory.
+- `xhs-visual-director` is the default upstream for new carousel visuals, cover redesigns, and full visual rewrites. It should produce the style judgment, visual master, confirmation image, and final card images before this skill checks the output directory.
+- Existing HTML/render workflows or `guizang-social-card-skill` may still be used for legacy packages or small local edits, but the final publish bundle should state whether the visual direction was confirmed.
 - `cheat-on-content` handles prediction, publish registration, retro, and rubric calibration after the user publishes.
 - `xhs-comment-research` reads and analyzes comments; this skill does not scrape comments.

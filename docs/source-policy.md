@@ -23,10 +23,10 @@
 - `总控`: `agent-role-orchestrator`、`gstack-office-hours`、`gstack-plan-ceo-review`、`startup-pressure-test`
 - `架构`: `gstack`、`gstack-spec`、`gstack-autoplan`、`gstack-plan-*`
 - `开发`: `gstack-investigate`、`gstack-review`、`gstack-ship`、`gstack-health`、`gstack-devex-review`、`gstack-careful`、`gstack-guard`
-- `UI/PPT`: `design-taste-frontend`、`guizang-ppt-skill`、`guizang-social-card-skill`、`photo-to-cute-3d-toy`、`playwright`
+- `UI/PPT`: `design-taste-frontend`、`guizang-ppt-skill`、`xhs-visual-director`、`guizang-social-card-skill`、`photo-to-cute-3d-toy`、`playwright`
 - `内容主编`: 管理公众号发布、小红书、视频和 UI/PPT 视觉资产协作；负责内容 skill 路由、正式对外文案 gate、账号边界和发布授权边界
 - `公众号发布`: `wechat-ai-app-ops` 承接公众号 AI 应用文章、周刊连续性、草稿箱 API 和本地交接；技术选题初稿可用 `wechat-tech-writer`，HTML 排版可用 `wechat-article-formatter`；正式对外文案输出前必须复用 `humanizer-zh`，视觉资产可复用 `guizang-social-card-skill`
-- `小红书`: 预留的小红书/Rednote 笔记和授权发布角色；内容实验和增长判断可复用 `cheat-on-content`，评论研究可复用 `xhs-comment-research`，标题、正文和 caption 在正式输出前必须复用 `humanizer-zh`，图文资产可复用 `guizang-social-card-skill`，发布前复制包可复用 `xhs-publish-assistant`
+- `小红书`: 预留的小红书/Rednote 笔记和授权发布角色；内容实验和增长判断可复用 `cheat-on-content`，评论研究可复用 `xhs-comment-research`，标题、正文和 caption 在正式输出前必须复用 `humanizer-zh`，新图文视觉、封面重做和完整视觉改版默认复用 `xhs-visual-director`，小型旧流程社交卡可复用 `guizang-social-card-skill`，发布前复制包可复用 `xhs-publish-assistant`
 - `story-deslop`: 从 `worldwonderer/oh-story-claudecode` 只抽取 `skills/story-deslop` 子 skill；仅保留去 AI 味规则、references 和标点脚本，不引入 story setup、扫榜、拆文、写作、封面、agents、hooks 或浏览器能力
 - `运维`: Hermes-owned 的部署前检查、部署后验证、Hermes cron、Python 服务和代理诊断类 skill；数据库实例主因转 `DBA`
 - `DBA`: 由 `agent-role-orchestrator` 的角色卡定义；当前没有独立 skill 目录，默认只读收集数据库实例证据，危险动作必须二次授权
