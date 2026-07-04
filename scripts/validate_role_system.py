@@ -73,6 +73,13 @@ def validate_docs(errors: list[str]) -> None:
             "check_codegraph.py",
             "aggregate_skill_hits.py",
             "上下文预算",
+            "Token Budget Profile",
+            "任务分发决策",
+            "`tiny`",
+            "`small`",
+            "`compact`",
+            "`standard`",
+            "`full`",
             "Loop 深度",
             "总控只直接对接负责人层",
             "开发负责人 / Dev Lead",
@@ -101,6 +108,13 @@ def validate_docs(errors: list[str]) -> None:
             "check_codegraph.py",
             "aggregate_skill_hits.py",
             "压缩交接卡",
+            "Token Budget Profile",
+            "任务分发决策",
+            "`tiny`",
+            "`small`",
+            "`compact`",
+            "`standard`",
+            "`full`",
             "Loop 深度",
             "总控只直接对接负责人层",
             "开发负责人 / Dev Lead",
@@ -135,6 +149,14 @@ def validate_orchestrator(errors: list[str]) -> None:
             "模型建议：",
             "技能命中回传：",
             "上下文预算",
+            "Token Budget Profile Rule",
+            "CEO Task Dispatch Decision Rule",
+            "--task-size tiny|small|medium|large|critical",
+            "任务分发决策：",
+            "--profile auto",
+            "`compact`",
+            "`standard`",
+            "`full`",
             "Loop Depth And Owner-Layer Routing Rule",
             "负责人交互边界",
             "开发负责人",
@@ -163,6 +185,9 @@ def validate_orchestrator(errors: list[str]) -> None:
             "validate_role_loop.py",
             "check_codegraph.py",
             "aggregate_skill_hits.py",
+            "Token Budget Profile",
+            "任务分发决策",
+            "--profile auto",
             "反老登味 / 反 AI 味内容闸门",
             "预览图实现路线选择",
             "preview implementation route decision",
@@ -200,6 +225,11 @@ def validate_scripts(errors: list[str]) -> None:
         if not script.is_file():
             errors.append(f"missing role-system script: {script.relative_to(ROOT)}")
 
+    require_contains(
+        RENDER_PROMPT,
+        ["--profile", "--task-size", "effective_token_profile", "task_dispatch_decision", "build_compact_prompt", "Token Budget Profile", "任务分发决策"],
+        errors,
+    )
     run([PYTHON, "-m", "py_compile", *(str(script) for script in ROLE_SCRIPTS), str(Path(__file__))], errors)
 
     with tempfile.TemporaryDirectory() as temp:
@@ -234,6 +264,30 @@ def validate_scripts(errors: list[str]) -> None:
             errors,
         )
         run([PYTHON, str(VALIDATE_LOOP), "--prompt", str(prompt)], errors)
+        if prompt.exists():
+            prompt_text = prompt.read_text(encoding="utf-8")
+            if "profile：compact" not in prompt_text:
+                errors.append("render_role_prompt.py auto profile did not compact an L1 execution prompt")
+            if "任务分发决策：" not in prompt_text:
+                errors.append("render_role_prompt.py output is missing 任务分发决策")
+
+        small_direct = run(
+            [
+                PYTHON,
+                str(RENDER_PROMPT),
+                "--role",
+                "开发",
+                "--objective",
+                "修改低风险单文件文案",
+                "--source-role",
+                "总控",
+                "--task-size",
+                "small",
+            ],
+            errors,
+        )
+        if "建议路径：总控直派开发" not in small_direct.stdout:
+            errors.append("render_role_prompt.py did not allow small CEO -> 开发 dispatch")
 
         good_callback.write_text(
             """压缩回调：

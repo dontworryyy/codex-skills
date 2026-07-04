@@ -191,7 +191,7 @@ def test_callback_must_start_with_forwardable_prefix() -> None:
         assert "callback must start with <codex_delegation> or 压缩回调" in result.stdout
 
 
-def test_render_prompt_rejects_ceo_direct_technical_execution() -> None:
+def test_render_prompt_rejects_ceo_direct_technical_execution_without_small_or_override() -> None:
     result = run(
         [
             PYTHON,
@@ -207,6 +207,64 @@ def test_render_prompt_rejects_ceo_direct_technical_execution() -> None:
     )
     assert result.returncode != 0
     assert "总控不能直接派发技术执行角色" in result.stderr
+
+
+def test_render_prompt_allows_ceo_direct_small_development_dispatch() -> None:
+    result = run(
+        [
+            PYTHON,
+            str(RENDER_PROMPT),
+            "--role",
+            "开发",
+            "--objective",
+            "修改一个低风险单文件文案",
+            "--source-role",
+            "总控",
+            "--task-size",
+            "small",
+        ]
+    )
+    assert "任务分发决策：" in result.stdout
+    assert "任务规模：small" in result.stdout
+    assert "建议路径：总控直派开发" in result.stdout
+    assert "单一、短、小、可验证" in result.stdout
+    assert "一旦出现架构判断、跨文件整合或风险升级，回流架构 / CTO" in result.stdout
+
+
+def test_render_prompt_outputs_ceo_dispatch_decision_by_task_size() -> None:
+    tiny = run(
+        [
+            PYTHON,
+            str(RENDER_PROMPT),
+            "--role",
+            "总控",
+            "--objective",
+            "顺手修正一个 README 错别字",
+            "--task-size",
+            "tiny",
+        ]
+    )
+    assert "任务分发决策：" in tiny.stdout
+    assert "任务规模：tiny" in tiny.stdout
+    assert "建议路径：总控自办" in tiny.stdout
+    assert "只允许低风险、局部、可验证的小改动" in tiny.stdout
+
+    large = run(
+        [
+            PYTHON,
+            str(RENDER_PROMPT),
+            "--role",
+            "总控",
+            "--objective",
+            "启动一个涉及前后端、QA 和发布门禁的新功能",
+            "--task-size",
+            "large",
+        ]
+    )
+    assert "任务规模：large" in large.stdout
+    assert "建议路径：启动完整角色团队" in large.stdout
+    assert "总控 -> 架构/内容主编 -> 执行角色" in large.stdout
+    assert "测试/QA/安全/DBA/运维等门禁" in large.stdout
 
 
 def test_render_prompt_rejects_ceo_direct_content_execution() -> None:
@@ -262,6 +320,76 @@ def test_render_prompt_allows_ceo_to_owner_layer_and_explicit_override() -> None
         ]
     )
     assert "用户明确要求绕过架构" in override.stdout
+
+
+def test_render_prompt_auto_compacts_l1_owner_prompt() -> None:
+    compact = run(
+        [
+            PYTHON,
+            str(RENDER_PROMPT),
+            "--role",
+            "内容主编",
+            "--objective",
+            "判断公众号和小红书内容任务是否需要拆下游",
+            "--source-role",
+            "总控",
+            "--loop-depth",
+            "L1",
+        ]
+    )
+    full_same_role = run(
+        [
+            PYTHON,
+            str(RENDER_PROMPT),
+            "--role",
+            "内容主编",
+            "--objective",
+            "判断公众号和小红书内容任务是否需要拆下游",
+            "--source-role",
+            "总控",
+            "--loop-depth",
+            "L1",
+            "--profile",
+            "full",
+        ]
+    )
+    assert "Token Budget Profile：" in compact.stdout
+    assert "profile：compact" in compact.stdout
+    assert "策略：只保留闭环必需字段" in compact.stdout
+    assert len(compact.stdout) < len(full_same_role.stdout)
+    assert "模型建议：" in compact.stdout
+    assert "负责人交互边界：" in compact.stdout
+    assert "技能路由台账" in compact.stdout
+    assert "技能命中回传：" in compact.stdout
+    assert "压缩回调：" in compact.stdout
+    assert "技术方案（架构/CTO 处理复杂技术需求必填" not in compact.stdout
+    assert "CodeGraph 状态（新本地代码项目必填" not in compact.stdout
+    assert "开源/可借鉴方案扫描" not in compact.stdout
+
+
+def test_render_prompt_full_profile_keeps_deep_sections() -> None:
+    full = run(
+        [
+            PYTHON,
+            str(RENDER_PROMPT),
+            "--role",
+            "架构",
+            "--objective",
+            "设计高风险技术改造并拆下游",
+            "--source-role",
+            "总控",
+            "--loop-depth",
+            "L3",
+            "--profile",
+            "full",
+            "--new-code-project",
+        ]
+    )
+    assert "Token Budget Profile：" in full.stdout
+    assert "profile：full" in full.stdout
+    assert "技术方案（架构/CTO 处理复杂技术需求必填" in full.stdout
+    assert "CodeGraph 状态（新本地代码项目必填" in full.stdout
+    assert "开源/可借鉴方案扫描" in full.stdout
 
 
 def test_render_prompt_routes_development_lead_and_subagents() -> None:
@@ -424,9 +552,13 @@ def main() -> int:
         test_check_codegraph_reports_state_without_guessing,
         test_aggregate_skill_hits_quantifies_required_actual_and_misfires,
         test_callback_must_start_with_forwardable_prefix,
-        test_render_prompt_rejects_ceo_direct_technical_execution,
+        test_render_prompt_rejects_ceo_direct_technical_execution_without_small_or_override,
+        test_render_prompt_allows_ceo_direct_small_development_dispatch,
+        test_render_prompt_outputs_ceo_dispatch_decision_by_task_size,
         test_render_prompt_rejects_ceo_direct_content_execution,
         test_render_prompt_allows_ceo_to_owner_layer_and_explicit_override,
+        test_render_prompt_auto_compacts_l1_owner_prompt,
+        test_render_prompt_full_profile_keeps_deep_sections,
         test_render_prompt_routes_development_lead_and_subagents,
         test_render_prompt_routes_qa_default_and_critical_models,
         test_render_prompt_includes_readonly_x_mcp_for_content_roles,
