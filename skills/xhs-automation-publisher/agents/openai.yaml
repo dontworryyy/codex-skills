@@ -1,0 +1,5 @@
+name: xhs-automation-publisher
+version: 1.0.0
+openai:
+  short_description: "Authorized Xiaohongshu browser automation"
+  default_prompt: "Use xhs-automation-publisher only for authorized Xiaohongshu login, preview fill, publish blockers, final posting, content data, or interaction actions; default to --preview/fill and require explicit approval before publish or engagement commands."

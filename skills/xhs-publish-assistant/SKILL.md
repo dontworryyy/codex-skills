@@ -15,6 +15,7 @@ Use it after the XHS role has already produced or approved the title, body, tags
 
 - Do not open or automate Xiaohongshu pages.
 - Do not click publish, save, update, or any final platform button.
+- If the user asks for browser automation, login checks, creator-center fill, automatic publishing blockers, content-data export, or final posting, route to `$xhs-automation-publisher` and keep the same explicit final-publish approval gate.
 - Do not generate a publish HTML panel.
 - Do not list every image path unless the user explicitly asks; output only the `output\` directory.
 - Do not modify published article source files. For a re-edit, use or create a `reedit-YYYY-MM-DD\` package and keep the original as history.
@@ -108,3 +109,4 @@ For a re-edit, append one extra section:
 - Existing HTML/render workflows or `guizang-social-card-skill` may still be used for legacy packages or small local edits, but the final publish bundle should state whether the visual direction was confirmed.
 - `cheat-on-content` handles prediction, publish registration, retro, and rubric calibration after the user publishes.
 - `xhs-comment-research` reads and analyzes comments; this skill does not scrape comments.
+- `xhs-automation-publisher` handles authorized browser/CDP automation. It defaults to preview/fill and requires explicit user approval before final posting or interaction commands.

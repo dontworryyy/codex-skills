@@ -192,6 +192,20 @@
     "summary": "小红书发布前复制包整理、标题长度检查、标签数量检查、配图目录、图片尺寸和视觉方向确认检查"
   },
   {
+    "name": "xhs-automation-publisher",
+    "path": "skills/xhs-automation-publisher",
+    "status": "active",
+    "origin_type": "external-github",
+    "upstream_url": "https://github.com/white0dew/XiaohongshuSkills",
+    "source_note": "Vendored from upstream HEAD 988fd2efac377cc6dab3a630ed157336b5ebfb03; SKILL.md adapted for this role system so preview/fill is default and publish, comment, engagement, account-switch, cookie-clear, and profile-delete actions require explicit user approval.",
+    "maintenance": "vendored-adapted",
+    "consumed_by_roles": [
+      "内容主编",
+      "小红书"
+    ],
+    "summary": "小红书/Rednote Chrome CDP 自动化登录检查、创作者中心预览填充、发布卡点排查、内容数据导出、搜索/详情读取和授权后的最终发布/互动门禁"
+  },
+  {
     "name": "xhs-comment-research",
     "path": "skills/xhs-comment-research",
     "status": "active",
