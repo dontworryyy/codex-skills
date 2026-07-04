@@ -595,6 +595,17 @@ Boundaries:
 - Secrets and OAuth: require the user's X Developer app and OAuth flow when real access is needed; never write `CLIENT_ID`, `CLIENT_SECRET`, tokens, cookies, or account-specific state into this repo.
 - Interpretation: X data is a trend and benchmark signal, not direct proof that a Xiaohongshu or WeChat piece will perform. Pair it with platform-local skills such as `$cheat-on-content`, `$xhs-comment-research`, and `$humanizer-zh` before final content.
 
+### Xiaohongshu Automation Publisher Gate
+
+`$xhs-automation-publisher` is the browser automation layer for `小红书` when the user explicitly needs Xiaohongshu login checks, creator-center preview fill, publish-flow blocker diagnosis, content-data export, search/detail collection, or approved final posting.
+
+Rules:
+- prefer `$xhs-publish-assistant` for copy-ready publish bundles that do not open the browser;
+- prefer `$xhs-automation-publisher` for browser/CDP work, but default to `--preview` or `cdp_publish.py fill`;
+- `publish_pipeline.py` clicks publish unless `--preview` is present, so running it without `--preview` is a high-risk write action;
+- `click-publish`, `publish`, `post-comment-to-feed`, `respond-comment`, `note-upvote`, `note-unvote`, `note-bookmark`, `note-unbookmark`, account switching, cookie clearing, and profile deletion require fresh explicit approval for the exact action and target account;
+- never persist cookies, QR payloads, account tokens, real account names, or Chrome profile paths in the shared repo or callback text.
+
 For role tools sourced from external GitHub skills or Hermes-owned operational skills, name them as dependencies instead of treating them as local role logic:
 - `总控` CEO/product pressure, role route, and model-budget review: `$gstack-office-hours`, `$gstack-plan-ceo-review`, `$startup-pressure-test`;
 - `架构` gstack method routing / plan lock-in before technical downstream windows: `$gstack`;
@@ -617,7 +628,7 @@ For role tools sourced from external GitHub skills or Hermes-owned operational s
 - `公众号发布` Markdown-to-WeChat HTML formatting and template polish: `$wechat-article-formatter`;
 - `公众号发布` final Chinese copy humanization, anti-AI texture, and voice polish before preview or draft handoff: `$humanizer-zh`;
 - `公众号发布` cover image pairs and inline article visuals when needed: `$guizang-social-card-skill`;
-- `小红书` Xiaohongshu/Rednote note packaging, carousel assets, captions, tags, content experiments, comment research, and publishing automation: use `$cheat-on-content` for topic scoring, blind prediction, benchmark learning, post-publish retro, and rubric evolution; use `$xhs-comment-research` for comment collection/analysis when the user asks to use comment data; use `$xhs-visual-director` for new carousel visuals, cover redesigns, full visual rewrites, style judgment, visual master, and image prompts; use `$humanizer-zh` for title/caption/body copy humanization before final packaging; use `$xhs-publish-assistant` for copy-ready publish bundles; use `$guizang-social-card-skill` only for legacy/small social-card production when needed; then apply explicit user authorization gates before posting;
+- `小红书` Xiaohongshu/Rednote note packaging, carousel assets, captions, tags, content experiments, comment research, and publishing automation: use `$cheat-on-content` for topic scoring, blind prediction, benchmark learning, post-publish retro, and rubric evolution; use `$xhs-comment-research` for comment collection/analysis when the user asks to use comment data; use `$xhs-visual-director` for new carousel visuals, cover redesigns, full visual rewrites, style judgment, visual master, and image prompts; use `$humanizer-zh` for title/caption/body copy humanization before final packaging; use `$xhs-publish-assistant` for copy-ready publish bundles; use `$xhs-automation-publisher` for authorized browser automation, preview fill, publish blockers, content-data export, and approved posting; use `$guizang-social-card-skill` only for legacy/small social-card production when needed; then apply explicit user authorization gates before posting or interaction;
 - `视频` final public-facing Chinese scripts, voiceover, and captions: `$humanizer-zh` before final output;
 - narrative/story/dialogue public prose in any content role: `$story-deslop` only for those narrative passages;
 - browser UI verification, rendered frontend checks, and E2E-like flows: `$playwright`;
@@ -1038,7 +1049,7 @@ Use these defaults unless the user says otherwise:
 - `UI/PPT` (also `UI/Frontend` for frontend visual work) and `视频` produce visible artifacts and perform visual verification; when UI/PPT receives a preview/reference image, it first chooses a `预览图实现路线选择` across CSS/components, asset, Canvas/SVG, Three.js/WebGL, Lottie/video, or library routes; when output includes final public-facing Chinese copy, it runs `$humanizer-zh` before export or handoff.
 - `内容主编` owns content-domain routing under `总控`: `公众号发布`, `小红书`, `视频`, and `UI/PPT` visual-asset collaboration; it enforces fact discipline, account boundaries, public-writing gates, and explicit publish approvals.
 - `公众号发布` uses `$wechat-ai-app-ops`, runs `$humanizer-zh` before final preview/draft handoff, prepares and automates WeChat Official Account article drafts/previews by default, and requires explicit approval before final publish.
-- `小红书` may use `$cheat-on-content` for social-content scoring, blind prediction, benchmark learning, and retro loops; it uses `$xhs-visual-director` for new carousel visuals, cover redesigns, and full visual rewrites, uses `$humanizer-zh` before final note/publish copy, uses `$xhs-publish-assistant` for copy-ready publish bundles, and requires explicit approval before final posting.
+- `小红书` may use `$cheat-on-content` for social-content scoring, blind prediction, benchmark learning, and retro loops; it uses `$xhs-visual-director` for new carousel visuals, cover redesigns, and full visual rewrites, uses `$humanizer-zh` before final note/publish copy, uses `$xhs-publish-assistant` for copy-ready publish bundles, uses `$xhs-automation-publisher` for authorized browser automation with preview/fill defaults, and requires explicit approval before final posting or interaction.
 - `测试` uses `$test-case-report-builder` for test case and test report artifacts, and owns independent stress/load/performance/concurrency validation when assigned.
 - `QA` checks review/release readiness, blockers, and acceptance risk through adversarial review that tries to falsify readiness with counterexamples, edge cases, regression surfaces, and evidence gaps.
 - `文档/交付` maintains the project documentation package across phases: requirements, quotes, contracts/service agreements, acceptance sheets, delivery checklists, operation guides, change confirmations, and handoff notes; it does not write code or replace legal/tax review.

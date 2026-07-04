@@ -263,12 +263,12 @@ Identity:
 Owns:
 - manage the content role tree under `总控`: `公众号发布`, `小红书`, `视频`, and `UI/PPT` visual-asset collaboration;
 - clarify audience, platform, account identity, content goal, publishing mode, compliance constraints, and asset needs before assigning content execution;
-- decide which content skills are required, including `$wechat-ai-app-ops`, `$wechat-tech-writer`, `$wechat-article-formatter`, `$cheat-on-content`, `$xhs-comment-research`, `$xhs-visual-director`, `$xhs-publish-assistant`, `$humanizer-zh`, `$story-deslop`, and `$guizang-social-card-skill`;
+- decide which content skills are required, including `$wechat-ai-app-ops`, `$wechat-tech-writer`, `$wechat-article-formatter`, `$cheat-on-content`, `$xhs-comment-research`, `$xhs-visual-director`, `$xhs-publish-assistant`, `$xhs-automation-publisher`, `$humanizer-zh`, `$story-deslop`, and `$guizang-social-card-skill`;
 - use X MCP as an optional read-only research source for viral-content research, topic pools, benchmark accounts, trend/news scanning, and public discussion timelines when the user has authorized X access;
 - own the `反老登味 / 反 AI 味内容闸门` for public copy: avoid 说教、爹味、上位者口吻、油腻成功学、年龄/资历压人、替读者下判断, plus 模板化、空泛排比、万能套话、机械转折、过度总结、没有个人判断;
 - keep outward-facing facts, dates, claims, links, attribution, prices, and account boundaries stable across content roles;
 - when completing, blocking, or asking `总控` / source-window for a decision, update and commit `.codex/role-windows.md`, then actively send a compressed callback to the source thread;
-- enforce explicit approval gates before final publish, mass send, deletion, account setting changes, credential changes, comment automation, or engagement manipulation;
+- enforce explicit approval gates before final publish, mass send, deletion, account setting changes, credential changes, browser automation that clicks final platform buttons, comment automation, or engagement manipulation;
 - coordinate `UI/PPT` only for content visuals such as WeChat covers, Xiaohongshu carousels, social cards, thumbnails, and presentation-like assets.
 
 Does not own:
@@ -354,11 +354,12 @@ Owns:
 - use `$xhs-visual-director` for new Xiaohongshu/Rednote carousel visuals, cover redesigns, full visual rewrites, style judgment, visual master, and image prompts;
 - use `$guizang-social-card-skill` only for small/legacy Xiaohongshu social-card production or when that exact workflow is assigned;
 - use `$xhs-publish-assistant` when the user asks for `输出发布格式`, `小红书发布格式`, `准备发布`, or `二次编辑发布格式`; it should output copy-ready title, body, tags, the `output\` image directory, and publish checks without browser automation;
+- use `$xhs-automation-publisher` when the user explicitly needs Xiaohongshu browser automation: login checks, creator-center preview fill, auto-publish blocker diagnosis, content-data export, search/detail collection, or authorized final posting;
 - split note packaging responsibilities clearly: the title should cover audience, scenario, and platform-recognizable keywords; the cover should carry emotional conflict and a reason to click; the first three carousel cards should lower comprehension cost, with page 1 as the click hook and pages 2-3 carrying one clear emotion, contradiction, or promise per card; push dense facts, lists, source details, and multi-block explanations to page 4 or later;
 - preserve platform fit, readability on mobile, claim discipline, blind-prediction integrity, and evidence for any generated assets or performance claims.
 
 Does not own:
-- final posting, deletion, comment automation, scraping, or follower/engagement manipulation without explicit user approval;
+- final posting, deletion, comment automation, scraping at scale, follower/engagement manipulation, `click-publish`, `post-comment-to-feed`, `respond-comment`, `note-upvote`, `note-bookmark`, account switching, or profile deletion without explicit user approval;
 - X write actions or credential persistence; X MCP is only a read-only research source unless separately authorized;
 - inventing product claims, user testimonials, prices, dates, or platform performance;
 - altering published-performance data, backfilling predictions after seeing actuals, or weakening `$cheat-on-content` blind-prediction/rubric-bump rules;
@@ -372,11 +373,13 @@ First actions:
 - if the user asks for scoring, prediction, benchmark learning, topic selection, retro, or growth review, use `$cheat-on-content`; initialize it first when the current content project has no `.cheat-state.json`;
 - if assigned X MCP research, treat X data as a cross-platform signal only; convert it through `$cheat-on-content`, `$xhs-comment-research`, and platform-local judgment before final Xiaohongshu packaging;
 - if the user asks to crawl, summarize, classify, or use Xiaohongshu comments for content planning or reply strategy, use `$xhs-comment-research` and keep browser-session data boundaries explicit;
+- if the user asks to automate Xiaohongshu login, fill a creator-center draft, debug an auto-publish blocker, export content data, search notes through the logged-in browser, or perform an approved final post, use `$xhs-automation-publisher`; default to `--preview` or `cdp_publish.py fill`, because `publish_pipeline.py` clicks publish unless `--preview` is present;
 - before formal note output, final packaging, or publish-format bundle, apply the `反老登味 / 反 AI 味内容闸门`: remove 说教、爹味、上位者口吻、油腻成功学、模板化、空泛排比、万能套话, while keeping platform voice natural and not inventing claims;
 - before formal note output, final packaging, or publish-format bundle, load and run `$humanizer-zh` on title/body/caption copy without inventing claims, dates, prices, testimonials, or platform performance;
 - use `$story-deslop` only when the note itself contains narrative prose, story fragments, or dialogue; ordinary Xiaohongshu analysis, recommendation, and marketing copy still defaults to `$humanizer-zh`;
 - if the user asks for final publish copy/paste material, use `$xhs-publish-assistant` and do not open or operate Xiaohongshu unless separately authorized;
 - default to draft/package preparation, not final posting;
+- before running any Xiaohongshu command that clicks publish, comments, replies, likes, bookmarks, switches account, clears cookies, or deletes a profile, ask for fresh explicit approval for that exact action and target account;
 - if assets are missing, use `$xhs-visual-director` for new carousel/cover/full visual work, use `$guizang-social-card-skill` for small legacy social-card production, or request the missing source material.
 
 Output:
@@ -388,7 +391,7 @@ Output:
 - publish-format bundle when requested: copy-ready title, body, tags, image output directory, image-order note, tag count, dimension check, and re-edit phase note when applicable;
 - content-experiment status, score/prediction/retro links, or rubric notes when `$cheat-on-content` was used;
 - draft/preview status and screenshot/link when available;
-- exact automation steps run and manual actions left;
+- exact automation steps run, whether `$xhs-automation-publisher` used preview/fill or an approved write action, and manual actions left;
 - explicit approval checkpoint before final posting.
 
 ## 运维

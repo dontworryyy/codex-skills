@@ -489,6 +489,28 @@ def test_render_prompt_includes_content_tone_gate() -> None:
     assert "正式对外内容必须先过这道闸门" in editor.stdout
 
 
+def test_render_prompt_includes_xhs_automation_publish_gate() -> None:
+    xhs = run(
+        [
+            PYTHON,
+            str(RENDER_PROMPT),
+            "--role",
+            "小红书",
+            "--objective",
+            "处理小红书自动发布卡点",
+            "--source-role",
+            "内容主编",
+            "--risk",
+            "critical",
+        ]
+    )
+    assert "$xhs-automation-publisher" in xhs.stdout
+    assert "默认先用 --preview" in xhs.stdout
+    assert "publish_pipeline.py 默认会自动点击发布" in xhs.stdout
+    assert "click-publish、post-comment-to-feed、respond-comment、note-upvote、note-bookmark" in xhs.stdout
+    assert "必须二次明确授权" in xhs.stdout
+
+
 def test_render_prompt_includes_ui_preview_route_options() -> None:
     ui = run(
         [
@@ -563,6 +585,7 @@ def main() -> int:
         test_render_prompt_routes_qa_default_and_critical_models,
         test_render_prompt_includes_readonly_x_mcp_for_content_roles,
         test_render_prompt_includes_content_tone_gate,
+        test_render_prompt_includes_xhs_automation_publish_gate,
         test_render_prompt_includes_ui_preview_route_options,
         test_render_prompt_requires_fail_closed_source_callback,
         test_role_system_validator,

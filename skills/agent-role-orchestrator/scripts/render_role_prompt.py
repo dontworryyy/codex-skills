@@ -259,6 +259,17 @@ def content_tone_gate(role: str) -> str:
 """
 
 
+def xhs_automation_publish_gate(role: str) -> str:
+    if role != "小红书":
+        return ""
+    return """小红书自动化发布门禁：
+- 自动化登录、创作者中心填充、发布卡点排查、内容数据导出、搜索详情读取或授权发布时使用 $xhs-automation-publisher。
+- 默认先用 --preview 或 cdp_publish.py fill，让用户在浏览器里复核；publish_pipeline.py 默认会自动点击发布，缺少 --preview 时视为高风险动作。
+- click-publish、post-comment-to-feed、respond-comment、note-upvote、note-bookmark 等发布/互动命令必须二次明确授权；不得把评论、点赞收藏、切号、清理账号 Profile 当作普通发布步骤。
+- 本地 cookie、登录二维码、账号配置、Chrome profile 路径和真实账号状态不得写入仓库或回调正文。
+"""
+
+
 def effective_token_profile(role: str, args: argparse.Namespace) -> str:
     if args.profile != "auto":
         return args.profile
@@ -319,6 +330,7 @@ Token Budget Profile：
 {ui_preview_route_guidance(role)}
 {content_research_guidance(role)}
 {content_tone_gate(role)}
+{xhs_automation_publish_gate(role)}
 角色树位置（总控/架构/内容主编/执行角色）：
 {ROLE_TREE_POSITION[role]}
 
@@ -485,6 +497,7 @@ Token Budget Profile：
 {ui_preview_route_guidance(role)}
 {content_research_guidance(role)}
 {content_tone_gate(role)}
+{xhs_automation_publish_gate(role)}
 角色树位置（总控/架构/内容主编/执行角色）：
 {ROLE_TREE_POSITION[role]}
 

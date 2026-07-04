@@ -87,6 +87,8 @@ def validate_docs(errors: list[str]) -> None:
             "窗口内一次性",
             "X MCP 内容研究源",
             "https://docs.x.com/tools/mcp",
+            "小红书自动化发布门禁",
+            "xhs-automation-publisher",
             "反老登味 / 反 AI 味内容闸门",
             "预览图实现路线选择",
             "仅完成台账更新不算闭环",
@@ -122,6 +124,8 @@ def validate_docs(errors: list[str]) -> None:
             "窗口内一次性",
             "X MCP 内容研究源",
             "https://docs.x.com/tools/mcp",
+            "xhs-automation-publisher",
+            "点击发布和互动动作二次授权",
             "反老登味 / 反 AI 味内容闸门",
             "预览图实现路线选择",
             "仅完成第 1 项不算闭环",
@@ -164,6 +168,8 @@ def validate_orchestrator(errors: list[str]) -> None:
             "in-window one-shot",
             "X MCP Content Research Source",
             "https://docs.x.com/tools/mcp",
+            "Xiaohongshu Automation Publisher Gate",
+            "$xhs-automation-publisher",
             "Content Tone Gate",
             "反老登味 / 反 AI 味内容闸门",
             "UI Preview Implementation Route Rule",
@@ -191,6 +197,7 @@ def validate_orchestrator(errors: list[str]) -> None:
             "反老登味 / 反 AI 味内容闸门",
             "预览图实现路线选择",
             "preview implementation route decision",
+            "$xhs-automation-publisher",
             "fail-closed callback status",
         ],
         errors,
@@ -227,7 +234,16 @@ def validate_scripts(errors: list[str]) -> None:
 
     require_contains(
         RENDER_PROMPT,
-        ["--profile", "--task-size", "effective_token_profile", "task_dispatch_decision", "build_compact_prompt", "Token Budget Profile", "任务分发决策"],
+        [
+            "--profile",
+            "--task-size",
+            "effective_token_profile",
+            "task_dispatch_decision",
+            "build_compact_prompt",
+            "xhs_automation_publish_gate",
+            "Token Budget Profile",
+            "任务分发决策",
+        ],
         errors,
     )
     run([PYTHON, "-m", "py_compile", *(str(script) for script in ROLE_SCRIPTS), str(Path(__file__))], errors)
