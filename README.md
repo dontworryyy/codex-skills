@@ -205,7 +205,7 @@ python skills/agent-role-orchestrator/scripts/aggregate_skill_hits.py \
 | 爆款内容研究、热点扫描、对标账号 | `内容主编` + X MCP 内容研究源（只读、需授权，见 https://docs.x.com/tools/mcp） |
 | 公众号发布 | `wechat-ai-app-ops`、`wechat-tech-writer`、`wechat-article-formatter` |
 | 小红书视觉、发布与内容实验 | `xhs-visual-director`、`cheat-on-content`、`xhs-publish-assistant`、`xhs-automation-publisher`、`xhs-comment-research` |
-| 中文正式对外文案 | `反老登味 / 反 AI 味内容闸门` + `humanizer-zh`，叙事类再按需用 `story-deslop` |
+| 中文正式对外文案 | 社交平台先用 `social-text-websense-gate` 防 README 腔/发布会腔/机械堆网词；再用 `反老登味 / 反 AI 味内容闸门` + `humanizer-zh`，叙事类按需用 `story-deslop`；用户改稿复盘用 `content-style-calibration-loop` |
 | 运维只读诊断 | Hermes-owned 运维 skills |
 | 数据库实例风险 | DBA 角色卡，危险动作二次授权 |
 | 测试资产和压测验证 | `test-case-report-builder`、`playwright` |
