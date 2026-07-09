@@ -24,7 +24,7 @@
       "知识库",
       "技能维护"
     ],
-    "summary": "总控/CEO 先行的多窗口角色编排，含可折叠 L0-L3 loop 深度、CEO 负责人层交互、CTO 技术闭环、开发负责人/Dev Lead 与窗口内一次性 Spark 开发执行 subagent 分层、QA gpt-5.5 模型路由、内容主编分流、X MCP 只读内容研究源、反老登味/反AI味内容闸门、UI预览图实现路线选择、模型路由默认值、fail-closed 提示词/台账/回调校验脚本、AGENTS.md/role-windows bootstrap、CodeGraph 状态检查、开源参考扫描、多方案选型、项目台账入口守卫、开发第一性原理、QA 对抗式审查、源窗口回调、来源thread压缩回调闭环、技能命中聚合治理、Token 压缩交接卡、技能维护角色和可复用优化沉淀提示词"
+    "summary": "总控/CEO 先行的多窗口角色编排，含可折叠 L0-L3 loop 深度、CEO 负责人层交互、CTO 技术闭环、开发负责人/Dev Lead 与窗口内一次性 Spark 开发执行 subagent 分层、QA gpt-5.5 模型路由、内容主编分流、小红书确认图/反模板视觉 gate、gzh-design/manifest 公众号 gate、content-model handoff、X MCP 只读内容研究源、反老登味/反AI味内容闸门、UI预览图实现路线选择、模型路由默认值、fail-closed 提示词/台账/回调校验脚本、AGENTS.md/role-windows bootstrap、CodeGraph 状态检查、开源参考扫描、多方案选型、项目台账入口守卫、开发第一性原理、QA 对抗式审查、源窗口回调、来源thread压缩回调闭环、技能命中聚合治理、Token 压缩交接卡、技能维护角色和可复用优化沉淀提示词"
   },
   {
     "name": "delivery-document-package",
@@ -130,7 +130,7 @@
       "内容主编",
       "小红书"
     ],
-    "summary": "小红书/Rednote 高级图文视觉导演、封面重做、统一视觉母版和图像提示词"
+    "summary": "小红书/Rednote 高级图文视觉导演、封面重做、统一视觉母版、确认图先行、反模板视觉 gate 和图像提示词"
   },
   {
     "name": "humanizer-zh",
@@ -177,6 +177,22 @@
       "内容主编"
     ],
     "summary": "社交内容选题打分、盲预测、发布复盘、rubric 迭代和内容实验工作流"
+  },
+  {
+    "name": "content-model-handoff",
+    "path": "skills/content-model-handoff",
+    "status": "active",
+    "origin_type": "local",
+    "upstream_url": null,
+    "maintenance": "local-owned",
+    "consumed_by_roles": [
+      "内容主编",
+      "公众号发布",
+      "小红书",
+      "视频",
+      "技能维护"
+    ],
+    "summary": "内容 raw 起草模型/长文本窗口、内容主编和用户终审之间的分工：少限制多上下文，raw 与正式发布稿分离，保留事实和平台 gate"
   },
   {
     "name": "social-text-websense-gate",
@@ -259,7 +275,7 @@
       "内容主编",
       "UI/PPT"
     ],
-    "summary": "微信公众号 AI 应用文章、周刊连续性、图文排版、草稿箱 API 和发布面板提醒工作流"
+    "summary": "微信公众号 AI 应用文章、周刊连续性、gzh-design 排版交接、manifest 发布 gate、草稿箱 API 和发布面板提醒工作流"
   },
   {
     "name": "wechat-article-formatter",
