@@ -179,6 +179,35 @@
     "summary": "社交内容选题打分、盲预测、发布复盘、rubric 迭代和内容实验工作流"
   },
   {
+    "name": "social-text-websense-gate",
+    "path": "skills/social-text-websense-gate",
+    "status": "active",
+    "origin_type": "local",
+    "upstream_url": null,
+    "maintenance": "local-owned",
+    "consumed_by_roles": [
+      "内容主编",
+      "小红书",
+      "视频"
+    ],
+    "summary": "小红书/抖音/社交平台中文文案的网感闸门：识别技术事故里的荒谬点，避免 README 腔、技术发布会腔和机械堆网词"
+  },
+  {
+    "name": "content-style-calibration-loop",
+    "path": "skills/content-style-calibration-loop",
+    "status": "active",
+    "origin_type": "local",
+    "upstream_url": null,
+    "maintenance": "local-owned",
+    "consumed_by_roles": [
+      "内容主编",
+      "小红书",
+      "视频",
+      "技能维护"
+    ],
+    "summary": "从用户手改文案和风格批评中提炼可复用写作规则，避免只记表层词汇，支持回流到 skill/reference"
+  },
+  {
     "name": "xhs-publish-assistant",
     "path": "skills/xhs-publish-assistant",
     "status": "active",
