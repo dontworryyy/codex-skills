@@ -19,6 +19,9 @@ REGISTRY = ROOT / "registry" / "skills.json"
 ORCHESTRATOR = ROOT / "skills" / "agent-role-orchestrator"
 SKILL_MD = ORCHESTRATOR / "SKILL.md"
 ROLE_CARDS = ORCHESTRATOR / "references" / "role-cards.md"
+MODEL_ROUTING = ORCHESTRATOR / "references" / "model-routing.md"
+TOOL_ROUTING = ORCHESTRATOR / "references" / "tool-routing.md"
+CONTENT_ROUTING = ORCHESTRATOR / "references" / "content-routing.md"
 RENDER_PROMPT = ORCHESTRATOR / "scripts" / "render_role_prompt.py"
 VALIDATE_LOOP = ORCHESTRATOR / "scripts" / "validate_role_loop.py"
 ENSURE_FILES = ORCHESTRATOR / "scripts" / "ensure_project_role_files.py"
@@ -95,7 +98,9 @@ def validate_docs(errors: list[str]) -> None:
             "<codex_delegation>",
             "gpt-5.6-terra` + `high",
             "gpt-5.6-sol` + `xhigh",
+            "gpt-5.6-luna` + `high",
             "gpt-5.4-mini` + `high",
+            "--execution-profile parallel",
         ],
         errors,
     )
@@ -134,7 +139,9 @@ def validate_docs(errors: list[str]) -> None:
             "<codex_delegation>",
             "gpt-5.6-terra` + `high",
             "gpt-5.6-sol` + `xhigh",
+            "gpt-5.6-luna` + `high",
             "gpt-5.4-mini` + `high",
+            "3-5 个 worker",
         ],
         errors,
     )
@@ -183,6 +190,7 @@ def validate_orchestrator(errors: list[str]) -> None:
             "<codex_delegation>",
             "gpt-5.6-terra` + `high",
             "gpt-5.6-sol` + `xhigh",
+            "gpt-5.6-luna` + `high",
             "gpt-5.4-mini` + `high",
         ],
         errors,
@@ -228,7 +236,7 @@ def validate_registry(errors: list[str]) -> None:
         errors.append("agent-role-orchestrator registry missing consumed_by_roles: " + "、".join(sorted(missing_roles)))
 
     summary = item.get("summary", "")
-    for needle in ("总控/CEO", "CTO", "内容主编", "反老登味/反AI味内容闸门", "UI预览图实现路线选择", "来源thread压缩回调闭环", "fail-closed"):
+    for needle in ("总控/CEO", "CTO", "内容主编", "Luna 有界执行", "显式并行 worker 门禁", "反老登味/反AI味内容闸门", "UI预览图实现路线选择", "来源thread压缩回调闭环", "fail-closed"):
         if needle not in summary:
             errors.append(f"agent-role-orchestrator summary missing: {needle}")
 
@@ -249,12 +257,32 @@ def validate_scripts(errors: list[str]) -> None:
             "xhs_automation_publish_gate",
             "gpt-5.6-terra",
             "gpt-5.6-sol",
+            "gpt-5.6-luna",
             "gpt-5.4-mini",
+            "--executor-tier",
+            "--execution-profile",
+            "--worker-count",
+            "--disjoint-scope",
+            "--independent-validation",
             "Token Budget Profile",
             "任务分发决策",
         ],
         errors,
     )
+    require_contains(
+        MODEL_ROUTING,
+        ["gpt-5.6-luna", "gpt-5.4-mini", "gpt-5.6-terra", "gpt-5.6-sol", "--execution-profile parallel", "--disjoint-scope", "--independent-validation"],
+        errors,
+    )
+    require_contains(TOOL_ROUTING, ["Fail-Closed Scripts", "aggregate_skill_hits.py", "Skill Ledger"], errors)
+    require_contains(CONTENT_ROUTING, ["X MCP Content Research Source", "反老登味 / 反 AI 味内容闸门", "$xhs-automation-publisher"], errors)
+
+    for path, max_lines, max_bytes in ((SKILL_MD, 350, 30000), (ROLE_CARDS, 180, 18000)):
+        text = read(path)
+        if len(text.splitlines()) > max_lines:
+            errors.append(f"{path.relative_to(ROOT)} exceeds line budget: {len(text.splitlines())} > {max_lines}")
+        if len(text.encode("utf-8")) > max_bytes:
+            errors.append(f"{path.relative_to(ROOT)} exceeds byte budget: {len(text.encode('utf-8'))} > {max_bytes}")
     run([PYTHON, "-m", "py_compile", *(str(script) for script in ROLE_SCRIPTS), str(Path(__file__))], errors)
 
     with tempfile.TemporaryDirectory() as temp:

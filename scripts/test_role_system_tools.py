@@ -18,6 +18,8 @@ VALIDATE_LOOP = ROOT / "skills" / "agent-role-orchestrator" / "scripts" / "valid
 CHECK_CODEGRAPH = ROOT / "skills" / "agent-role-orchestrator" / "scripts" / "check_codegraph.py"
 AGGREGATE_SKILL_HITS = ROOT / "skills" / "agent-role-orchestrator" / "scripts" / "aggregate_skill_hits.py"
 VALIDATE_ROLE_SYSTEM = ROOT / "scripts" / "validate_role_system.py"
+ORCHESTRATOR_SKILL = ROOT / "skills" / "agent-role-orchestrator" / "SKILL.md"
+ROLE_CARDS = ROOT / "skills" / "agent-role-orchestrator" / "references" / "role-cards.md"
 
 
 def run(args: list[str], cwd: Path | None = None, check: bool = True) -> subprocess.CompletedProcess[str]:
@@ -559,6 +561,15 @@ def test_render_prompt_extreme_cto_uses_supported_xhigh() -> None:
     assert "thinking：max" not in extreme.stdout
 
 
+def test_orchestrator_entry_files_stay_within_token_budget() -> None:
+    skill_text = ORCHESTRATOR_SKILL.read_text(encoding="utf-8")
+    role_cards_text = ROLE_CARDS.read_text(encoding="utf-8")
+    assert len(skill_text.splitlines()) <= 350
+    assert len(skill_text.encode("utf-8")) <= 30000
+    assert len(role_cards_text.splitlines()) <= 180
+    assert len(role_cards_text.encode("utf-8")) <= 18000
+
+
 def test_render_prompt_routes_owner_ops_dba_and_mechanical_work() -> None:
     ceo = run(
         [
@@ -766,6 +777,7 @@ def main() -> int:
         test_render_prompt_compact_profile_stays_within_budget,
         test_render_prompt_routes_qa_default_and_critical_models,
         test_render_prompt_extreme_cto_uses_supported_xhigh,
+        test_orchestrator_entry_files_stay_within_token_budget,
         test_render_prompt_routes_owner_ops_dba_and_mechanical_work,
         test_render_prompt_includes_readonly_x_mcp_for_content_roles,
         test_render_prompt_includes_content_tone_gate,

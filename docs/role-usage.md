@@ -224,6 +224,7 @@ python skills/agent-role-orchestrator/scripts/aggregate_skill_hits.py \
 - 负责人层关闭技术或内容子树前，必须确认 `.codex/role-windows.md` 已更新并提交，且来源 thread 已收到压缩回调；如果没有发送工具，回调输出必须以 `<codex_delegation>` 或 `压缩回调` 开头。
 - 当上下文接近过长、remote compact 失败、或同一任务跨多个 PR/闭环时，优先开新窗口或接续既有角色窗口；输入只用 `.codex/role-windows.md`、压缩交接卡、提交/PR、文件证据和必要短摘要。
 - 生成下游提示词时使用 Token Budget Profile：`compact` 给 L0/L1 小闭环，只保留闭环必需字段；`standard` 给 L2、架构或新代码项目；`full` 给 L3、关键 PR、对抗审查、高风险公开声明、生产/数据/安全闭环。`render_role_prompt.py --profile auto` 是默认入口，负责人只在证据表明 compact 不够时升级。
+- `agent-role-orchestrator/SKILL.md` 只加载稳定闭环契约；角色边界、模型分级、工具路由、内容平台规则按需读取 `references/role-cards.md`、`model-routing.md`、`tool-routing.md`、`content-routing.md`，避免无关角色说明进入每个窗口上下文。PR 校验会限制入口文件行数和字节数。
 - 有回调文件或台账快照时，用 `aggregate_skill_hits.py` 聚合命中率，不靠总控或架构凭记忆估算。
 - `总控` 负责本次任务的全局路由判断和聚合视图；`架构` 与 `内容主编` 负责各自子树。长期的漏召、误召、触发描述过期、registry 漂移、README 说明混乱或跨角色 token 过重，转给 `技能维护`。
 - `技能维护` 只沉淀可公开复用的 skill 体系改进，不接收项目私有 `.codex/role-windows.md`、本机 memory、账号登录态或生产细节。
@@ -235,9 +236,9 @@ python skills/agent-role-orchestrator/scripts/aggregate_skill_hits.py \
 | 角色 | 默认模型 |
 | --- | --- |
 | `总控 / CEO` | `gpt-5.6-terra` + `high`；资金、上线、生产恢复、跨角色最终 go/no-go 升 `gpt-5.6-sol` + `xhigh` |
-| `架构 / CTO` | `gpt-5.6-sol` + `high`；实盘架构、事故根因、DB/并发/安全、不可逆方案升 `xhigh`；极难问题才用 `max` |
+| `架构 / CTO` | `gpt-5.6-sol` + `high`；实盘架构、事故根因、DB/并发/安全、不可逆方案升 `xhigh`；不生成不存在的 `max` 档位 |
 | `开发负责人 / Dev Lead` | `gpt-5.6-terra` + `high`；live exit、资金安全、PnL/fee、并发、重复失败返工升 `gpt-5.6-sol` + `xhigh` |
-| `开发执行 subagent` | 窗口内一次性 worker。单文件、测试明确、机械实现：`gpt-5.4-mini` + `high`；两三个文件、需要理解业务语义：`gpt-5.6-terra` + `high`；live/资金/并发/账本不下放，由 Dev Lead 用 Sol + xhigh 处理 |
+| `开发执行 subagent` | 窗口内一次性 worker。纯机械单文件：`gpt-5.4-mini` + `high`；边界清楚、可独立验证的有限语义任务：`gpt-5.6-luna` + `high`；跨文件业务语义：`gpt-5.6-terra` + `high`；live/资金/并发/账本不下放，由 Dev Lead 用 Sol + xhigh 处理 |
 | `QA` | 普通验收：`gpt-5.6-terra` + `high`；关键 PR / 对抗式审查 / 发布门禁：`gpt-5.6-sol` + `xhigh` |
 | `运维` / `DBA` | 只读采证、容量、锁、空间分析：`gpt-5.6-terra` + `high`；部署、restart、rollback、生产故障、DDL、清理、恢复、数据风险：`gpt-5.6-sol` + `xhigh` |
 | `知识库` / `技能维护` / `文档/交付` | 默认 `gpt-5.6-terra` + `high`；纯索引、排版、搬运、registry 机械同步：`gpt-5.4-mini` + `medium` |
@@ -249,10 +250,11 @@ python skills/agent-role-orchestrator/scripts/aggregate_skill_hits.py \
 
 - `架构 / CTO` 拆分后的代码实现。
 - `开发` 默认是 `开发负责人 / Dev Lead`：用 `gpt-5.6-terra` + `high` 拆解任务、整合结果、纠偏、最终验证和提交；live exit、资金安全、PnL/fee、并发或重复失败返工升 `gpt-5.6-sol` + `xhigh`。
-- `开发执行 subagent` 是当前开发负责人窗口内的一次性 worker：单文件、测试明确、机械实现用 `gpt-5.4-mini` + `high`；两三个文件且需要理解业务语义用 `gpt-5.6-terra` + `high`。不写入 `.codex/role-windows.md`，任务结束后关闭，不作为角色窗口复用。
+- `开发执行 subagent` 是当前开发负责人窗口内的一次性 worker：纯机械单文件用 `gpt-5.4-mini` + `high`；边界清楚、可独立验证的有限语义任务用 `gpt-5.6-luna` + `high`；跨文件业务语义用 `gpt-5.6-terra` + `high`。不写入 `.codex/role-windows.md`，任务结束后关闭，不作为角色窗口复用。
 - 不要让低成本 subagent 独立承担长任务负责人、架构判断、跨文件整合、最终提交或完整上下文恢复；live/资金/并发/账本工作必须由 Dev Lead 使用 `gpt-5.6-sol` + `xhigh` 处理。
 - 开发全过程默认遵循第一性原理：先还原目标、事实、约束/不变量、最小可证伪假设、最小改动和验证证据，再动手实现。
 - 长任务或容易 compact 的任务先由 Dev Lead 写任务卡，包含目标、文件白名单、禁止范围、验证命令、预期输出和回调对象，再派发给开发执行 subagent。
+- 默认串行；普通并行最多 2 个 worker，且必须声明互斥范围和独立验证。3-5 个 worker 只允许显式 `parallel` profile，并通过 `--worker-count`、`--disjoint-scope` 和 `--independent-validation` fail-closed 校验。
 - 前端/UI/PPT/社交卡/视频产物；纯前端或视觉保真任务默认先由 `UI/PPT` / `UI/Frontend` 定视觉路线，再让 `开发` 按范围实现。有预览图、参考图、截图或高保真目标时，UI/PPT 先输出 2-4 条实现路线，不要默认拿 CSS 硬干；复杂插画、纹理、3D、粒子或动效优先考虑资产化、Canvas/SVG、Three.js/WebGL、Lottie/视频或专用库，并用截图对比/视觉 QA 验收。
 - 公众号文章和小红书笔记的草稿、预览、发布包和明确授权后的发布自动化。
 - 交付文档包和个人知识库整理。
