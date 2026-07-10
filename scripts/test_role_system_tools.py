@@ -417,6 +417,90 @@ def test_render_prompt_routes_development_lead_and_subagents() -> None:
     assert "不写入 .codex/role-windows.md" in dev.stdout
     assert "任务结束后关闭，不作为角色窗口复用" in dev.stdout
 
+    bounded = run(
+        [
+            PYTHON,
+            str(RENDER_PROMPT),
+            "--role",
+            "开发",
+            "--objective",
+            "修改两个边界清楚且已有测试的业务文件",
+            "--source-role",
+            "架构",
+            "--executor-tier",
+            "bounded",
+        ]
+    )
+    assert "model：gpt-5.6-luna" in bounded.stdout
+    assert "thinking：high" in bounded.stdout
+    assert "一次性 subagent" in bounded.stdout
+
+
+def test_render_prompt_rejects_unsafe_parallel_worker_fanout() -> None:
+    rejected = run(
+        [
+            PYTHON,
+            str(RENDER_PROMPT),
+            "--role",
+            "开发",
+            "--objective",
+            "并行实现三个模块",
+            "--source-role",
+            "架构",
+            "--execution-profile",
+            "parallel",
+            "--worker-count",
+            "3",
+        ],
+        check=False,
+    )
+    assert rejected.returncode != 0
+    assert "disjoint-scope" in rejected.stderr
+    assert "independent-validation" in rejected.stderr
+
+    accepted = run(
+        [
+            PYTHON,
+            str(RENDER_PROMPT),
+            "--role",
+            "开发",
+            "--objective",
+            "并行实现三个互不重叠的适配器",
+            "--source-role",
+            "架构",
+            "--execution-profile",
+            "parallel",
+            "--worker-count",
+            "3",
+            "--disjoint-scope",
+            "每个 worker 仅修改一个独立适配器目录",
+            "--independent-validation",
+            "每个适配器都有独立单测命令",
+        ]
+    )
+    assert "execution-profile：parallel" in accepted.stdout
+    assert "worker-count：3" in accepted.stdout
+    assert "默认串行" not in accepted.stdout
+
+
+def test_render_prompt_compact_profile_stays_within_budget() -> None:
+    compact = run(
+        [
+            PYTHON,
+            str(RENDER_PROMPT),
+            "--role",
+            "开发",
+            "--objective",
+            "修复一个有明确回归测试的边界错误",
+            "--source-role",
+            "架构",
+            "--profile",
+            "compact",
+        ]
+    )
+    assert len(compact.stdout.splitlines()) <= 90
+    assert len(compact.stdout.encode("utf-8")) <= 6000
+
 
 def test_render_prompt_routes_qa_default_and_critical_models() -> None:
     ordinary = run(
@@ -450,6 +534,29 @@ def test_render_prompt_routes_qa_default_and_critical_models() -> None:
     )
     assert "model：gpt-5.6-sol" in critical.stdout
     assert "thinking：xhigh" in critical.stdout
+    assert "技术方案（架构/CTO 处理复杂技术需求必填" not in critical.stdout
+    assert "CodeGraph 状态（新本地代码项目必填" not in critical.stdout
+    assert "开源/可借鉴方案扫描" not in critical.stdout
+
+
+def test_render_prompt_extreme_cto_uses_supported_xhigh() -> None:
+    extreme = run(
+        [
+            PYTHON,
+            str(RENDER_PROMPT),
+            "--role",
+            "架构",
+            "--objective",
+            "收敛信息高度冲突的不可逆技术决策",
+            "--source-role",
+            "总控",
+            "--risk",
+            "extreme",
+        ]
+    )
+    assert "model：gpt-5.6-sol" in extreme.stdout
+    assert "thinking：xhigh" in extreme.stdout
+    assert "thinking：max" not in extreme.stdout
 
 
 def test_render_prompt_routes_owner_ops_dba_and_mechanical_work() -> None:
@@ -655,7 +762,10 @@ def main() -> int:
         test_render_prompt_auto_compacts_l1_owner_prompt,
         test_render_prompt_full_profile_keeps_deep_sections,
         test_render_prompt_routes_development_lead_and_subagents,
+        test_render_prompt_rejects_unsafe_parallel_worker_fanout,
+        test_render_prompt_compact_profile_stays_within_budget,
         test_render_prompt_routes_qa_default_and_critical_models,
+        test_render_prompt_extreme_cto_uses_supported_xhigh,
         test_render_prompt_routes_owner_ops_dba_and_mechanical_work,
         test_render_prompt_includes_readonly_x_mcp_for_content_roles,
         test_render_prompt_includes_content_tone_gate,
