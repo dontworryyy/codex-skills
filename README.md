@@ -65,7 +65,7 @@ Windows 没有 `rsync` 时，可以按目录复制 `skills/<skill-name>/` 到 `%
 - 总控/架构/多角色/派发/回调/台账类任务必须先读取 `agent-role-orchestrator` 和项目 `.codex/role-windows.md`。
 - `总控` 维护全局技能路由和模型预算台账，`架构` 维护技术子树台账，`内容主编` 维护内容子树台账。
 - 机械字段、提示词模板、CodeGraph 状态、台账状态、回调完整性和技能命中统计优先交给 `agent-role-orchestrator/scripts/` 做 fail-closed 校验。
-- `开发` 默认是 `开发负责人 / Dev Lead`：用 `gpt-5.5` + `xhigh` 拆解、集成、纠偏和最终提交；`gpt-5.3-codex-spark` + `xhigh` 只作为短小可验证的开发执行 subagent。
+- `开发` 默认是 `开发负责人 / Dev Lead`：用 `gpt-5.6-terra` + `high` 拆解、集成、纠偏和最终提交；subagent 按任务分级，不再默认使用 Spark。
 - `QA` 默认做对抗式审查：主动找反例、边界、回归面、证据缺口和过度声明。
 - 新建或接续角色窗口时默认写清 model/thinking 路由。
 - 已建立角色默认继承/接续，不重复开新窗口。
@@ -218,18 +218,18 @@ python skills/agent-role-orchestrator/scripts/aggregate_skill_hits.py \
 
 | 角色 | 默认模型 |
 | --- | --- |
-| `总控 / CEO` | `gpt-5.5` + `xhigh` |
-| `架构 / CTO` | `gpt-5.5` + `xhigh` |
-| `开发负责人 / Dev Lead` | `gpt-5.5` + `xhigh` |
-| `开发执行 subagent` | `gpt-5.3-codex-spark` + `xhigh`，窗口内一次性 worker，只执行单一、短、小、可验证的代码任务 |
-| `QA` 普通验收 | `gpt-5.5` + `medium` |
-| `QA` 关键 PR / 对抗式审查 / 发布门禁 | `gpt-5.5` + `xhigh` |
-| `技能维护` / `文档/交付` | `gpt-5.3-codex-spark` + `high`，小文档可用 `gpt-5.4-mini` |
-| `内容主编` / 内容执行角色 | 默认 `gpt-5.3-codex-spark` + `high`，高风险定位或公开声明升 `gpt-5.5` + `xhigh` |
+| `总控 / CEO` | `gpt-5.6-terra` + `high`；资金、上线、生产恢复、跨角色最终 go/no-go 升 `gpt-5.6-sol` + `xhigh` |
+| `架构 / CTO` | `gpt-5.6-sol` + `high`；实盘架构、事故根因、DB/并发/安全、不可逆方案升 `xhigh`；极难问题才用 `max` |
+| `开发负责人 / Dev Lead` | `gpt-5.6-terra` + `high`；live exit、资金安全、PnL/fee、并发、重复失败返工升 `gpt-5.6-sol` + `xhigh` |
+| `开发执行 subagent` | 窗口内一次性 worker。单文件、测试明确、机械实现：`gpt-5.4-mini` + `high`；两三个文件、需要理解业务语义：`gpt-5.6-terra` + `high`；live/资金/并发/账本不下放，由 Dev Lead 用 Sol + xhigh 处理 |
+| `QA` | 普通验收：`gpt-5.6-terra` + `high`；关键 PR / 对抗式审查 / 发布门禁：`gpt-5.6-sol` + `xhigh` |
+| `运维` / `DBA` | 只读采证、容量、锁、空间分析：`gpt-5.6-terra` + `high`；部署、restart、rollback、生产故障、DDL、清理、恢复、数据风险：`gpt-5.6-sol` + `xhigh` |
+| `知识库` / `技能维护` / `文档/交付` | 默认 `gpt-5.6-terra` + `high`；纯索引、排版、搬运、registry 机械同步：`gpt-5.4-mini` + `medium` |
+| `UI/PPT` / 内容角色 | 默认 `gpt-5.6-terra` + `high`；机械 HTML/资产整理：`gpt-5.4-mini` + `high`；公开高风险定位、声明或合规：`gpt-5.6-sol` + `xhigh` |
 
 新建窗口时由 `总控` 或 `架构` 显式指定 model/thinking；已开窗口优先复用，并可在后续消息里覆盖 model/thinking，覆盖只影响之后的回复。
 
-长任务不要让 Spark 独立扛完整上下文。`开发负责人 / Dev Lead` 先写任务卡，明确目标、文件白名单、禁止范围、验证命令、期望输出和回调对象，再把短小执行片段派给 `开发执行 subagent`。这里的 subagent 是当前窗口内的一次性 worker：任务结束后关闭，不写入 `.codex/role-windows.md`，不作为角色窗口复用。最终 review、整合、纠偏、验证和提交仍由 Dev Lead 负责。
+长任务不要让低成本 subagent 独立扛完整上下文。`开发负责人 / Dev Lead` 先写任务卡，明确目标、文件白名单、禁止范围、验证命令、期望输出和回调对象，再按任务复杂度派发短小执行片段。这里的 subagent 是当前窗口内的一次性 worker：任务结束后关闭，不写入 `.codex/role-windows.md`，不作为角色窗口复用。最终 review、整合、纠偏、验证和提交仍由 Dev Lead 负责。`gpt-5.3-codex-spark` 仍是 research preview，不作为可预测预算下的默认执行模型。
 
 ### X MCP 内容研究源
 

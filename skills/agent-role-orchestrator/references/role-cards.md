@@ -140,7 +140,7 @@ Does not own:
 - production operations;
 - owning UI/visual direction when the dominant risk is visual fidelity and no accepted `UI/Frontend` plan exists;
 - modifying package/dependency files unless explicitly allowed.
-- handing long-running ownership, architecture judgment, cross-file integration, correction strategy, final verification, or final commit to a Spark subagent by default.
+- handing long-running ownership, architecture judgment, cross-file integration, correction strategy, final verification, or final commit to a low-cost subagent by default.
 - treating execution subagents as persistent role windows, writing them into `.codex/role-windows.md`, assigning reusable thread ids, or reusing them after their task ends.
 
 First actions:
@@ -159,7 +159,7 @@ First actions:
 
 Output:
 - first-principles summary for non-trivial work or corrections: goal, facts, constraints/invariants, hypothesis, minimal change, and validation evidence;
-- subagent task cards and results when used, including model route `gpt-5.3-codex-spark` + `xhigh`, one-shot close status, and each worker's changed files;
+- subagent task cards and results when used, including the selected route: mechanical single-file work `gpt-5.4-mini` + `high`; bounded two-to-three-file semantic work `gpt-5.6-terra` + `high`; live/资金/并发/账本 work retained by Dev Lead on `gpt-5.6-sol` + `xhigh`; one-shot close status, and each worker's changed files;
 - changed files;
 - verification commands and results;
 - commit hash if committed;

@@ -80,19 +80,41 @@ def canonical_role(raw: str) -> str:
 
 
 def model_route(role: str, risk: str) -> ModelRoute:
-    if role in {"总控", "架构"}:
-        return ModelRoute("gpt-5.5", "xhigh", "降级仅限低风险摘要或已确认的机械同步。")
+    if role == "总控":
+        if risk == "critical":
+            return ModelRoute("gpt-5.6-sol", "xhigh", "只用于资金、上线、生产恢复或跨角色最终 go/no-go；其余情况回到 Terra + high。")
+        return ModelRoute("gpt-5.6-terra", "high", "资金、上线、生产恢复或跨角色最终 go/no-go 升级到 gpt-5.6-sol + xhigh。")
+    if role == "架构":
+        if risk == "extreme":
+            return ModelRoute("gpt-5.6-sol", "max", "仅限极难、信息高度冲突且常规 xhigh 仍无法收敛的问题。")
+        if risk == "critical":
+            return ModelRoute("gpt-5.6-sol", "xhigh", "实盘架构、事故根因、DB/并发/安全或不可逆方案升级；极难问题才使用 max。")
+        return ModelRoute("gpt-5.6-sol", "high", "实盘架构、事故根因、DB/并发/安全或不可逆方案升级到 xhigh；极难问题才使用 max。")
     if role == "开发":
-        return ModelRoute("gpt-5.5", "xhigh", "开发执行 subagent 默认使用 gpt-5.3-codex-spark + xhigh；复杂架构决策或跨系统高风险变更回流架构/总控。")
+        if risk == "critical":
+            return ModelRoute("gpt-5.6-sol", "xhigh", "live exit、资金安全、PnL/fee、并发或重复失败返工由 Dev Lead 亲自处理，不交给廉价 subagent。")
+        return ModelRoute("gpt-5.6-terra", "high", "live exit、资金安全、PnL/fee、并发或重复失败返工升级到 gpt-5.6-sol + xhigh。")
     if role == "QA":
         if risk == "critical":
-            return ModelRoute("gpt-5.5", "xhigh", "普通验收可降级到 gpt-5.5 + medium。")
-        return ModelRoute("gpt-5.5", "medium", "关键 PR、对抗式审查、发布门禁升级到 gpt-5.5 + xhigh。")
+            return ModelRoute("gpt-5.6-sol", "xhigh", "关键 PR、对抗式审查、发布门禁或生产风险需要 Sol xhigh。")
+        return ModelRoute("gpt-5.6-terra", "high", "关键 PR、对抗式审查、发布门禁或生产风险升级到 gpt-5.6-sol + xhigh。")
+    if role in {"运维", "DBA"}:
+        if risk == "critical":
+            return ModelRoute("gpt-5.6-sol", "xhigh", "真正部署、restart、rollback、生产故障、DDL、清理、恢复或数据风险需要 Sol xhigh。")
+        return ModelRoute("gpt-5.6-terra", "high", "只读采证、容量、锁或空间分析用 Terra；部署/恢复/DDL/数据风险升级到 gpt-5.6-sol + xhigh。")
     if role in {"技能维护", "文档/交付", "知识库"}:
-        return ModelRoute("gpt-5.3-codex-spark", "high", "小型文档/registry 机械编辑可降级到 gpt-5.4-mini。")
+        if risk == "mechanical":
+            return ModelRoute("gpt-5.4-mini", "medium", "仅限已确认范围内的索引、排版、搬运或 registry 机械同步；一旦需要判断，回到 Terra + high。")
+        return ModelRoute("gpt-5.6-terra", "high", "策略结论、收益判断、知识结构或跨角色治理使用 Terra；纯索引、排版、搬运可降级到 gpt-5.4-mini + medium。")
     if role in CONTENT_ROLES:
-        return ModelRoute("gpt-5.3-codex-spark", "high", "高风险公开定位、声明、合规或跨平台策略升级到 gpt-5.5 + xhigh。")
-    return ModelRoute("gpt-5.3-codex-spark", "high", "涉及高风险决策或跨角色协调时回流总控/架构。")
+        if risk == "critical":
+            return ModelRoute("gpt-5.6-sol", "xhigh", "高风险公开定位、声明、合规或跨平台策略需要 Sol xhigh。")
+        return ModelRoute("gpt-5.6-terra", "high", "高风险公开定位、声明、合规或跨平台策略升级到 gpt-5.6-sol + xhigh。")
+    if risk == "mechanical":
+        return ModelRoute("gpt-5.4-mini", "high", "仅限单文件、测试明确、无业务语义判断的机械执行。")
+    if risk == "critical":
+        return ModelRoute("gpt-5.6-sol", "xhigh", "高风险实现、不可逆操作或最终技术判断升级到 Sol xhigh。")
+    return ModelRoute("gpt-5.6-terra", "high", "涉及高风险决策或跨角色协调时升级到 gpt-5.6-sol + xhigh。")
 
 
 def lines_or_default(values: list[str], default: str) -> str:
@@ -214,11 +236,13 @@ def role_execution_guidance(role: str) -> str:
     if role != "开发":
         return ""
     return """开发负责人 / Dev Lead 执行规则：
-- 本窗口默认是开发负责人 / Dev Lead，使用 gpt-5.5 + xhigh，负责拆解、集成、纠偏、最终提交。
+- 本窗口默认是开发负责人 / Dev Lead，使用 gpt-5.6-terra + high，负责拆解、集成、纠偏、最终提交。
 - 需要并行或长任务时，先拆成任务卡，再把单一、短、小、可验证的代码任务交给开发执行 subagent。
 - 开发执行 subagent 是窗口内一次性 subagent，不是新的角色窗口；不写入 .codex/role-windows.md，不作为后续任务复用。
-- 开发执行 subagent 默认模型：gpt-5.3-codex-spark + xhigh；只执行单一、短、小、可验证的代码任务；任务结束后关闭，不作为角色窗口复用。
-- subagent 必须带文件白名单、禁止范围、验收命令和退出条件；不要让 subagent 承担架构判断、跨文件整合或最终提交。
+- 任务结束后关闭，不作为角色窗口复用。
+- subagent 只执行单一、短、小、可验证的代码任务：单文件、测试明确、机械实现用 gpt-5.4-mini + high；两三个文件、需要理解业务语义用 gpt-5.6-terra + high。
+- live/资金/并发/账本、PnL/fee 或重复失败返工不得交给廉价 subagent；由 Dev Lead 使用 gpt-5.6-sol + xhigh 亲自处理。
+- subagent 必须带文件白名单、禁止范围、验收命令和退出条件；不要让 subagent 承担架构判断、跨文件整合、纠偏策略、最终验证或提交。
 """
 
 
@@ -639,7 +663,7 @@ def parse_args(argv: list[str]) -> argparse.Namespace:
     parser.add_argument("--loop-depth", default="L1", choices=["L0", "L1", "L2", "L3"], help="Collapsible routing depth. L0 direct user-to-executor; L1 owner layer; L2 owner-to-executor loop; L3 high-risk gated loop.")
     parser.add_argument("--profile", default="auto", choices=["auto", "compact", "standard", "full"], help="Token budget profile. auto chooses compact for L0/L1 owner/simple prompts, standard for L2/architecture/new-code prompts, and full for L3/critical prompts.")
     parser.add_argument("--task-size", default="medium", choices=["tiny", "small", "medium", "large", "critical"], help="Task dispatch size. tiny lets CEO self-handle only local low-risk changes; small allows CEO -> 开发 direct dispatch; medium routes to owner layer; large/critical uses full role teams and gates.")
-    parser.add_argument("--risk", default="normal", choices=["normal", "critical"], help="Use critical for release gates, adversarial QA, compliance, or high-risk public claims.")
+    parser.add_argument("--risk", default="normal", choices=["normal", "mechanical", "critical", "extreme"], help="Use mechanical only for fully scoped rote work, critical for production/release/data/security gates, and extreme only for exceptional CTO reasoning.")
     parser.add_argument("--source-role", help="Source/callback role. Defaults to 用户 only for 总控/架构, otherwise 待确认.")
     parser.add_argument("--source-thread", help="Source thread id. Defaults to 待确认.")
     parser.add_argument("--context", help="Short known context.")
