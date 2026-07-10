@@ -405,11 +405,13 @@ def test_render_prompt_routes_development_lead_and_subagents() -> None:
             "架构",
         ]
     )
-    assert "model：gpt-5.5" in dev.stdout
-    assert "thinking：xhigh" in dev.stdout
+    assert "model：gpt-5.6-terra" in dev.stdout
+    assert "thinking：high" in dev.stdout
     assert "开发负责人 / Dev Lead" in dev.stdout
     assert "开发执行 subagent" in dev.stdout
-    assert "gpt-5.3-codex-spark" in dev.stdout
+    assert "gpt-5.4-mini + high" in dev.stdout
+    assert "gpt-5.6-terra + high" in dev.stdout
+    assert "gpt-5.6-sol + xhigh" in dev.stdout
     assert "只执行单一、短、小、可验证的代码任务" in dev.stdout
     assert "窗口内一次性 subagent" in dev.stdout
     assert "不写入 .codex/role-windows.md" in dev.stdout
@@ -429,8 +431,8 @@ def test_render_prompt_routes_qa_default_and_critical_models() -> None:
             "架构",
         ]
     )
-    assert "model：gpt-5.5" in ordinary.stdout
-    assert "thinking：medium" in ordinary.stdout
+    assert "model：gpt-5.6-terra" in ordinary.stdout
+    assert "thinking：high" in ordinary.stdout
 
     critical = run(
         [
@@ -446,8 +448,79 @@ def test_render_prompt_routes_qa_default_and_critical_models() -> None:
             "critical",
         ]
     )
-    assert "model：gpt-5.5" in critical.stdout
+    assert "model：gpt-5.6-sol" in critical.stdout
     assert "thinking：xhigh" in critical.stdout
+
+
+def test_render_prompt_routes_owner_ops_dba_and_mechanical_work() -> None:
+    ceo = run(
+        [
+            PYTHON,
+            str(RENDER_PROMPT),
+            "--role",
+            "总控",
+            "--objective",
+            "跨角色结果验收",
+        ]
+    )
+    assert "model：gpt-5.6-terra" in ceo.stdout
+    assert "thinking：high" in ceo.stdout
+
+    cto = run(
+        [
+            PYTHON,
+            str(RENDER_PROMPT),
+            "--role",
+            "架构",
+            "--objective",
+            "实盘架构方案",
+        ]
+    )
+    assert "model：gpt-5.6-sol" in cto.stdout
+    assert "thinking：high" in cto.stdout
+
+    ops = run(
+        [
+            PYTHON,
+            str(RENDER_PROMPT),
+            "--role",
+            "运维",
+            "--objective",
+            "生产恢复",
+            "--risk",
+            "critical",
+        ]
+    )
+    assert "model：gpt-5.6-sol" in ops.stdout
+    assert "thinking：xhigh" in ops.stdout
+
+    dba = run(
+        [
+            PYTHON,
+            str(RENDER_PROMPT),
+            "--role",
+            "DBA",
+            "--objective",
+            "索引空间分析",
+        ]
+    )
+    assert "model：gpt-5.6-terra" in dba.stdout
+    assert "thinking：high" in dba.stdout
+
+    knowledge = run(
+        [
+            PYTHON,
+            str(RENDER_PROMPT),
+            "--role",
+            "知识库",
+            "--objective",
+            "机械整理索引",
+            "--risk",
+            "mechanical",
+        ]
+    )
+    assert "model：gpt-5.4-mini" in knowledge.stdout
+    assert "thinking：medium" in knowledge.stdout
 
 
 def test_render_prompt_includes_readonly_x_mcp_for_content_roles() -> None:
@@ -583,6 +656,7 @@ def main() -> int:
         test_render_prompt_full_profile_keeps_deep_sections,
         test_render_prompt_routes_development_lead_and_subagents,
         test_render_prompt_routes_qa_default_and_critical_models,
+        test_render_prompt_routes_owner_ops_dba_and_mechanical_work,
         test_render_prompt_includes_readonly_x_mcp_for_content_roles,
         test_render_prompt_includes_content_tone_gate,
         test_render_prompt_includes_xhs_automation_publish_gate,
