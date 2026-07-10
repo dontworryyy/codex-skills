@@ -13,6 +13,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 PYTHON = sys.executable
 README = ROOT / "README.md"
+TECHNICAL_HIGHLIGHTS = ROOT / "docs" / "technical-highlights.md"
 ROLE_USAGE = ROOT / "docs" / "role-usage.md"
 PUBLICATION_CHECKLIST = ROOT / "docs" / "publication-checklist.md"
 REGISTRY = ROOT / "registry" / "skills.json"
@@ -103,9 +104,29 @@ def validate_docs(errors: list[str]) -> None:
             "gpt-5.4-mini` + `high",
             "--execution-profile parallel",
             "--prefer-spark --spark-available",
+            "docs/technical-highlights.md",
         ],
         errors,
     )
+    require_contains(
+        TECHNICAL_HIGHLIGHTS,
+        [
+            "CEO-First 与负责人分层",
+            "可折叠的 Multi-Window Loop",
+            "Fail-Closed Tool Layer",
+            "Token-Aware Prompt Architecture",
+            "稳定模型路由与 Spark 机会通道",
+            "可量化的 Skill Routing",
+            "CodeGraph、开源参考与治理",
+        ],
+        errors,
+    )
+
+    readme_text = read(README)
+    if len(readme_text.splitlines()) > 260:
+        errors.append(f"README.md exceeds line budget: {len(readme_text.splitlines())} > 260")
+    if len(readme_text.encode("utf-8")) > 20000:
+        errors.append(f"README.md exceeds byte budget: {len(readme_text.encode('utf-8'))} > 20000")
     require_contains(
         ROLE_USAGE,
         [

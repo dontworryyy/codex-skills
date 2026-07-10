@@ -12,6 +12,8 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 PYTHON = sys.executable
+README = ROOT / "README.md"
+TECHNICAL_HIGHLIGHTS = ROOT / "docs" / "technical-highlights.md"
 ENSURE = ROOT / "skills" / "agent-role-orchestrator" / "scripts" / "ensure_project_role_files.py"
 RENDER_PROMPT = ROOT / "skills" / "agent-role-orchestrator" / "scripts" / "render_role_prompt.py"
 VALIDATE_LOOP = ROOT / "skills" / "agent-role-orchestrator" / "scripts" / "validate_role_loop.py"
@@ -630,6 +632,33 @@ def test_orchestrator_entry_files_stay_within_token_budget() -> None:
     assert len(role_cards_text.encode("utf-8")) <= 18000
 
 
+def test_readme_stays_scannable_and_current() -> None:
+    text = README.read_text(encoding="utf-8")
+    assert len(text.splitlines()) <= 260
+    assert len(text.encode("utf-8")) <= 20000
+    for heading in (
+        "## 30 秒上手",
+        "## 角色与任务流",
+        "## Fail-Closed Tool Layer",
+        "## 稳定模型路由与 Spark 机会通道",
+        "## 能力路由",
+        "## 仓库与维护",
+    ):
+        assert heading in text
+    assert "docs/technical-highlights.md" in text
+
+    highlights = TECHNICAL_HIGHLIGHTS.read_text(encoding="utf-8")
+    for heading in (
+        "## CEO-First 与负责人分层",
+        "## 可折叠的 Multi-Window Loop",
+        "## Fail-Closed Tool Layer",
+        "## Token-Aware Prompt Architecture",
+        "## 稳定模型路由与 Spark 机会通道",
+        "## 可量化的 Skill Routing",
+    ):
+        assert heading in highlights
+
+
 def test_render_prompt_routes_owner_ops_dba_and_mechanical_work() -> None:
     ceo = run(
         [
@@ -839,6 +868,7 @@ def main() -> int:
         test_render_prompt_routes_qa_default_and_critical_models,
         test_render_prompt_extreme_cto_uses_supported_xhigh,
         test_orchestrator_entry_files_stay_within_token_budget,
+        test_readme_stays_scannable_and_current,
         test_render_prompt_routes_owner_ops_dba_and_mechanical_work,
         test_render_prompt_includes_readonly_x_mcp_for_content_roles,
         test_render_prompt_includes_content_tone_gate,
