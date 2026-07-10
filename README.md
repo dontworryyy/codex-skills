@@ -65,7 +65,7 @@ Windows 没有 `rsync` 时，可以按目录复制 `skills/<skill-name>/` 到 `%
 - 总控/架构/多角色/派发/回调/台账类任务必须先读取 `agent-role-orchestrator` 和项目 `.codex/role-windows.md`。
 - `总控` 维护全局技能路由和模型预算台账，`架构` 维护技术子树台账，`内容主编` 维护内容子树台账。
 - 机械字段、提示词模板、CodeGraph 状态、台账状态、回调完整性和技能命中统计优先交给 `agent-role-orchestrator/scripts/` 做 fail-closed 校验。
-- `开发` 默认是 `开发负责人 / Dev Lead`：用 `gpt-5.6-terra` + `high` 拆解、集成、纠偏和最终提交；subagent 按任务分级，不再默认使用 Spark。
+- `开发` 默认是 `开发负责人 / Dev Lead`：用 `gpt-5.6-terra` + `high` 拆解、集成、纠偏和最终提交；subagent 按任务分级，Spark 只作为确认可用后的独立额度机会通道。
 - `QA` 默认做对抗式审查：主动找反例、边界、回归面、证据缺口和过度声明。
 - 新建或接续角色窗口时默认写清 model/thinking 路由。
 - 已建立角色默认继承/接续，不重复开新窗口。
@@ -222,6 +222,7 @@ python skills/agent-role-orchestrator/scripts/aggregate_skill_hits.py \
 | `架构 / CTO` | `gpt-5.6-sol` + `high`；实盘架构、事故根因、DB/并发/安全、不可逆方案升 `xhigh`；不生成不存在的 `max` 档位 |
 | `开发负责人 / Dev Lead` | `gpt-5.6-terra` + `high`；live exit、资金安全、PnL/fee、并发、重复失败返工升 `gpt-5.6-sol` + `xhigh` |
 | `开发执行 subagent` | 窗口内一次性 worker。纯机械单文件：`gpt-5.4-mini` + `high`；边界清楚、可独立验证的有限语义任务：`gpt-5.6-luna` + `high`；跨文件业务语义：`gpt-5.6-terra` + `high`；live/资金/并发/账本不下放，由 Dev Lead 用 Sol + xhigh 处理 |
+| `Spark Opportunity Lane` | Spark 当前可用且独立预览额度有剩余时，mechanical/bounded 一次性开发 executor 可用 `gpt-5.3-codex-spark` + `high`；未确认可用时回退 Mini/Luna，不承担 owner、集成、最终 QA 或高风险任务 |
 | `QA` | 普通验收：`gpt-5.6-terra` + `high`；关键 PR / 对抗式审查 / 发布门禁：`gpt-5.6-sol` + `xhigh` |
 | `运维` / `DBA` | 只读采证、容量、锁、空间分析：`gpt-5.6-terra` + `high`；部署、restart、rollback、生产故障、DDL、清理、恢复、数据风险：`gpt-5.6-sol` + `xhigh` |
 | `知识库` / `技能维护` / `文档/交付` | 默认 `gpt-5.6-terra` + `high`；纯索引、排版、搬运、registry 机械同步：`gpt-5.4-mini` + `medium` |
@@ -232,6 +233,8 @@ python skills/agent-role-orchestrator/scripts/aggregate_skill_hits.py \
 长任务不要让低成本 subagent 独立扛完整上下文。`开发负责人 / Dev Lead` 先写任务卡，明确目标、文件白名单、禁止范围、验证命令、期望输出和回调对象，再按任务复杂度派发短小执行片段。这里的 subagent 是当前窗口内的一次性 worker：任务结束后关闭，不写入 `.codex/role-windows.md`，不作为角色窗口复用。最终 review、整合、纠偏、验证和提交仍由 Dev Lead 负责。默认串行；普通并行最多 2 个 worker，且必须有互斥范围和独立验证；3-5 个 worker 只允许显式 `parallel` profile，不因“任务很大”自动扩散。
 
 生成 bounded Luna executor 或并行任务时，使用 `render_role_prompt.py --executor-tier bounded`，以及 `--execution-profile parallel --worker-count N --disjoint-scope ... --independent-validation ...`。缺少范围或验证证据时脚本 fail closed。
+
+Spark 通过 `--prefer-spark --spark-available` 显式启用。它是 research preview、text-only、128K，独立限额和可用性可能调整；任务卡必须带验证命令，因为 Spark 的轻量默认行为不保证自动运行测试。未提供 `--spark-available` 时脚本保留稳定 Mini/Luna 路由。
 
 ### X MCP 内容研究源
 

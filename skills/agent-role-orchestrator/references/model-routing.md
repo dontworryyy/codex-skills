@@ -26,6 +26,19 @@ No route uses `max`; the highest supported recommendation is `xhigh`.
 
 Use `--executor-tier mechanical|bounded|semantic|high-risk`. The worker is an in-window one-shot subagent, not a durable role thread.
 
+## Spark Opportunity Lane
+
+`gpt-5.3-codex-spark` is an opportunistic preview lane alongside the stable tiers. OpenAI currently describes it as a text-only, 128K, real-time coding model with a separate preview rate limit that may change with demand; credit rates are not final. Source: [Introducing GPT-5.3-Codex-Spark](https://openai.com/index/introducing-gpt-5-3-codex-spark/).
+
+Select it only when all are true:
+
+- the task is a `mechanical` or `bounded` one-shot development executor;
+- current Spark availability/quota is explicitly confirmed;
+- scope is short, text-only, and independently verifiable;
+- the task card names the validation command and requires its result.
+
+Use `--prefer-spark --spark-available`. Without confirmed availability, the generator falls back to Mini/Luna. Spark is forbidden for owner, semantic integration, high-risk, critical, architecture, final QA, and long-context work.
+
 ## Parallel Profile
 
 Default: `serial`, one worker.

@@ -290,6 +290,44 @@ def validate_execution_profile(role: str, args: argparse.Namespace) -> None:
         raise ValueError("parallel execution-profile requires " + " and ".join(missing))
 
 
+def validate_spark_opportunity(role: str, args: argparse.Namespace) -> None:
+    if args.spark_available and not args.prefer_spark:
+        raise ValueError("--spark-available requires --prefer-spark")
+    if not args.prefer_spark:
+        return
+    if role != "开发" or args.executor_tier not in {"mechanical", "bounded"}:
+        raise ValueError("Spark Opportunity Lane only supports 开发 mechanical or bounded one-shot executors")
+    if args.risk in {"critical", "extreme"}:
+        raise ValueError("Spark Opportunity Lane does not support critical or extreme risk")
+
+
+def selected_model_route(role: str, args: argparse.Namespace) -> ModelRoute:
+    if args.prefer_spark and args.spark_available:
+        return ModelRoute(
+            "gpt-5.3-codex-spark",
+            "high",
+            "仅用于短小、文本型、范围明确且可独立验证的一次性编码任务；不可用、排队或范围增长时回退稳定路由。",
+        )
+    return model_route(role, args.risk, args.executor_tier)
+
+
+def spark_opportunity_guidance(role: str, args: argparse.Namespace) -> str:
+    if role != "开发" or not args.prefer_spark:
+        return ""
+    fallback = model_route(role, args.risk, args.executor_tier)
+    selection = (
+        "使用 Spark 独立额度"
+        if args.spark_available
+        else f"Spark 未确认可用，回退稳定路由 {fallback.model} + {fallback.thinking}"
+    )
+    return f"""Spark Opportunity Lane：
+- 选择结果：{selection}
+- 适用边界：仅限 mechanical/bounded、文本型、短小且可独立验证的一次性开发 executor。
+- 预览约束：research preview、128K、text-only；独立限额和可用性可能随需求调整。
+- 验证门禁：Spark 默认工作方式轻量，任务卡必须显式运行验证命令并回传结果。
+"""
+
+
 def ui_preview_route_guidance(role: str) -> str:
     if role != "UI/PPT":
         return ""
@@ -407,7 +445,7 @@ def build_compact_prompt(
 Token Budget Profile：
 - profile：{profile}
 - 策略：{token_profile_strategy(profile)}
-{role_execution_guidance(role)}{execution_profile_guidance(role, args)}{ui_preview_route_guidance(role)}{content_research_guidance(role)}{content_tone_gate(role)}{xhs_automation_publish_gate(role)}
+{role_execution_guidance(role)}{execution_profile_guidance(role, args)}{spark_opportunity_guidance(role, args)}{ui_preview_route_guidance(role)}{content_research_guidance(role)}{content_tone_gate(role)}{xhs_automation_publish_gate(role)}
 角色树位置：{ROLE_TREE_POSITION[role]}
 Loop 深度（可折叠路由）：
 - 本次深度：{args.loop_depth}；L0 直达，L1 负责人，L2 负责人拆执行，L3 增加独立门禁。
@@ -465,7 +503,8 @@ def build_prompt(args: argparse.Namespace) -> str:
     role = canonical_role(args.role)
     validate_source_route(role, args)
     validate_execution_profile(role, args)
-    route = model_route(role, args.risk, args.executor_tier)
+    validate_spark_opportunity(role, args)
+    route = selected_model_route(role, args)
     source_role = args.source_role or ("用户" if role in {"总控", "架构"} else "待确认")
     source_thread = args.source_thread or "待确认"
     project = args.project or "待确认"
@@ -520,6 +559,7 @@ Token Budget Profile：
 
 {role_execution_guidance(role)}
 {execution_profile_guidance(role, args)}
+{spark_opportunity_guidance(role, args)}
 {ui_preview_route_guidance(role)}
 {content_research_guidance(role)}
 {content_tone_gate(role)}
@@ -651,6 +691,8 @@ def parse_args(argv: list[str]) -> argparse.Namespace:
     parser.add_argument("--worker-count", type=int, default=1, help="One-shot development workers. Default 1; explicit parallel profile permits 2-5.")
     parser.add_argument("--disjoint-scope", help="Evidence that parallel worker file/surface ownership does not overlap.")
     parser.add_argument("--independent-validation", help="Evidence that each parallel worker has an independent validation command or check.")
+    parser.add_argument("--prefer-spark", action="store_true", help="Prefer the opportunistic Spark lane for a mechanical/bounded one-shot development executor.")
+    parser.add_argument("--spark-available", action="store_true", help="Confirm Spark is currently available with usable preview quota; requires --prefer-spark.")
     parser.add_argument("--source-role", help="Source/callback role. Defaults to 用户 only for 总控/架构, otherwise 待确认.")
     parser.add_argument("--source-thread", help="Source thread id. Defaults to 待确认.")
     parser.add_argument("--context", help="Short known context.")

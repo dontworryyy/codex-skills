@@ -66,3 +66,11 @@
 - [ ] 生成总控、架构、开发、QA、知识库提示词，记录新体积。
 - [ ] 同步本机安装目录并用本机生成器复验。
 - [ ] 推送分支并创建新的可读 PR。
+
+### Addendum：Spark 独立额度机会通道
+
+- `gpt-5.3-codex-spark` 不进入四级稳定路由，只作为 research preview 机会通道。
+- 仅允许 mechanical/bounded、短小、text-only、可独立验证的一次性开发 executor。
+- 通过 `--prefer-spark --spark-available` 显式启用；未确认可用时回退 Mini/Luna。
+- Spark 不承担 owner、semantic 集成、最终 QA、critical/high-risk 或长上下文任务。
+- 任务卡必须显式给出验证命令，脚本负责 fail-closed 校验。

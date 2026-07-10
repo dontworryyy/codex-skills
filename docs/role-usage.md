@@ -239,6 +239,7 @@ python skills/agent-role-orchestrator/scripts/aggregate_skill_hits.py \
 | `架构 / CTO` | `gpt-5.6-sol` + `high`；实盘架构、事故根因、DB/并发/安全、不可逆方案升 `xhigh`；不生成不存在的 `max` 档位 |
 | `开发负责人 / Dev Lead` | `gpt-5.6-terra` + `high`；live exit、资金安全、PnL/fee、并发、重复失败返工升 `gpt-5.6-sol` + `xhigh` |
 | `开发执行 subagent` | 窗口内一次性 worker。纯机械单文件：`gpt-5.4-mini` + `high`；边界清楚、可独立验证的有限语义任务：`gpt-5.6-luna` + `high`；跨文件业务语义：`gpt-5.6-terra` + `high`；live/资金/并发/账本不下放，由 Dev Lead 用 Sol + xhigh 处理 |
+| `Spark Opportunity Lane` | Spark 当前可用且独立预览额度有剩余时，mechanical/bounded 一次性开发 executor 可用 `gpt-5.3-codex-spark` + `high`；未确认可用时回退 Mini/Luna，不承担 owner、集成、最终 QA 或高风险任务 |
 | `QA` | 普通验收：`gpt-5.6-terra` + `high`；关键 PR / 对抗式审查 / 发布门禁：`gpt-5.6-sol` + `xhigh` |
 | `运维` / `DBA` | 只读采证、容量、锁、空间分析：`gpt-5.6-terra` + `high`；部署、restart、rollback、生产故障、DDL、清理、恢复、数据风险：`gpt-5.6-sol` + `xhigh` |
 | `知识库` / `技能维护` / `文档/交付` | 默认 `gpt-5.6-terra` + `high`；纯索引、排版、搬运、registry 机械同步：`gpt-5.4-mini` + `medium` |
@@ -255,6 +256,7 @@ python skills/agent-role-orchestrator/scripts/aggregate_skill_hits.py \
 - 开发全过程默认遵循第一性原理：先还原目标、事实、约束/不变量、最小可证伪假设、最小改动和验证证据，再动手实现。
 - 长任务或容易 compact 的任务先由 Dev Lead 写任务卡，包含目标、文件白名单、禁止范围、验证命令、预期输出和回调对象，再派发给开发执行 subagent。
 - 默认串行；普通并行最多 2 个 worker，且必须声明互斥范围和独立验证。3-5 个 worker 只允许显式 `parallel` profile，并通过 `--worker-count`、`--disjoint-scope` 和 `--independent-validation` fail-closed 校验。
+- Spark 是独立额度机会通道，不是稳定第五级：仅在当前可用性已确认时，用 `--prefer-spark --spark-available` 把 mechanical/bounded 一次性 executor 路由到 Spark/high；否则回退 Mini/Luna。Spark 任务必须显式给出验证命令，不承担 owner、跨文件集成、最终 QA、critical/high-risk 或长上下文任务。
 - 前端/UI/PPT/社交卡/视频产物；纯前端或视觉保真任务默认先由 `UI/PPT` / `UI/Frontend` 定视觉路线，再让 `开发` 按范围实现。有预览图、参考图、截图或高保真目标时，UI/PPT 先输出 2-4 条实现路线，不要默认拿 CSS 硬干；复杂插画、纹理、3D、粒子或动效优先考虑资产化、Canvas/SVG、Three.js/WebGL、Lottie/视频或专用库，并用截图对比/视觉 QA 验收。
 - 公众号文章和小红书笔记的草稿、预览、发布包和明确授权后的发布自动化。
 - 交付文档包和个人知识库整理。

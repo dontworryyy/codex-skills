@@ -485,6 +485,66 @@ def test_render_prompt_rejects_unsafe_parallel_worker_fanout() -> None:
     assert "默认串行" not in accepted.stdout
 
 
+def test_render_prompt_uses_spark_only_for_confirmed_short_executor() -> None:
+    spark = run(
+        [
+            PYTHON,
+            str(RENDER_PROMPT),
+            "--role",
+            "开发",
+            "--objective",
+            "实现一个已有独立测试的适配器",
+            "--source-role",
+            "架构",
+            "--executor-tier",
+            "bounded",
+            "--prefer-spark",
+            "--spark-available",
+        ]
+    )
+    assert "model：gpt-5.3-codex-spark" in spark.stdout
+    assert "thinking：high" in spark.stdout
+    assert "Spark Opportunity Lane" in spark.stdout
+    assert "选择结果：使用 Spark 独立额度" in spark.stdout
+    assert "必须显式运行验证命令" in spark.stdout
+
+    fallback = run(
+        [
+            PYTHON,
+            str(RENDER_PROMPT),
+            "--role",
+            "开发",
+            "--objective",
+            "实现一个已有独立测试的适配器",
+            "--source-role",
+            "架构",
+            "--executor-tier",
+            "bounded",
+            "--prefer-spark",
+        ]
+    )
+    assert "model：gpt-5.6-luna" in fallback.stdout
+    assert "选择结果：Spark 未确认可用，回退稳定路由" in fallback.stdout
+
+    rejected = run(
+        [
+            PYTHON,
+            str(RENDER_PROMPT),
+            "--role",
+            "开发",
+            "--objective",
+            "担任长期开发负责人",
+            "--source-role",
+            "架构",
+            "--prefer-spark",
+            "--spark-available",
+        ],
+        check=False,
+    )
+    assert rejected.returncode != 0
+    assert "mechanical or bounded" in rejected.stderr
+
+
 def test_render_prompt_compact_profile_stays_within_budget() -> None:
     compact = run(
         [
@@ -774,6 +834,7 @@ def main() -> int:
         test_render_prompt_full_profile_keeps_deep_sections,
         test_render_prompt_routes_development_lead_and_subagents,
         test_render_prompt_rejects_unsafe_parallel_worker_fanout,
+        test_render_prompt_uses_spark_only_for_confirmed_short_executor,
         test_render_prompt_compact_profile_stays_within_budget,
         test_render_prompt_routes_qa_default_and_critical_models,
         test_render_prompt_extreme_cto_uses_supported_xhigh,

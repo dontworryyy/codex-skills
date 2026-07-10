@@ -99,8 +99,10 @@ def validate_docs(errors: list[str]) -> None:
             "gpt-5.6-terra` + `high",
             "gpt-5.6-sol` + `xhigh",
             "gpt-5.6-luna` + `high",
+            "gpt-5.3-codex-spark` + `high",
             "gpt-5.4-mini` + `high",
             "--execution-profile parallel",
+            "--prefer-spark --spark-available",
         ],
         errors,
     )
@@ -140,8 +142,10 @@ def validate_docs(errors: list[str]) -> None:
             "gpt-5.6-terra` + `high",
             "gpt-5.6-sol` + `xhigh",
             "gpt-5.6-luna` + `high",
+            "gpt-5.3-codex-spark` + `high",
             "gpt-5.4-mini` + `high",
             "3-5 个 worker",
+            "--prefer-spark --spark-available",
         ],
         errors,
     )
@@ -191,7 +195,10 @@ def validate_orchestrator(errors: list[str]) -> None:
             "gpt-5.6-terra` + `high",
             "gpt-5.6-sol` + `xhigh",
             "gpt-5.6-luna` + `high",
+            "gpt-5.3-codex-spark",
             "gpt-5.4-mini` + `high",
+            "Spark Opportunity Lane",
+            "--prefer-spark --spark-available",
         ],
         errors,
     )
@@ -236,7 +243,7 @@ def validate_registry(errors: list[str]) -> None:
         errors.append("agent-role-orchestrator registry missing consumed_by_roles: " + "、".join(sorted(missing_roles)))
 
     summary = item.get("summary", "")
-    for needle in ("总控/CEO", "CTO", "内容主编", "Luna 有界执行", "显式并行 worker 门禁", "反老登味/反AI味内容闸门", "UI预览图实现路线选择", "来源thread压缩回调闭环", "fail-closed"):
+    for needle in ("总控/CEO", "CTO", "内容主编", "Luna 有界执行", "Spark 独立额度机会通道", "显式并行 worker 门禁", "反老登味/反AI味内容闸门", "UI预览图实现路线选择", "来源thread压缩回调闭环", "fail-closed"):
         if needle not in summary:
             errors.append(f"agent-role-orchestrator summary missing: {needle}")
 
@@ -258,8 +265,11 @@ def validate_scripts(errors: list[str]) -> None:
             "gpt-5.6-terra",
             "gpt-5.6-sol",
             "gpt-5.6-luna",
+            "gpt-5.3-codex-spark",
             "gpt-5.4-mini",
             "--executor-tier",
+            "--prefer-spark",
+            "--spark-available",
             "--execution-profile",
             "--worker-count",
             "--disjoint-scope",
@@ -271,7 +281,7 @@ def validate_scripts(errors: list[str]) -> None:
     )
     require_contains(
         MODEL_ROUTING,
-        ["gpt-5.6-luna", "gpt-5.4-mini", "gpt-5.6-terra", "gpt-5.6-sol", "--execution-profile parallel", "--disjoint-scope", "--independent-validation"],
+        ["gpt-5.6-luna", "gpt-5.3-codex-spark", "gpt-5.4-mini", "gpt-5.6-terra", "gpt-5.6-sol", "Spark Opportunity Lane", "--prefer-spark --spark-available", "--execution-profile parallel", "--disjoint-scope", "--independent-validation"],
         errors,
     )
     require_contains(TOOL_ROUTING, ["Fail-Closed Scripts", "aggregate_skill_hits.py", "Skill Ledger"], errors)

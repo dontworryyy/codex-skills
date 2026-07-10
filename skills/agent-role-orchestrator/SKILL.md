@@ -117,6 +117,8 @@ Load `references/model-routing.md` when selecting or overriding models. The stab
 - deterministic mechanical executor: `gpt-5.4-mini` + `high`;
 - bounded one-shot executor: `gpt-5.6-luna` + `high`.
 
+`gpt-5.3-codex-spark` is an optional `Spark Opportunity Lane`, not a durable fifth tier. During its research preview it may have a separate usage limit, but availability and rates may change. Use it only for a mechanical/bounded, text-only, short, independently verifiable one-shot development executor when current availability is explicitly confirmed; otherwise fall back to Mini/Luna. Spark never owns architecture, integration, final QA, high-risk work, or long context.
+
 Never emit an unsupported `max` tier. User selection and actual model availability override these recommendations; record fallbacks explicitly.
 
 For development, durable owner and executor are different:
@@ -125,6 +127,7 @@ For development, durable owner and executor are different:
 - `开发执行 subagent` is an in-window one-shot worker. It handles one short, narrow, independently verifiable task, is not added to `.codex/role-windows.md`, and is not reused after completion.
 - Default execution is serial. Two workers require disjoint scope and independent validation. Three to five workers require an explicit parallel profile and the same fail-closed evidence.
 - High-risk implementation stays with Dev Lead on Sol/xhigh; do not send it to a low-cost executor.
+- Spark tasks must include an explicit validation command because its lightweight default behavior may not run tests automatically.
 
 ## Token Budget Profile Rule
 
@@ -242,6 +245,9 @@ python scripts/render_role_prompt.py --role 开发 --objective "实现订单修�
 
 # Bounded one-shot Luna executor
 python scripts/render_role_prompt.py --role 开发 --objective "实现独立适配器" --source-role 架构 --executor-tier bounded --profile compact
+
+# Same bounded task using confirmed Spark preview quota
+python scripts/render_role_prompt.py --role 开发 --objective "实现独立适配器" --source-role 架构 --executor-tier bounded --prefer-spark --spark-available --validation "pytest tests/test_adapter.py"
 
 # Explicit three-worker parallel execution
 python scripts/render_role_prompt.py --role 开发 --objective "实现三个独立适配器" --source-role 架构 --execution-profile parallel --worker-count 3 --disjoint-scope "每人一个目录" --independent-validation "每个目录独立测试"
