@@ -14,6 +14,7 @@ ROOT = Path(__file__).resolve().parents[1]
 PYTHON = sys.executable
 README = ROOT / "README.md"
 TECHNICAL_HIGHLIGHTS = ROOT / "docs" / "technical-highlights.md"
+BROWSER_AUTOMATION_DOC = ROOT / "docs" / "browser-automation.md"
 ROLE_USAGE = ROOT / "docs" / "role-usage.md"
 PUBLICATION_CHECKLIST = ROOT / "docs" / "publication-checklist.md"
 REGISTRY = ROOT / "registry" / "skills.json"
@@ -23,6 +24,11 @@ ROLE_CARDS = ORCHESTRATOR / "references" / "role-cards.md"
 MODEL_ROUTING = ORCHESTRATOR / "references" / "model-routing.md"
 TOOL_ROUTING = ORCHESTRATOR / "references" / "tool-routing.md"
 CONTENT_ROUTING = ORCHESTRATOR / "references" / "content-routing.md"
+BROWSER_ROUTER = ROOT / "skills" / "browser-automation-router" / "SKILL.md"
+PLAYWRIGHT_SKILL = ROOT / "skills" / "playwright" / "SKILL.md"
+XHS_COMMENT_RESEARCH = ROOT / "skills" / "xhs-comment-research" / "SKILL.md"
+XHS_CHROME_SNIPPETS = ROOT / "skills" / "xhs-comment-research" / "references" / "chrome-snippets.md"
+XHS_AUTOMATION_PUBLISHER = ROOT / "skills" / "xhs-automation-publisher" / "SKILL.md"
 RENDER_PROMPT = ORCHESTRATOR / "scripts" / "render_role_prompt.py"
 VALIDATE_LOOP = ORCHESTRATOR / "scripts" / "validate_role_loop.py"
 ENSURE_FILES = ORCHESTRATOR / "scripts" / "ensure_project_role_files.py"
@@ -105,6 +111,9 @@ def validate_docs(errors: list[str]) -> None:
             "--execution-profile parallel",
             "--prefer-spark --spark-available",
             "docs/technical-highlights.md",
+            "browser-automation-router",
+            "docs/browser-automation.md",
+            "2026-06-11",
         ],
         errors,
     )
@@ -118,6 +127,18 @@ def validate_docs(errors: list[str]) -> None:
             "稳定模型路由与 Spark 机会通道",
             "可量化的 Skill Routing",
             "CodeGraph、开源参考与治理",
+        ],
+        errors,
+    )
+    require_contains(
+        BROWSER_AUTOMATION_DOC,
+        [
+            "Support Floor",
+            "2026-06-11",
+            "Codex in-app Browser",
+            "Codex Chrome extension",
+            "Playwright",
+            "Fail-Closed Checks",
         ],
         errors,
     )
@@ -167,6 +188,8 @@ def validate_docs(errors: list[str]) -> None:
             "gpt-5.4-mini` + `high",
             "3-5 个 worker",
             "--prefer-spark --spark-available",
+            "browser-automation-router",
+            "原生 Chrome",
         ],
         errors,
     )
@@ -220,6 +243,8 @@ def validate_orchestrator(errors: list[str]) -> None:
             "gpt-5.4-mini` + `high",
             "Spark Opportunity Lane",
             "--prefer-spark --spark-available",
+            "Native Browser Routing Rule",
+            "$browser-automation-router",
         ],
         errors,
     )
@@ -264,9 +289,17 @@ def validate_registry(errors: list[str]) -> None:
         errors.append("agent-role-orchestrator registry missing consumed_by_roles: " + "、".join(sorted(missing_roles)))
 
     summary = item.get("summary", "")
-    for needle in ("总控/CEO", "CTO", "内容主编", "Luna 有界执行", "Spark 独立额度机会通道", "显式并行 worker 门禁", "反老登味/反AI味内容闸门", "UI预览图实现路线选择", "来源thread压缩回调闭环", "fail-closed"):
+    for needle in ("总控/CEO", "CTO", "内容主编", "Luna 有界执行", "Spark 独立额度机会通道", "显式并行 worker 门禁", "原生 Browser/Chrome fail-closed 路由", "反老登味/反AI味内容闸门", "UI预览图实现路线选择", "来源thread压缩回调闭环", "fail-closed"):
         if needle not in summary:
             errors.append(f"agent-role-orchestrator summary missing: {needle}")
+
+    browser_item = next((entry for entry in registry if entry.get("name") == "browser-automation-router"), None)
+    if not browser_item:
+        errors.append("registry missing browser-automation-router")
+    else:
+        for needle in ("Browser", "Chrome", "Playwright", "2026-06-11", "fail-closed"):
+            if needle not in browser_item.get("summary", ""):
+                errors.append(f"browser-automation-router summary missing: {needle}")
 
 
 def validate_scripts(errors: list[str]) -> None:
@@ -283,6 +316,10 @@ def validate_scripts(errors: list[str]) -> None:
             "task_dispatch_decision",
             "build_compact_prompt",
             "xhs_automation_publish_gate",
+            "browser_automation_guidance",
+            "BROWSER_ROLES",
+            "$browser-automation-router",
+            "Codex Desktop 2026-06-11",
             "gpt-5.6-terra",
             "gpt-5.6-sol",
             "gpt-5.6-luna",
@@ -305,8 +342,14 @@ def validate_scripts(errors: list[str]) -> None:
         ["gpt-5.6-luna", "gpt-5.3-codex-spark", "gpt-5.4-mini", "gpt-5.6-terra", "gpt-5.6-sol", "Spark Opportunity Lane", "--prefer-spark --spark-available", "--execution-profile parallel", "--disjoint-scope", "--independent-validation"],
         errors,
     )
-    require_contains(TOOL_ROUTING, ["Fail-Closed Scripts", "aggregate_skill_hits.py", "Skill Ledger"], errors)
-    require_contains(CONTENT_ROUTING, ["X MCP Content Research Source", "反老登味 / 反 AI 味内容闸门", "$xhs-automation-publisher"], errors)
+    require_contains(TOOL_ROUTING, ["Fail-Closed Scripts", "aggregate_skill_hits.py", "Skill Ledger", "$browser-automation-router", "$playwright"], errors)
+    require_contains(CONTENT_ROUTING, ["X MCP Content Research Source", "反老登味 / 反 AI 味内容闸门", "$browser-automation-router", "$xhs-automation-publisher"], errors)
+    require_contains(BROWSER_ROUTER, ["Route Order", "2026-06-11", "existing Chrome profile", "Fail-Closed Capability Gate", "Write Gates"], errors)
+    require_contains(PLAYWRIGHT_SKILL, ["deterministic CLI/CI lane", "$browser-automation-router", "Do not import cookies"], errors)
+    require_contains(XHS_COMMENT_RESEARCH, ["$browser-automation-router", "Do not load repository-maintained JavaScript snippets", "Chrome plugin"], errors)
+    require_contains(XHS_AUTOMATION_PUBLISHER, ["$browser-automation-router", "native Chrome surface", "deterministic Xiaohongshu batch/export fallback"], errors)
+    if XHS_CHROME_SNIPPETS.exists():
+        errors.append("xhs-comment-research still contains repository-maintained chrome-snippets.md")
 
     for path, max_lines, max_bytes in ((SKILL_MD, 350, 30000), (ROLE_CARDS, 180, 18000)):
         text = read(path)

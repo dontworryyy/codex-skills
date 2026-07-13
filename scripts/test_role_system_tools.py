@@ -14,6 +14,7 @@ ROOT = Path(__file__).resolve().parents[1]
 PYTHON = sys.executable
 README = ROOT / "README.md"
 TECHNICAL_HIGHLIGHTS = ROOT / "docs" / "technical-highlights.md"
+BROWSER_AUTOMATION_DOC = ROOT / "docs" / "browser-automation.md"
 ENSURE = ROOT / "skills" / "agent-role-orchestrator" / "scripts" / "ensure_project_role_files.py"
 RENDER_PROMPT = ROOT / "skills" / "agent-role-orchestrator" / "scripts" / "render_role_prompt.py"
 VALIDATE_LOOP = ROOT / "skills" / "agent-role-orchestrator" / "scripts" / "validate_role_loop.py"
@@ -22,6 +23,11 @@ AGGREGATE_SKILL_HITS = ROOT / "skills" / "agent-role-orchestrator" / "scripts" /
 VALIDATE_ROLE_SYSTEM = ROOT / "scripts" / "validate_role_system.py"
 ORCHESTRATOR_SKILL = ROOT / "skills" / "agent-role-orchestrator" / "SKILL.md"
 ROLE_CARDS = ROOT / "skills" / "agent-role-orchestrator" / "references" / "role-cards.md"
+BROWSER_ROUTER = ROOT / "skills" / "browser-automation-router" / "SKILL.md"
+PLAYWRIGHT_SKILL = ROOT / "skills" / "playwright" / "SKILL.md"
+XHS_COMMENT_RESEARCH = ROOT / "skills" / "xhs-comment-research" / "SKILL.md"
+XHS_CHROME_SNIPPETS = ROOT / "skills" / "xhs-comment-research" / "references" / "chrome-snippets.md"
+XHS_AUTOMATION_PUBLISHER = ROOT / "skills" / "xhs-automation-publisher" / "SKILL.md"
 
 
 def run(args: list[str], cwd: Path | None = None, check: bool = True) -> subprocess.CompletedProcess[str]:
@@ -647,6 +653,26 @@ def test_readme_stays_scannable_and_current() -> None:
         assert heading in text
     assert "docs/technical-highlights.md" in text
 
+
+def test_native_browser_routing_prefers_plugins_and_keeps_deterministic_fallbacks() -> None:
+    readme = README.read_text(encoding="utf-8")
+    browser_doc = BROWSER_AUTOMATION_DOC.read_text(encoding="utf-8")
+    router = BROWSER_ROUTER.read_text(encoding="utf-8")
+    playwright = PLAYWRIGHT_SKILL.read_text(encoding="utf-8")
+    comments = XHS_COMMENT_RESEARCH.read_text(encoding="utf-8")
+    publisher = XHS_AUTOMATION_PUBLISHER.read_text(encoding="utf-8")
+
+    assert "browser-automation-router" in readme
+    assert "docs/browser-automation.md" in readme
+    assert "2026-06-11" in browser_doc
+    assert "OpenAI does not publish a stable numeric" in router
+    assert "existing Chrome profile" in router
+    assert "deterministic terminal or CI automation" in playwright
+    assert "Do not load repository-maintained JavaScript snippets" in comments
+    assert not XHS_CHROME_SNIPPETS.exists()
+    assert "native Chrome surface" in publisher
+    assert "deterministic Xiaohongshu batch/export fallback" in publisher
+
     highlights = TECHNICAL_HIGHLIGHTS.read_text(encoding="utf-8")
     for heading in (
         "## CEO-First 与负责人分层",
@@ -784,8 +810,11 @@ def test_render_prompt_includes_xhs_automation_publish_gate() -> None:
             "critical",
         ]
     )
+    assert "$browser-automation-router" in xhs.stdout
+    assert "现有登录态、Chrome tab/profile/extension" in xhs.stdout
+    assert "Codex Desktop 2026-06-11" in xhs.stdout
     assert "$xhs-automation-publisher" in xhs.stdout
-    assert "默认先用 --preview" in xhs.stdout
+    assert "脚本降级默认先用 --preview" in xhs.stdout
     assert "publish_pipeline.py 默认会自动点击发布" in xhs.stdout
     assert "click-publish、post-comment-to-feed、respond-comment、note-upvote、note-bookmark" in xhs.stdout
     assert "必须二次明确授权" in xhs.stdout
@@ -869,6 +898,7 @@ def main() -> int:
         test_render_prompt_extreme_cto_uses_supported_xhigh,
         test_orchestrator_entry_files_stay_within_token_budget,
         test_readme_stays_scannable_and_current,
+        test_native_browser_routing_prefers_plugins_and_keeps_deterministic_fallbacks,
         test_render_prompt_routes_owner_ops_dba_and_mechanical_work,
         test_render_prompt_includes_readonly_x_mcp_for_content_roles,
         test_render_prompt_includes_content_tone_gate,
