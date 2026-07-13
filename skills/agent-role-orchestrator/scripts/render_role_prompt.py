@@ -59,6 +59,7 @@ ROLE_TREE_POSITION = {
 TECHNICAL_ROLES = {"架构", "开发", "UI/PPT", "测试", "QA", "安全", "DBA", "运维"}
 CONTENT_ROLES = {"内容主编", "公众号发布", "小红书", "视频"}
 PUBLIC_COPY_ROLES = CONTENT_ROLES | {"UI/PPT"}
+BROWSER_ROLES = {"UI/PPT", "测试", "QA", "小红书"}
 TECHNICAL_EXECUTION_ROLES = {"开发", "UI/PPT", "测试", "QA", "安全", "DBA", "运维"}
 CONTENT_EXECUTION_ROLES = {"公众号发布", "小红书", "视频"}
 OWNER_LAYER_ROLES = {"架构", "内容主编", "知识库", "技能维护", "文档/交付"}
@@ -365,12 +366,22 @@ def content_tone_gate(role: str) -> str:
 """
 
 
+def browser_automation_guidance(role: str) -> str:
+    if role not in BROWSER_ROLES:
+        return ""
+    return """浏览器自动化路由：
+- 先加载 $browser-automation-router；公开页、localhost 和视觉验收优先应用内 Browser，需要现有登录态、Chrome tab/profile/extension 时优先原生 Chrome 插件。
+- 仅在 CI、可复现回归、trace、无人值守批处理或原生插件不可用时使用 $playwright 或平台脚本；不默认维护临时 JavaScript、cookie 导入或 profile-path 启动逻辑。
+- 原生路由最低能力门槛为 Codex Desktop 2026-06-11 发布版本且当前任务实际可见对应插件；缺失时 fail closed 到明确降级方案。
+"""
+
+
 def xhs_automation_publish_gate(role: str) -> str:
     if role != "小红书":
         return ""
     return """小红书自动化发布门禁：
-- 自动化登录、创作者中心填充、发布卡点排查、内容数据导出、搜索详情读取或授权发布时使用 $xhs-automation-publisher。
-- 默认先用 --preview 或 cdp_publish.py fill，让用户在浏览器里复核；publish_pipeline.py 默认会自动点击发布，缺少 --preview 时视为高风险动作。
+- 自动化登录、创作者中心交互填充和发布卡点排查先走 $browser-automation-router 的原生 Chrome 登录态；批量填充、内容数据导出、搜索详情读取或原生插件降级时使用 $xhs-automation-publisher。
+- 原生 Chrome 默认只填充并让用户复核；脚本降级默认先用 --preview 或 cdp_publish.py fill。publish_pipeline.py 默认会自动点击发布，缺少 --preview 时视为高风险动作。
 - click-publish、post-comment-to-feed、respond-comment、note-upvote、note-bookmark 等发布/互动命令必须二次明确授权；不得把评论、点赞收藏、切号、清理账号 Profile 当作普通发布步骤。
 - 本地 cookie、登录二维码、账号配置、Chrome profile 路径和真实账号状态不得写入仓库或回调正文。
 """
@@ -445,7 +456,7 @@ def build_compact_prompt(
 Token Budget Profile：
 - profile：{profile}
 - 策略：{token_profile_strategy(profile)}
-{role_execution_guidance(role)}{execution_profile_guidance(role, args)}{spark_opportunity_guidance(role, args)}{ui_preview_route_guidance(role)}{content_research_guidance(role)}{content_tone_gate(role)}{xhs_automation_publish_gate(role)}
+{role_execution_guidance(role)}{execution_profile_guidance(role, args)}{spark_opportunity_guidance(role, args)}{ui_preview_route_guidance(role)}{browser_automation_guidance(role)}{content_research_guidance(role)}{content_tone_gate(role)}{xhs_automation_publish_gate(role)}
 角色树位置：{ROLE_TREE_POSITION[role]}
 Loop 深度（可折叠路由）：
 - 本次深度：{args.loop_depth}；L0 直达，L1 负责人，L2 负责人拆执行，L3 增加独立门禁。
@@ -561,6 +572,7 @@ Token Budget Profile：
 {execution_profile_guidance(role, args)}
 {spark_opportunity_guidance(role, args)}
 {ui_preview_route_guidance(role)}
+{browser_automation_guidance(role)}
 {content_research_guidance(role)}
 {content_tone_gate(role)}
 {xhs_automation_publish_gate(role)}

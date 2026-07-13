@@ -157,13 +157,17 @@ QA uses adversarial review: try to falsify readiness, inspect negative paths, bo
 
 When a preview image exists, `UI/PPT` must not `不要默认拿 CSS 硬干`. First compare CSS/components, image assets, Canvas/SVG, Three.js/WebGL, Lottie/video, proven libraries, or generated/manual assets. Record the selected route and visual verification evidence before development.
 
+### Native Browser Routing Rule
+
+For browser interaction, load `$browser-automation-router`. Prefer the in-app Browser for public/local visual work and the Chrome extension for an approved existing login/profile. Keep `$playwright` for deterministic CLI/CI evidence and platform scripts for explicit batch/export fallback. If the required native plugin is unavailable, fail closed to a named fallback instead of maintaining ad hoc JavaScript or profile-path logic.
+
 ## Content Routing Gates
 
 Load `references/content-routing.md` only for public writing, platform research, or publishing work.
 
 - `X MCP Content Research Source`: use [official X MCP docs](https://docs.x.com/tools/mcp) for authorized read-only trend, topic, benchmark-account, and public-discussion research. Writes need separate authorization.
 - `Content Tone Gate`: 正式对外内容先过 `反老登味 / 反 AI 味内容闸门`, then use `$humanizer-zh` without changing facts.
-- `Xiaohongshu Automation Publisher Gate`: use `$xhs-automation-publisher`; preview/fill first, and require explicit confirmation for publish or interaction actions.
+- `Xiaohongshu Automation Publisher Gate`: load `$browser-automation-router`; use native Chrome for interactive logged-in work and `$xhs-automation-publisher` for deterministic Python/CDP fallback; preview/fill first, and require explicit confirmation for publish or interaction actions.
 
 ## Source-Window Callback Rule
 

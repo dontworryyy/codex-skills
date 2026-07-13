@@ -1,13 +1,24 @@
 ---
 name: "playwright"
-description: "Use when the task requires automating a real browser from the terminal (navigation, form filling, snapshots, screenshots, data extraction, UI-flow debugging) via `playwright-cli` or the bundled wrapper script."
+description: "Use when browser work requires deterministic terminal or CI automation, repeatable regression runs, traces, snapshots, screenshots, or unattended batch execution via `playwright-cli`. For interactive pages or an existing Chrome login/profile, route through browser-automation-router and Codex's Browser/Chrome plugins first."
 ---
 
 
 # Playwright CLI Skill
 
 Drive a real browser from the terminal using `playwright-cli`. Prefer the bundled wrapper script so the CLI works even when it is not globally installed.
-Treat this skill as CLI-first automation. Do not pivot to `@playwright/test` unless the user explicitly asks for test files.
+Treat this skill as the deterministic CLI/CI lane. For interactive browsing, localhost visual review, or a user's existing Chrome session, load `$browser-automation-router` and prefer the native Browser/Chrome surface when available. Do not pivot to `@playwright/test` unless the user explicitly asks for test files.
+
+## Route Gate
+
+Use this CLI lane when at least one is true:
+
+- the workflow must run in CI or without a user-owned browser session;
+- repeatability, traces, scripted assertions, or durable regression artifacts matter;
+- the native Browser/Chrome plugin is unavailable and the user accepts the fallback;
+- the repository already owns Playwright tests that should be extended.
+
+Do not use this lane merely to reuse an existing Chrome login. Do not import cookies, copy a Chrome profile, or replace a supported Browser/Chrome interaction with custom JavaScript.
 
 ## Prerequisite check (required)
 
