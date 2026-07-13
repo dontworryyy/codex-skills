@@ -1,6 +1,6 @@
 ---
 name: xhs-comment-research
-description: Read and analyze Xiaohongshu/Rednote comments from the user's logged-in Chrome session. Use when the user asks to crawl, collect, export, summarize, classify, or use 小红书评论区 / XHS comments for content planning, follow-up posts, audience research, reply strategy, or 引流文案. Works best for already-open note pages or creator-manager note links.
+description: Read and analyze Xiaohongshu/Rednote comments from the user's logged-in Chrome session through Codex's native Chrome browser surface. Use when the user asks to collect, export, summarize, classify, or use 小红书评论区 / XHS comments for content planning, follow-up posts, audience research, reply strategy, or 引流文案. Works best for already-open note pages or creator-manager note links.
 ---
 
 # XHS Comment Research
@@ -17,15 +17,15 @@ Use this skill to turn Xiaohongshu comment threads into content intelligence.
 
 ## Browser Path
 
-Use the Chrome plugin when comments require the user's logged-in session.
+Load `$browser-automation-router`, then use the Chrome plugin when comments require the user's logged-in session.
 
-1. Connect to Chrome with the plugin's `browser-client.mjs`.
-2. Read `await browser.documentation()` once per fresh browser session.
-3. Use `browser.user.openTabs()` to find an already-open note page when possible.
-4. Claim the exact tab with `browser.user.claimTab(tabInfo)`.
-5. Prefer Playwright `domSnapshot()` or read-only `evaluate()` for extraction.
+1. Confirm the Chrome plugin is available and the user has approved access to the intended tab.
+2. Reuse an already-open note or creator-manager tab when possible.
+3. Verify the visible account, note title, and URL before collecting data.
+4. Prefer the plugin's current high-level snapshot, semantic locator, scroll, click, and text-reading operations.
+5. Do not load repository-maintained JavaScript snippets or hard-code a selector recipe before inspecting the live page.
 6. Use clicks only for harmless UI expansion such as "展开 ... 条回复".
-7. End with `browser.tabs.finalize({ keep: [] })` unless the user needs the page kept.
+7. If the plugin is unavailable, declare the fallback instead of launching a copied Chrome profile or reading browser state from disk.
 
 ## Extraction Workflow
 
@@ -35,9 +35,9 @@ Use the Chrome plugin when comments require the user's logged-in session.
    - URL
    - displayed comment count
    - current loaded comment count
-3. Scroll the `.note-scroller` container from top to bottom in small batches.
-4. Repeatedly expand visible reply buttons matching `展开` / `条回复` when present.
-5. Extract `.comment-item` records:
+3. Identify the live comment scroll region from the current page snapshot and move from top to bottom in small batches.
+4. Repeatedly expand visible reply controls when present.
+5. Extract comment records from the visible page structure:
    - `id`
    - `isSub`
    - `name`

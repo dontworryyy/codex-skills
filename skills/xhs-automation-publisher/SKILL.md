@@ -1,11 +1,11 @@
 ---
 name: xhs-automation-publisher
-description: Use when the Xiaohongshu/Rednote role needs authorized browser automation for login checks, creator-center preview fill, publish-flow blockers, final posting, content search, content-data export, or comment/engagement actions after explicit user approval.
+description: Use when the Xiaohongshu/Rednote role needs authorized browser automation for login checks, creator-center preview fill, publish-flow blockers, final posting, content search, content-data export, or comment/engagement actions after explicit user approval. Prefer Codex's native Browser/Chrome surface for interactive logged-in work and retain the vendored Python/CDP commands for deterministic batch/export fallback.
 ---
 
 # XHS Automation Publisher
 
-This skill vendors `white0dew/XiaohongshuSkills` as the Xiaohongshu browser automation layer. It uses Python + Chrome DevTools Protocol (CDP) for login checks, preview filling, authorized publishing, content search, creator data export, and optional interaction commands.
+This skill vendors `white0dew/XiaohongshuSkills` as a deterministic Xiaohongshu batch/export fallback. Interactive logged-in work should first load `$browser-automation-router` and use the Codex Chrome extension when available. The vendored Python + Chrome DevTools Protocol (CDP) commands remain useful for repeatable preview filling, creator data export, and explicit batch contracts.
 
 ## Use With The Local Role System
 
@@ -15,17 +15,24 @@ This skill vendors `white0dew/XiaohongshuSkills` as the Xiaohongshu browser auto
 
 ## Hard Gates
 
-- Default to preview/fill, not final posting. Prefer `publish_pipeline.py --preview` or `cdp_publish.py fill`.
+- Default to preview/fill, not final posting. Prefer the native Chrome surface for an interactive reviewable fill; use `publish_pipeline.py --preview` or `cdp_publish.py fill` when a deterministic script fallback is required.
 - `publish_pipeline.py` defaults to clicking publish when `--preview` is absent. Treat that as high risk.
 - Do not run `click-publish`, `publish`, `post-comment-to-feed`, `respond-comment`, `note-upvote`, `note-unvote`, `note-bookmark`, `note-unbookmark`, `remove-account`, `re-login`, or `switch-account` without a fresh explicit user approval for that exact action.
 - Do not store cookies, account tokens, login QR payloads, real account names, or Chrome profile paths in this repo.
 - Do not use this skill for scraping or interaction at scale. Respect platform rules, rate limits, and account risk.
 - Stop before final publish if the target account, media list, title, body, tags, or publish time is uncertain.
 
+## Surface Selection
+
+1. Use the Codex Chrome extension for an existing signed-in profile, visible creator-center review, one-off form filling, and user-observed troubleshooting.
+2. Use the in-app Browser only when its separate login state is acceptable; it does not inherit the user's Chrome profile.
+3. Use the vendored Python/CDP commands for batch export, a stable command contract, unattended repeatability, or an explicit fallback when native plugins are unavailable.
+4. Do not launch or copy a local Chrome profile merely to bypass a missing native plugin. Do not commit profile paths or login state.
+
 ## Safe Default Flow
 
 1. Confirm target account, desired mode, media files, and whether final posting is authorized.
-2. Check/login only when requested:
+2. For interactive work, verify the native Chrome surface and active account. For a script fallback, check/login only when requested:
 
 ```powershell
 python scripts/cdp_publish.py check-login

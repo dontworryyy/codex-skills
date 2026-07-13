@@ -137,6 +137,7 @@ Token Budget Profile 控制 prompt 体积：`compact` 用于 L0/L1 小闭环，`
 | 任务 | 推荐入口 |
 | --- | --- |
 | 技术规划、实现、评审、发布 | `架构 / CTO` + `gstack-*`，执行角色按任务加载调查、Review、QA、Ship 方法 |
+| 浏览器交互与登录态复用 | `browser-automation-router`：应用内 Browser 处理公开页/localhost，Chrome 插件复用现有登录态；Playwright 留给 CI/回归 |
 | UI、网页 PPT、社交卡 | `UI/PPT` + `design-taste-frontend`、`guizang-*`；有参考图先做 `预览图实现路线选择` |
 | 公众号 | `wechat-ai-app-ops`、`wechat-tech-writer`、`wechat-article-formatter` |
 | 小红书 | `xhs-visual-director`、`xhs-publish-assistant`、`xhs-automation-publisher`、`xhs-comment-research`、`cheat-on-content` |
@@ -144,6 +145,8 @@ Token Budget Profile 控制 prompt 体积：`compact` 用于 L0/L1 小闭环，`
 | 测试与安全 | `test-case-report-builder`、`playwright`、`authorized-blackbox-web-security` 或 Codex Security 系列 |
 | 运维与数据库 | 只读诊断 skills + 运维/DBA 角色；写操作和危险动作单独授权 |
 | 知识、交付、技能治理 | 知识库、文档/交付、技能维护角色按边界处理 |
+
+浏览器能力从 Codex Desktop `2026-06-11` 发布版本起作为最低能力门槛，并且必须在当前任务中实际检测到 Browser/Chrome 插件；完整路由和旧版降级见 [docs/browser-automation.md](docs/browser-automation.md)。
 
 内容分支保留三道明确门禁：
 

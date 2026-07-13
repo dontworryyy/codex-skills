@@ -24,7 +24,24 @@
       "知识库",
       "技能维护"
     ],
-    "summary": "总控/CEO 先行的多窗口角色编排，含可折叠 L0-L3 loop 深度、CEO 负责人层交互、CTO 技术闭环、开发负责人/Dev Lead 与窗口内一次性分级 subagent、Terra 默认/Sol 风险升级/Luna 有界执行/Mini 机械执行四级稳定路由、Spark 独立额度机会通道、显式并行 worker 门禁、QA 对抗式审查、内容主编分流、小红书确认图/反模板视觉 gate、gzh-design/manifest 公众号 gate、content-model handoff、X MCP 只读内容研究源、反老登味/反AI味内容闸门、UI预览图实现路线选择、fail-closed 提示词/台账/回调校验脚本、AGENTS.md/role-windows bootstrap、CodeGraph 状态检查、开源参考扫描、多方案选型、项目台账入口守卫、开发第一性原理、源窗口回调、来源thread压缩回调闭环、技能命中聚合治理、Token 压缩交接卡、技能维护角色和可复用优化沉淀提示词"
+    "summary": "总控/CEO 先行的多窗口角色编排，含可折叠 L0-L3 loop 深度、CEO 负责人层交互、CTO 技术闭环、开发负责人/Dev Lead 与窗口内一次性分级 subagent、Terra 默认/Sol 风险升级/Luna 有界执行/Mini 机械执行四级稳定路由、Spark 独立额度机会通道、显式并行 worker 门禁、QA 对抗式审查、内容主编分流、小红书确认图/反模板视觉 gate、gzh-design/manifest 公众号 gate、content-model handoff、X MCP 只读内容研究源、原生 Browser/Chrome fail-closed 路由、反老登味/反AI味内容闸门、UI预览图实现路线选择、fail-closed 提示词/台账/回调校验脚本、AGENTS.md/role-windows bootstrap、CodeGraph 状态检查、开源参考扫描、多方案选型、项目台账入口守卫、开发第一性原理、源窗口回调、来源thread压缩回调闭环、技能命中聚合治理、Token 压缩交接卡、技能维护角色和可复用优化沉淀提示词"
+  },
+  {
+    "name": "browser-automation-router",
+    "path": "skills/browser-automation-router",
+    "status": "active",
+    "origin_type": "local",
+    "upstream_url": null,
+    "maintenance": "local-owned",
+    "consumed_by_roles": [
+      "开发",
+      "UI/PPT",
+      "内容主编",
+      "小红书",
+      "测试",
+      "QA"
+    ],
+    "summary": "Codex 应用内 Browser、Chrome 登录态复用、Playwright CLI 和平台脚本之间的 fail-closed 浏览器自动化路由，含 2026-06-11 最低能力门槛"
   },
   {
     "name": "delivery-document-package",
@@ -242,13 +259,13 @@
     "status": "active",
     "origin_type": "external-github",
     "upstream_url": "https://github.com/white0dew/XiaohongshuSkills",
-    "source_note": "Vendored from upstream HEAD 988fd2efac377cc6dab3a630ed157336b5ebfb03; SKILL.md adapted for this role system so preview/fill is default and publish, comment, engagement, account-switch, cookie-clear, and profile-delete actions require explicit user approval.",
+    "source_note": "Vendored from upstream HEAD 988fd2efac377cc6dab3a630ed157336b5ebfb03; SKILL.md adapted for this role system so native Chrome is preferred for interactive login state, Python/CDP remains the deterministic batch/export fallback, preview/fill is default, and publish, comment, engagement, account-switch, cookie-clear, and profile-delete actions require explicit user approval.",
     "maintenance": "vendored-adapted",
     "consumed_by_roles": [
       "内容主编",
       "小红书"
     ],
-    "summary": "小红书/Rednote Chrome CDP 自动化登录检查、创作者中心预览填充、发布卡点排查、内容数据导出、搜索/详情读取和授权后的最终发布/互动门禁"
+    "summary": "小红书/Rednote 原生 Chrome 交互优先，Python/CDP 承担批量预览、内容数据导出、搜索/详情读取和确定性降级，发布/互动保持二次授权门禁"
   },
   {
     "name": "xhs-comment-research",
@@ -261,7 +278,7 @@
       "小红书",
       "内容主编"
     ],
-    "summary": "读取和分析小红书/Rednote 评论，用于内容选题、受众研究和回复策略"
+    "summary": "通过 Codex 原生 Chrome 登录态读取和分析小红书/Rednote 评论，不维护仓库内 JS selector 片段，用于内容选题、受众研究和回复策略"
   },
   {
     "name": "wechat-ai-app-ops",
@@ -822,7 +839,7 @@
       "QA",
       "开发"
     ],
-    "summary": "终端 Playwright CLI 浏览器自动化"
+    "summary": "用于 CI、可复现回归、trace 和无人值守批处理的确定性 Playwright CLI 浏览器自动化；交互式浏览器任务优先走原生 Browser/Chrome"
   },
   {
     "name": "post-deployment-readonly-verification",

@@ -22,16 +22,16 @@
 
 - `总控`: `agent-role-orchestrator`、`gstack-office-hours`、`gstack-plan-ceo-review`、`startup-pressure-test`
 - `架构`: `gstack`、`gstack-spec`、`gstack-autoplan`、`gstack-plan-*`
-- `开发`: `gstack-investigate`、`gstack-review`、`gstack-ship`、`gstack-health`、`gstack-devex-review`、`gstack-careful`、`gstack-guard`
-- `UI/PPT`: `design-taste-frontend`、`guizang-ppt-skill`、`xhs-visual-director`、`guizang-social-card-skill`、`photo-to-cute-3d-toy`、`playwright`
+- `开发`: `gstack-investigate`、`gstack-review`、`gstack-ship`、`gstack-health`、`gstack-devex-review`、`gstack-careful`、`gstack-guard`；交互式浏览器任务先用 `browser-automation-router`，确定性回归再用 `playwright`
+- `UI/PPT`: `design-taste-frontend`、`guizang-ppt-skill`、`xhs-visual-director`、`guizang-social-card-skill`、`photo-to-cute-3d-toy`、`browser-automation-router`；CI/回归按需用 `playwright`
 - `内容主编`: 管理公众号发布、小红书、视频和 UI/PPT 视觉资产协作；负责内容 skill 路由、正式对外文案 gate、账号边界和发布授权边界；正式文本生产可复用 `content-model-handoff` 分离 raw 起草、主编 gate 和用户终审
 - `公众号发布`: `wechat-ai-app-ops` 承接公众号 AI 应用文章、周刊连续性、草稿箱 API、gzh-design 排版交接和 manifest 发布 gate；技术选题初稿可用 `wechat-tech-writer`，HTML 排版旧流程可用 `wechat-article-formatter`，正式 gzh 主题排版优先用本地可用的 `gzh-design`；正式对外文案输出前必须复用 `humanizer-zh`，视觉资产可复用 `guizang-social-card-skill`
-- `小红书`: 小红书/Rednote 笔记和授权发布角色；内容实验和增长判断可复用 `cheat-on-content`，评论研究可复用 `xhs-comment-research`，标题、正文和 caption 在正式输出前先按需使用 `social-text-websense-gate` 防 README 腔/发布会腔/机械堆网词，再复用 `humanizer-zh`；用户手改文案后的风格规则沉淀可复用 `content-style-calibration-loop`；新图文视觉、封面重做和完整视觉改版默认复用 `xhs-visual-director`，必须先做视觉确认图并通过反模板 gate 后再批量生成；小型旧流程社交卡可复用 `guizang-social-card-skill`，发布前复制包可复用 `xhs-publish-assistant`，登录检查、预览填充、发布卡点排查和明确授权后的发布自动化可复用 `xhs-automation-publisher`，但默认预览/填充，点击发布和互动动作必须二次授权
+- `小红书`: 小红书/Rednote 笔记和授权发布角色；内容实验和增长判断可复用 `cheat-on-content`，评论研究可复用 `xhs-comment-research`，标题、正文和 caption 在正式输出前先按需使用 `social-text-websense-gate` 防 README 腔/发布会腔/机械堆网词，再复用 `humanizer-zh`；用户手改文案后的风格规则沉淀可复用 `content-style-calibration-loop`；新图文视觉、封面重做和完整视觉改版默认复用 `xhs-visual-director`，必须先做视觉确认图并通过反模板 gate 后再批量生成；小型旧流程社交卡可复用 `guizang-social-card-skill`，发布前复制包可复用 `xhs-publish-assistant`；涉及登录态的交互先用 `browser-automation-router` 选择 Chrome 原生通道，`xhs-automation-publisher` 的 Python/CDP 只承担批处理、导出和确定性降级，点击发布和互动动作仍须二次授权
 - `story-deslop`: 从 `worldwonderer/oh-story-claudecode` 只抽取 `skills/story-deslop` 子 skill；仅保留去 AI 味规则、references 和标点脚本，不引入 story setup、扫榜、拆文、写作、封面、agents、hooks 或浏览器能力
 - `运维`: Hermes-owned 的部署前检查、部署后验证、Hermes cron、Python 服务和代理诊断类 skill；数据库实例主因转 `DBA`
 - `DBA`: 由 `agent-role-orchestrator` 的角色卡定义；当前没有独立 skill 目录，默认只读收集数据库实例证据，危险动作必须二次授权
-- `测试`: `test-case-report-builder`、`playwright`；被指派时承接压力/负载/性能/并发验证
-- `QA`: `gstack-qa-only`、`gstack-qa`、`gstack-canary`、`gstack-review`、`playwright`，可按需使用 Hermes-owned 只读验证 skill，但默认不负责测试用例/测试报告资产
+- `测试`: `test-case-report-builder`、`browser-automation-router`；CI、可复现回归和 trace 使用 `playwright`；被指派时承接压力/负载/性能/并发验证
+- `QA`: `gstack-qa-only`、`gstack-qa`、`gstack-canary`、`gstack-review`、`browser-automation-router`，CI/回归按需用 `playwright`，也可按需使用 Hermes-owned 只读验证 skill，但默认不负责测试用例/测试报告资产
 - `安全`: `gstack-cso`、`authorized-blackbox-web-security`
 - `文档/交付`: `delivery-document-package`，可按需配合 `gstack-document-*`
 - `知识库`: 由 `agent-role-orchestrator` 的角色卡定义；当前没有独立 skill 目录
